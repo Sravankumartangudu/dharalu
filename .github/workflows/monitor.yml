@@ -1,0 +1,49 @@
+name: WheatWise monitor
+
+on:
+  schedule:
+    - cron: "0 7 * * *"    # 12:30 IST - after morning mandi reports
+    - cron: "0 14 * * *"   # 19:30 IST - after the day's reports
+  workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: "Re-seed price history first (slow with the sample key)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wheatwise
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      DATA_GOV_IN_KEY: ${{ secrets.DATA_GOV_IN_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      TZ: Asia/Kolkata
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install optional AI briefing library
+        run: pip install --quiet anthropic
+      - name: Seed history
+        if: ${{ inputs.bootstrap }}
+        run: python agent/bootstrap.py
+      - name: Save seeded history
+        if: ${{ inputs.bootstrap && !cancelled() }}
+        run: ./.github/save.sh "data: seed history"
+      - name: Fetch, analyse, alert
+        run: python agent/run.py
+      - name: Save data
+        # Runs even if the analysis failed, so fetched prices are never thrown away.
+        if: ${{ !cancelled() }}
+        run: ./.github/save.sh "data: $(date +'%Y-%m-%d %H:%M IST')"

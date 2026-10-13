@@ -1,0 +1,195 @@
+{
+  "business": {
+    "location": "Srikakulam, Andhra Pradesh",
+    "unit": "Rs per quintal (100 kg)",
+    "note": "Andhra Pradesh has no wheat mandi data (AP buys wheat from other states), so Srikakulam prices are worked out as source-mandi price + mandi fee + freight + handling."
+  },
+  "msp": {
+    "value": 2585,
+    "season": "RMS 2026-27 (wheat harvested Mar-Jun 2026)",
+    "next_value": 2610,
+    "next_season": "RMS 2027-28 (wheat harvested Mar-Jun 2027)",
+    "history": [
+      {
+        "from": "2022-03-01",
+        "value": 2015,
+        "season": "RMS 2022-23"
+      },
+      {
+        "from": "2023-03-01",
+        "value": 2125,
+        "season": "RMS 2023-24"
+      },
+      {
+        "from": "2024-03-01",
+        "value": 2275,
+        "season": "RMS 2024-25"
+      },
+      {
+        "from": "2025-03-01",
+        "value": 2425,
+        "season": "RMS 2025-26"
+      },
+      {
+        "from": "2026-03-01",
+        "value": 2585,
+        "season": "RMS 2026-27"
+      },
+      {
+        "from": "2027-03-01",
+        "value": 2610,
+        "season": "RMS 2027-28"
+      }
+    ],
+    "note": "history = which MSP was the floor on each date (used to replay past days fairly). Each Sep/Oct the Cabinet announces the next MSP: add a row for 1 Mar next year and update value/next_value."
+  },
+  "omss": {
+    "reserve_price": null,
+    "active_from": null,
+    "note": "FCI Open Market Sale Scheme (OMSS) wheat reserve price in Rs/qtl. When FCI is selling, open-market prices rarely stay much above this + freight. Set reserve_price and active_from (YYYY-MM-DD, first auction) when sales start; set both back to null when they stop."
+  },
+  "freight": {
+    "rate_per_qtl_per_km": 0.3,
+    "note": "Truck freight assumption (Rs 3.0 per tonne-km). Replace with your transporter's real quote - or set freight_override on a market."
+  },
+  "costs": {
+    "source_mandi_fee_pct": 1.7,
+    "handling_per_qtl": 25,
+    "bags_per_qtl": 15,
+    "brokerage_per_qtl": 10,
+    "note": "Mandi fee (MP mandi tax ~1.5% + nirashrit ~0.2%), loading/unloading, gunny bags, commission."
+  },
+  "carrying": {
+    "interest_pct_per_month": 1.25,
+    "storage_per_qtl_per_month": 8,
+    "loss_pct_per_month": 0.25,
+    "note": "Cost of holding stock: interest on money, godown rent, moisture/rodent loss. A buy-and-hold only pays if the price rise beats this."
+  },
+  "source_markets": [
+    {
+      "name": "Jabalpur APMC",
+      "old_name": "Jabalpur",
+      "state": "Madhya Pradesh",
+      "km": 960,
+      "long_history": true
+    },
+    {
+      "name": "Katni APMC",
+      "old_name": "Katni",
+      "state": "Madhya Pradesh",
+      "km": 1000
+    },
+    {
+      "name": "Narsinghpur APMC",
+      "old_name": "Narsinghpur",
+      "state": "Madhya Pradesh",
+      "km": 1000
+    },
+    {
+      "name": "Damoh APMC",
+      "old_name": "Damoh",
+      "state": "Madhya Pradesh",
+      "km": 1040
+    },
+    {
+      "name": "Satna APMC",
+      "old_name": "Satna",
+      "state": "Madhya Pradesh",
+      "km": 1050
+    },
+    {
+      "name": "Rewa APMC",
+      "old_name": "Rewa",
+      "state": "Madhya Pradesh",
+      "km": 1050
+    },
+    {
+      "name": "Itarsi APMC",
+      "old_name": "Itarsi",
+      "state": "Madhya Pradesh",
+      "km": 1080
+    },
+    {
+      "name": "Sagar APMC",
+      "old_name": "Sagar",
+      "state": "Madhya Pradesh",
+      "km": 1100
+    },
+    {
+      "name": "Harda APMC",
+      "old_name": "Harda",
+      "state": "Madhya Pradesh",
+      "km": 1150
+    },
+    {
+      "name": "Bhopal APMC",
+      "old_name": "Bhopal",
+      "state": "Madhya Pradesh",
+      "km": 1150
+    },
+    {
+      "name": "Sehore APMC",
+      "old_name": "Sehore",
+      "state": "Madhya Pradesh",
+      "km": 1190
+    },
+    {
+      "name": "Dewas APMC",
+      "old_name": "Dewas",
+      "state": "Madhya Pradesh",
+      "km": 1320
+    },
+    {
+      "name": "Indore APMC",
+      "old_name": "Indore",
+      "state": "Madhya Pradesh",
+      "km": 1350,
+      "long_history": true
+    },
+    {
+      "name": "Ujjain APMC",
+      "old_name": "Ujjain",
+      "state": "Madhya Pradesh",
+      "km": 1400
+    },
+    {
+      "name": "Kota APMC",
+      "old_name": "Kota",
+      "state": "Rajasthan",
+      "km": 1650,
+      "long_history": true
+    },
+    {
+      "name": "APMC Nagpur",
+      "old_name": "Nagpur",
+      "state": "Maharashtra",
+      "km": 850
+    }
+  ],
+  "state_km": {
+    "Madhya Pradesh": 1150,
+    "Chattisgarh": 560,
+    "Chhattisgarh": 560,
+    "Maharashtra": 1000,
+    "Rajasthan": 1650,
+    "Uttar Pradesh": 1450,
+    "Gujarat": 1750,
+    "Bihar": 1100,
+    "Punjab": 2000,
+    "Haryana": 1900,
+    "Uttarakhand": 1850
+  },
+  "consumer_states": [
+    "Karnataka",
+    "West Bengal",
+    "Odisha",
+    "Telangana",
+    "Tamil Nadu",
+    "Kerala",
+    "Assam"
+  ],
+  "alerts": {
+    "daily_move_pct": 2.5,
+    "weekly_summary_weekday": 0
+  }
+}

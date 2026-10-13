@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+.env
+# your own trade exports - keep private
+*trades*.csv
+
+# Mac app build output
+mac/WheatWise.app/
+mac/dist/
+mac/Icon/AppIcon.iconset/

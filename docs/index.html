@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WheatWise - wheat buy/sell agent for Srikakulam</title>
+<meta name="description" content="Daily wheat price monitor, forecast and buy/sell signal with proof, for a wheat trader in Srikakulam, Andhra Pradesh.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+</head>
+<body>
+<header>
+  <h1>🌾 WheatWise</h1>
+  <div class="sub" id="asof">Loading…</div>
+  <div class="spacer"></div>
+  <a class="btn" href="https://github.com/Sravankumartangudu/wheatwise/blob/main/guide/USER_GUIDE.md" target="_blank" rel="noopener" title="How to use WheatWise">Help</a>
+  <button id="share" title="Share this page">Share</button>
+  <button id="theme" title="Light / dark">◐</button>
+</header>
+<nav role="tablist" id="tabs">
+  <button role="tab" data-tab="today" aria-selected="true">Today · ఈరోజు</button>
+  <button role="tab" data-tab="forecast">Forecast · అంచనా</button>
+  <button role="tab" data-tab="pre">Before you trade</button>
+  <button role="tab" data-tab="trades">My trades · after</button>
+  <button role="tab" data-tab="record">Agent track record</button>
+  <button role="tab" data-tab="mandis">Mandis & landed cost</button>
+  <button role="tab" data-tab="watch">What to watch</button>
+</nav>
+<main>
+  <section id="today"></section>
+  <section id="forecast" hidden></section>
+  <section id="pre" hidden></section>
+  <section id="trades" hidden></section>
+  <section id="record" hidden></section>
+  <section id="mandis" hidden></section>
+  <section id="watch" hidden></section>
+</main>
+<footer>
+  Prices: Agmarknet via data.gov.in (Rs per quintal). Updated automatically twice a day.
+  This is decision support, not financial advice - always check with your local market before trading.
+  Your trades are stored only in this browser.
+  <a href="https://github.com/Sravankumartangudu/wheatwise#readme" target="_blank" rel="noopener">Guide &amp; source</a>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>
