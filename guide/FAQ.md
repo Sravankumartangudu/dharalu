@@ -18,7 +18,7 @@ See [HOW_IT_WORKS.md](HOW_IT_WORKS.md#6-the-score).
 **The call changed from yesterday. Why?**
 Compare the proof table with yesterday's (or read the Telegram alert). Usually one rule crossed its threshold. For example, the price moved into the dearest 15% of the year.
 
-**The track record says only 2 HOLD days last year.**
+**The track record shows only a handful of HOLD days last year.**
 HOLD needs a specific mix of rules, so it's rarer than the others. That's why the dashboard also shows the **whole history since 2016**, and quotes it when the last year has fewer than 10 such days.
 
 **Why no Srikakulam mandi price?**

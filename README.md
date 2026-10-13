@@ -25,7 +25,7 @@ WheatWise watches wheat prices twice a day in the mandis that supply Srikakulam,
 | 🔴 **SELL** | −1 / −2 | Avoid stocking - buy hand-to-mouth | Sell gradually - prices may soften |
 | 🔴 **STRONG SELL** | −3 or less | Do not stock now | Sell / clear stock now |
 
-**HOLD vs WAIT:** both have a total score of 0. It is HOLD when the two forward-looking rules (the 30-day forecast and the season) still point up. That usually means today's price is too high to buy, but prices should rise from here, so keep what you have. In the replay since 2016, HOLD days beat the holding cost 50% of the time, against 45% for WAIT and 29% for SELL.
+**HOLD vs WAIT:** both have a total score of 0. It is HOLD when the two forward-looking rules (the 30-day forecast and the season) still point up. That usually means today's price is too high to buy, but prices should rise from here, so keep what you have. In the replay since 2016, HOLD days beat the holding cost 42% of the time, against 36% for WAIT and 33% for SELL.
 
 ## How a call is made - and proved
 

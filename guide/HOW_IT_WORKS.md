@@ -77,7 +77,7 @@ That percentile range becomes the **likely range** on the dashboard, widened for
 
 **Why HOLD is split from WAIT:** a 0 can mean "nothing is happening". It can also mean "the price is high today (the price-level and trend rules are negative) but the outlook is still up (forecast and season are positive)". For someone holding stock those are different situations.
 
-In the replay since 2016, HOLD days averaged a +3.0% move in 30 days and beat the holding cost 50% of the time. WAIT days averaged +0.9% (45%) and SELL days −1.3% (29%).
+In the replay since 2016, HOLD days (38 of them) averaged a +1.0% move in 30 days and beat the holding cost 42% of the time. WAIT days averaged +0.4% (36%) and SELL days −0.5% (33%).
 
 ## 7. Track record - no peeking
 
