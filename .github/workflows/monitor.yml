@@ -40,10 +40,12 @@ jobs:
         run: python agent/bootstrap.py
       - name: Save seeded history
         if: ${{ inputs.bootstrap && !cancelled() }}
-        run: ./.github/save.sh "data: seed history"
+        run: |
+          ./.github/save.sh "data: seed history"
       - name: Fetch, analyse, alert
         run: python agent/run.py
       - name: Save data
         # Runs even if the analysis failed, so fetched prices are never thrown away.
         if: ${{ !cancelled() }}
-        run: ./.github/save.sh "data: $(date +'%Y-%m-%d %H:%M IST')"
+        run: |
+          ./.github/save.sh "data: $(date +'%Y-%m-%d %H:%M IST')"
