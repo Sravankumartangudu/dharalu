@@ -39,6 +39,25 @@ enum Settings {
         get { d.object(forKey: "minutes") as? Int ?? 30 }
         set { d.set(newValue, forKey: "minutes") }
     }
+    /// "system" (follow macOS, Auto included), "light" or "dark".
+    static var appearance: String {
+        get { let v = d.string(forKey: "appearance") ?? "system"; return ["system", "light", "dark"].contains(v) ? v : "system" }
+        set { d.set(newValue, forKey: "appearance") }
+    }
+    static func applyAppearance() {
+        switch appearance {
+        case "light": NSApp.appearance = NSAppearance(named: .aqua)
+        case "dark": NSApp.appearance = NSAppearance(named: .darkAqua)
+        default: NSApp.appearance = nil
+        }
+    }
+    /// JS that makes the dashboard page match the choice (same `ww.theme` key the page's own toggle uses).
+    static var themeScript: String {
+        let v = appearance
+        return v == "system"
+            ? "try{localStorage.removeItem('ww.theme');delete document.documentElement.dataset.theme;}catch(e){}"
+            : "try{localStorage.setItem('ww.theme','\"\(v)\"');document.documentElement.dataset.theme='\(v)';}catch(e){}"
+    }
     static var lastSignal: String? {
         get { d.string(forKey: "lastSignal") }
         set { d.set(newValue, forKey: "lastSignal") }
@@ -150,6 +169,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
             if self.isStale { return ("warn", "data is \(self.ageHours)h old") }
             return ("ok", "\(l.signal.label) \(rs(l.benchmark.price))")
         }
+        Settings.applyAppearance()
         installEditMenu()
         let menu = NSMenu()
         menu.delegate = self
@@ -381,6 +401,16 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         let note = action("Notify on Signal Change / Big Moves", #selector(toggleNotify)); note.state = Settings.notify ? .on : .off
         let login = action("Launch at Login", #selector(toggleLogin)); login.state = SMAppService.mainApp.status == .enabled ? .on : .off
         m.addItem(price); m.addItem(note); m.addItem(login)
+        let look = NSMenuItem(title: "Appearance", action: nil, keyEquivalent: "")
+        let lm = NSMenu()
+        for (key, title) in [("system", "System (follows macOS)"), ("light", "Light"), ("dark", "Dark")] {
+            let x = action(title, #selector(setAppearance(_:)))
+            x.representedObject = key
+            x.state = Settings.appearance == key ? .on : .off
+            lm.addItem(x)
+        }
+        look.submenu = lm
+        m.addItem(look)
         let every = NSMenuItem(title: "Check Every", action: nil, keyEquivalent: "")
         let em = NSMenu()
         for mins in [15, 30, 60, 120] {
@@ -426,6 +456,12 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
 
     @objc func togglePrice() { Settings.showPrice.toggle(); updateTitle() }
     @objc func toggleNotify() { Settings.notify.toggle() }
+    @objc func setAppearance(_ s: NSMenuItem) {
+        guard let v = s.representedObject as? String else { return }
+        Settings.appearance = v
+        Settings.applyAppearance()
+        dashboard.applyTheme()
+    }
     @objc func setMinutes(_ s: NSMenuItem) { Settings.minutes = s.tag; schedule() }
 
     @objc func toggleLogin() {
@@ -493,6 +529,8 @@ final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDel
         if window == nil {
             let cfg = WKWebViewConfiguration()
             cfg.websiteDataStore = .default()   // keeps trades (localStorage) between launches
+            // Apply the Appearance choice before the page's own script reads its saved theme.
+            cfg.userContentController.addUserScript(WKUserScript(source: Settings.themeScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
             let w = WKWebView(frame: .zero, configuration: cfg)
             w.navigationDelegate = self
             w.uiDelegate = self
@@ -516,6 +554,14 @@ final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDel
         NSApp.setActivationPolicy(.regular)   // Dock icon + ⌘-Tab while the window is open
         NSApp.activate(ignoringOtherApps: true)
         window?.makeKeyAndOrderFront(nil)
+    }
+
+    /// Re-theme the open page at once (the script is re-read on every load, so it is always current).
+    func applyTheme() {
+        guard let w = web else { return }
+        w.configuration.userContentController.removeAllUserScripts()
+        w.configuration.userContentController.addUserScript(WKUserScript(source: Settings.themeScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        w.evaluateJavaScript(Settings.themeScript + ";if(typeof renderAll==='function'){try{renderAll()}catch(e){}}", completionHandler: nil)
     }
 
     func windowWillClose(_ n: Notification) { NSApp.setActivationPolicy(.accessory) }

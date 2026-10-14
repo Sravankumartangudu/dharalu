@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0 - 15 Oct 2026
+
+**Mac app**
+- Settings › Appearance: System (follows macOS, Auto included), Light or Dark. Applies at once to the dashboard window and the app's own windows.
+
+**Dashboard**
+- No change: in a browser it still follows the system, with the existing ◐ toggle.
+
 ## 1.0.0 - 13 Oct 2026
 
 First release.
