@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 - 15 Oct 2026
+
+- **Sharper small icons.** At 16–64 px the app icon's drop shadow filled the whole image, leaving a faint grey
+  square behind it in Finder lists, Spotlight and the menu. Every size is now shrunk from the full-size drawing,
+  so the shadow keeps its proportions and the corners stay clear. The icon itself is unchanged.
+
 ## 1.2.0 - 15 Oct 2026
 
 **Mac app**
