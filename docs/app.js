@@ -184,19 +184,19 @@ function renderToday() {
 
   <h2>Why this call - the proof</h2>
   <p class="ink2 small">Each rule below looks at real data and adds or removes points. Total score ≥ +3 = strong buy, +1 to +2 = buy, 0 = hold (if the forecast + season rules still point up) or wait, −1 to −2 = sell, ≤ −3 = strong sell.</p>
-  <div class="card tablewrap"><table>
+  <div class="card tablewrap"><table class="proof">
     <tr><th>Rule</th><th>What the data shows today</th><th>Test used</th><th class="num">Points</th></tr>
-    ${s.evidence.map(e => `<tr><td><b>${esc(e.rule)}</b><div class="why">${esc(e.why)}</div></td>
-      <td>${esc(e.value)}<div class="why">Source: ${esc(e.source)}</div></td><td class="small ink2">${esc(e.test)}</td>
-      <td class="num pts ${cls(e.points)}">${e.points > 0 ? "+" : ""}${e.points}</td></tr>`).join("")}
-    <tr><td colspan="3"><b>Total score</b></td><td class="num pts ${cls(s.score)}">${s.score > 0 ? "+" : ""}${s.score}</td></tr>
+    ${s.evidence.map(e => `<tr><td data-label="Rule"><b>${esc(e.rule)}</b><div class="why">${esc(e.why)}</div></td>
+      <td data-label="What the data shows today">${esc(e.value)}<div class="why">Source: ${esc(e.source)}</div></td><td data-label="Test used" class="small ink2">${esc(e.test)}</td>
+      <td data-label="Points" class="num pts ${cls(e.points)}">${e.points > 0 ? "+" : ""}${e.points}</td></tr>`).join("")}
+    <tr><td colspan="3" class="total"><b>Total score</b></td><td class="num pts total ${cls(s.score)}">${s.score > 0 ? "+" : ""}${s.score}</td></tr>
   </table></div>
   <div class="card"><b>Has this worked before?</b> ${proofLine || "Not enough history yet."}
     ${live.graded ? `<br>Live calls graded so far: <b>${live.graded}</b>, right <b>${live.right_pct}%</b>.` : `<br><span class="muted small">Live calls are graded automatically 30 days after each call (${live.calls || 0} logged so far).</span>`}
     <div class="small muted">See the "Agent track record" tab for every past call.</div></div>
 
   <h2>Key numbers</h2>
-  <div class="grid">
+  <div class="grid kn">
     <div class="tile"><div class="k">Benchmark price (${b.markets.map(x => x.replace(" APMC", "")).join(", ")})</div><div class="v">${rs(b.price)}</div>
       <div class="d">1 day <span class="${cls(b.chg_1d)}">${pc(b.chg_1d)}</span> · 7 days <span class="${cls(b.chg_7d)}">${pc(b.chg_7d)}</span> · 30 days <span class="${cls(b.chg_30d)}">${pc(b.chg_30d)}</span></div></div>
     <div class="tile"><div class="k">30-day forecast</div><div class="v">${f30 ? rs(f30.price) : "–"}</div>
@@ -566,10 +566,17 @@ function show(tab) {
 }
 
 async function boot() {
-  const th = store.get("theme", null); if (th) document.documentElement.dataset.theme = th;
+  // Theme: "system" (default, follows prefers-color-scheme), "light" or "dark". Same ww.theme key; the Mac app may set it.
+  const MODES = ["system", "light", "dark"], LABEL = { system: "◐ System", light: "☀ Light", dark: "☾ Dark" };
+  const applyTheme = () => {
+    let m = store.get("theme", "system"); if (!MODES.includes(m)) m = "system";
+    if (m === "system") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = m;
+    $("#theme").textContent = LABEL[m]; $("#theme").title = `Theme: ${m} (click to change)`; $("#theme").setAttribute("aria-label", `Theme: ${m}`);
+    return m;
+  };
+  applyTheme();
   $("#theme").onclick = () => {
-    const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.dataset.theme = dark ? "light" : "dark"; store.set("theme", document.documentElement.dataset.theme); renderAll();
+    const cur = applyTheme(); store.set("theme", MODES[(MODES.indexOf(cur) + 1) % 3]); applyTheme(); renderAll();
   };
   $("#share").onclick = async () => {
     const s = A.signal, text = `WheatWise ${A.asof}: ${s.label} (${s.telugu}) - score ${s.score}. Benchmark ${rs(A.benchmark.price)}/qtl.`;

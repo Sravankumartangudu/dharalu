@@ -397,34 +397,86 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
     func settingsItem() -> NSMenuItem {
         let it = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
         let m = NSMenu()
-        let price = action("Show Price in Menu Bar", #selector(togglePrice)); price.state = Settings.showPrice ? .on : .off
-        let note = action("Notify on Signal Change / Big Moves", #selector(toggleNotify)); note.state = Settings.notify ? .on : .off
-        let login = action("Launch at Login", #selector(toggleLogin)); login.state = SMAppService.mainApp.status == .enabled ? .on : .off
-        m.addItem(price); m.addItem(note); m.addItem(login)
-        let look = NSMenuItem(title: "Appearance", action: nil, keyEquivalent: "")
-        let lm = NSMenu()
-        for (key, title) in [("system", "System (follows macOS)"), ("light", "Light"), ("dark", "Dark")] {
-            let x = action(title, #selector(setAppearance(_:)))
-            x.representedObject = key
-            x.state = Settings.appearance == key ? .on : .off
-            lm.addItem(x)
-        }
-        look.submenu = lm
-        m.addItem(look)
-        let every = NSMenuItem(title: "Check Every", action: nil, keyEquivalent: "")
-        let em = NSMenu()
-        for mins in [15, 30, 60, 120] {
-            let x = action(mins < 60 ? "\(mins) minutes" : "\(mins / 60) hour\(mins > 60 ? "s" : "")", #selector(setMinutes(_:)))
-            x.tag = mins
-            x.state = Settings.minutes == mins ? .on : .off
-            em.addItem(x)
-        }
-        every.submenu = em
-        m.addItem(every)
+        // Menu bar
+        m.addItem(groupHeader("Menu bar"))
+        m.addItem(switchRow("Show price", Settings.showPrice, #selector(switchPrice(_:))))
+        // Alerts
+        m.addItem(.separator())
+        m.addItem(groupHeader("Alerts"))
+        m.addItem(switchRow("Notify on signal change / big moves", Settings.notify, #selector(switchNotify(_:))))
+        m.addItem(segmentRow("Check every", ["15m", "30m", "1h", "2h"], [15, 30, 60, 120].firstIndex(of: Settings.minutes) ?? 1, #selector(segMinutes(_:))))
+        // General
+        m.addItem(.separator())
+        m.addItem(groupHeader("General"))
+        m.addItem(switchRow("Launch at login", SMAppService.mainApp.status == .enabled, #selector(switchLogin(_:))))
+        m.addItem(segmentRow("Appearance", ["System", "Light", "Dark"], ["system", "light", "dark"].firstIndex(of: Settings.appearance) ?? 0, #selector(segAppearance(_:))))
         m.addItem(.separator())
         m.addItem(action("Data Source…", #selector(editSource)))
         it.submenu = m
         return it
+    }
+
+    // MARK: Settings rows (grouped, with switches and segmented controls)
+
+    static let rowWidth: CGFloat = 300
+
+    func groupHeader(_ title: String) -> NSMenuItem {
+        let it = NSMenuItem()
+        it.isEnabled = false
+        it.attributedTitle = NSAttributedString(string: title.uppercased(), attributes: [
+            .font: NSFont.systemFont(ofSize: 10, weight: .semibold),
+            .foregroundColor: NSColor.secondaryLabelColor,
+            .kern: 0.6])
+        return it
+    }
+
+    func rowLabel(_ text: String) -> NSTextField {
+        let l = NSTextField(labelWithString: text)
+        l.font = .menuFont(ofSize: 13)
+        l.textColor = .labelColor
+        l.lineBreakMode = .byTruncatingTail
+        return l
+    }
+
+    func switchRow(_ title: String, _ on: Bool, _ sel: Selector) -> NSMenuItem {
+        let v = NSView(frame: NSRect(x: 0, y: 0, width: App.rowWidth, height: 30))
+        let l = rowLabel(title); l.frame = NSRect(x: 14, y: 6, width: App.rowWidth - 82, height: 18)
+        let sw = NSSwitch(); sw.controlSize = .small; sw.state = on ? .on : .off
+        sw.target = self; sw.action = sel
+        sw.sizeToFit(); sw.frame.origin = NSPoint(x: App.rowWidth - sw.frame.width - 14, y: (30 - sw.frame.height) / 2)
+        v.addSubview(l); v.addSubview(sw)
+        let it = NSMenuItem(); it.view = v
+        return it
+    }
+
+    func segmentRow(_ title: String, _ labels: [String], _ selected: Int, _ sel: Selector) -> NSMenuItem {
+        let v = NSView(frame: NSRect(x: 0, y: 0, width: App.rowWidth, height: 52))
+        let l = rowLabel(title); l.frame = NSRect(x: 14, y: 31, width: App.rowWidth - 28, height: 16)
+        let seg = NSSegmentedControl(labels: labels, trackingMode: .selectOne, target: self, action: sel)
+        seg.controlSize = .small; seg.segmentStyle = .rounded; seg.selectedSegment = selected
+        seg.frame = NSRect(x: 14, y: 5, width: App.rowWidth - 28, height: 22)
+        v.addSubview(l); v.addSubview(seg)
+        let it = NSMenuItem(); it.view = v
+        return it
+    }
+
+    @objc func switchPrice(_ s: NSSwitch) { Settings.showPrice = s.state == .on; updateTitle() }
+    @objc func switchNotify(_ s: NSSwitch) { Settings.notify = s.state == .on }
+    @objc func switchLogin(_ s: NSSwitch) {
+        toggleLogin()
+        s.state = SMAppService.mainApp.status == .enabled ? .on : .off   // snap back if it failed
+    }
+    @objc func segMinutes(_ s: NSSegmentedControl) {
+        let opts = [15, 30, 60, 120]
+        guard opts.indices.contains(s.selectedSegment) else { return }
+        Settings.minutes = opts[s.selectedSegment]; schedule()
+    }
+    @objc func segAppearance(_ s: NSSegmentedControl) {
+        let opts = ["system", "light", "dark"]
+        guard opts.indices.contains(s.selectedSegment) else { return }
+        Settings.appearance = opts[s.selectedSegment]
+        Settings.applyAppearance()
+        dashboard.applyTheme()
     }
 
     func info(_ title: String) -> NSMenuItem {
@@ -453,16 +505,6 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(s + "\n" + Settings.siteURL.absoluteString, forType: .string)
     }
-
-    @objc func togglePrice() { Settings.showPrice.toggle(); updateTitle() }
-    @objc func toggleNotify() { Settings.notify.toggle() }
-    @objc func setAppearance(_ s: NSMenuItem) {
-        guard let v = s.representedObject as? String else { return }
-        Settings.appearance = v
-        Settings.applyAppearance()
-        dashboard.applyTheme()
-    }
-    @objc func setMinutes(_ s: NSMenuItem) { Settings.minutes = s.tag; schedule() }
 
     @objc func toggleLogin() {
         do {

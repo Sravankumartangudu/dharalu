@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0 - 15 Oct 2026
+
+**Mac app**
+- Settings menu is grouped (Menu bar, Alerts, General) with real switches, and segmented controls for Check every and Appearance. Same settings, same stored values.
+
+**Dashboard**
+- Theme button is now System / Light / Dark (System is the default and follows the device). Same saved setting as before, with "system" as a new value.
+- Phone: the proof table now reflows into stacked rows (nothing clipped, every rule, value, source, test and points still shown); the header wraps neatly.
+- Key numbers sit in an even grid (3 x 2, 2 x 3 or 1 column) instead of leaving one orphan tile.
+- Muted grey text in light mode is darker, for readable contrast (4.5:1 or better).
+
 ## 1.1.0 - 15 Oct 2026
 
 **Mac app**

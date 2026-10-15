@@ -106,4 +106,4 @@ Also a month-by-month "wheat year" for a Srikakulam trader.
 **Share** opens your phone's share sheet (WhatsApp etc.) with today's call and the link. On a computer it copies them.
 
 ## Light / dark
-The ◐ button switches the theme.
+The ◐ button cycles System (follows your device, the default), Light and Dark.

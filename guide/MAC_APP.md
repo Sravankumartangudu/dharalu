@@ -44,13 +44,15 @@ The menu-bar title shows **⚠︎** when the data is more than 36 hours old or c
 
 ## Settings
 
+The Settings menu is grouped: **Menu bar**, **Alerts** and **General**. On/off settings are switches; Check every and Appearance are segmented controls.
+
 | Setting | Default | What |
 |---|---|---|
-| Show Price in Menu Bar | On | `🌾 SELL ₹2,590`, or just `🌾 SELL` |
-| Notify on Signal Change / Big Moves | On | Notify when the call changes, or when the price moves 2.5% or more in a day |
-| Launch at Login | Off | Start with your Mac |
+| Show price | On | `🌾 SELL ₹2,590`, or just `🌾 SELL` |
+| Notify on signal change / big moves | On | Notify when the call changes, or when the price moves 2.5% or more in a day |
+| Launch at login | Off | Start with your Mac |
 | Appearance | System | System (follows macOS, Auto included) / Light / Dark. Changes at once |
-| Check Every | 30 min | 15 / 30 / 60 / 120 minutes. The agent publishes twice a day, so 30 is plenty |
+| Check every | 30 min | 15 / 30 / 60 / 120 minutes. The agent publishes twice a day, so 30 is plenty |
 | Data Source… | this repo's dashboard | Change it only if you run your own fork: `https://<you>.github.io/wheatwise/data/latest.json` |
 
 ## Your trades in the app
