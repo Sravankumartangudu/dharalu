@@ -2,7 +2,7 @@
 
 ## 1.3.1 - 18 Oct 2026
 
-- **Dashboard header shows the price.** It ended in "₹ per quintal" with no number. It now shows today's benchmark price and the cheapest landed price at Srikakulam, e.g. *17 Oct 2026 · benchmark ₹2,693/qtl · landed ₹2,906/qtl*. The Mac app's window shows the same header (it opens the dashboard), so the app needs no update. The page now loads its script and styles with a version tag, so browsers and the app pick up changes straight away instead of running an old cached copy.
+- **Dashboard header shows the price.** It ended in "₹ per quintal" with no number. It now shows today's benchmark price and the cheapest landed price at Srikakulam, e.g. *17 Oct 2026 · benchmark ₹2,693/qtl · landed ₹2,906/qtl*. The Mac app's window opens the dashboard, so it shows the new header too. The app itself is unchanged apart from the version number. The page now loads its script and styles with a version tag, so browsers and the app pick up changes straight away instead of running an old cached copy.
 
 ## 1.3.0 - 18 Oct 2026
 
