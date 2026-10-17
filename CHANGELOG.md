@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0 - 18 Oct 2026
+
+**Prices kept refreshing on GitHub but stopped at 13 Oct.** data.gov.in refuses GitHub's servers, which are outside India. Each run showed ✅ but brought no new prices, and the dashboard looked fresh because only the "published" time changed.
+- **Fetch from your Mac:** `scripts/mac-schedule.sh install` fetches and publishes at 12:00 and 19:00 (`run`, `status`, `uninstall` too). `scripts/mac-refresh.sh` does one fetch by hand. See guide/SETUP.md step 8.
+- **Mac app:** ⚠︎ also appears when the newest mandi price is 3+ days old. The menu says which, and what to do.
+- **Dashboard:** the header shows ⚠︎ *N days old* when prices are 3+ days old.
+- **Agent:** when data.gov.in fails, the log says why (HTTP error, timeout, message).
+
 ## 1.2.1 - 15 Oct 2026
 
 - **Sharper small icons.** At 16–64 px the app icon's drop shadow filled the whole image, leaving a faint grey

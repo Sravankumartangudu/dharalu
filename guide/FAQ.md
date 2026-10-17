@@ -26,9 +26,13 @@ Andhra Pradesh hasn't reported wheat mandi prices since 2017; it buys wheat from
 
 ## Data
 
-**The dashboard shows an old date.**
+**The dashboard shows an old date (⚠︎ N days old).**
 - Mandis don't report on Sundays and holidays, and data.gov.in is sometimes late or down. The agent then analyses the data it already has, and tries again at the next run.
-- If the date is more than 2 days old, open GitHub → *Actions* and look for red ❌ runs.
+- data.gov.in refuses GitHub's servers, so the GitHub runs show ✅ but bring no new prices. Fresh prices come from your Mac: `scripts/mac-schedule.sh status` to check it's installed, `scripts/mac-schedule.sh run` to fetch now ([SETUP.md](SETUP.md#8-fetch-prices-from-your-mac-important)).
+- The dashboard header and the Mac app show ⚠︎ when the newest price is 3 or more days old.
+
+**I pressed Refresh in the Mac app and nothing changed.**
+Refresh reloads what the agent last published. It doesn't fetch new mandi prices. If the prices are old, run `scripts/mac-schedule.sh run` (or `scripts/mac-refresh.sh`) and press Refresh again after a minute.
 
 **A mandi is missing from the landed-cost table.**
 It hasn't reported in the last 7 days.

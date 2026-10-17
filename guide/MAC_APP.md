@@ -40,7 +40,7 @@ macOS 13 Ventura or newer, on Apple Silicon or Intel (it's a universal app). No 
 | Help - How to Use | Opens this page |
 | Quit WheatWise ⌘Q | |
 
-The menu-bar title shows **⚠︎** when the data is more than 36 hours old or can't be loaded. The agent may have failed, or you're offline.
+The menu-bar title shows **⚠︎** when the data can't be loaded, when the agent hasn't published for 36 hours, or when the newest mandi price is 3 or more days old. **Refresh** reloads what the agent published; it doesn't fetch new prices. For those, see [SETUP.md step 8](SETUP.md#8-fetch-prices-from-your-mac-important).
 
 ## Settings
 
@@ -86,5 +86,5 @@ open WheatWise.app
 | "WheatWise can't be opened" / "unverified developer" | System Settings → Privacy & Security → **Open Anyway** (once) |
 | No 🌾 in the menu bar | The menu bar may be full: quit some menu-bar apps, or hold ⌘ and drag icons to make room. If you use a menu-bar folder or manager (Nexus, Bartender), look there |
 | No notifications | System Settings → Notifications → WheatWise → Allow. Also check 🌾 → Settings → Notify on Signal Change / Big Moves |
-| ⚠︎ next to 🌾 | The data is stale or unreachable. Check your internet connection, then the dashboard. If the dashboard is also old, look at GitHub *Actions* for a failed run |
+| ⚠︎ next to 🌾 | Open the menu: it says why. *Prices are N days old*: run `scripts/mac-schedule.sh run` in the repo, and check the job is installed. *Hours old* or *can't load*: check your internet connection, then GitHub *Actions* for a failed run |
 | Launch at Login won't turn on | Move the app to /Applications first, then try again |

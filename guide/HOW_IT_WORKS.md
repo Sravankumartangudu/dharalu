@@ -119,3 +119,5 @@ This is worked out for each of the 16 source mandis, using its latest report fro
 5. Commit, via `.github/save.sh`, which pulls and retries if two runs overlap.
 
 The save step runs even if the analysis fails, so fetched prices are never lost.
+
+**Fetching from the Mac.** data.gov.in refuses GitHub's servers, which are outside India. So `scripts/mac-refresh.sh` does the same fetch → analyse → publish on your Mac at 12:00 and 19:00 IST. That's half an hour before each GitHub run, and the GitHub run then re-publishes the Mac's prices. When a request fails, the log line now says why (for example the HTTP error).

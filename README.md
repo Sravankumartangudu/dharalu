@@ -54,6 +54,7 @@ How it all works in detail: [guide/HOW_IT_WORKS.md](guide/HOW_IT_WORKS.md).
 |---|---|
 | The dashboard | Any browser. Nothing to install |
 | The automatic agent | A free GitHub account (it runs on GitHub Actions, free for public repos) and a free [data.gov.in](https://data.gov.in) API key (recommended) |
+| Fresh prices | A Mac (or any computer) in India that's on most days: data.gov.in refuses GitHub's servers, so the Mac fetches the prices and GitHub publishes them |
 | Telegram alerts (optional) | A Telegram account |
 | AI briefing (optional) | An Anthropic API key |
 | The Mac app (optional) | macOS 13 Ventura or newer, Apple Silicon or Intel |
@@ -76,7 +77,8 @@ This repository is already set up and running. To run your own copy (for example
 
 3. *Settings → Pages*: deploy from the `main` branch, `/docs` folder.
 4. *Actions → WheatWise monitor → Run workflow* (tick **bootstrap** the first time to download price history).
-5. **Edit `config.json`** with your real freight rate, mandi fee, interest and godown costs: [guide/CONFIG.md](guide/CONFIG.md).
+5. **Fetch prices from your Mac:** `scripts/mac-schedule.sh install` (fetches and publishes at 12:00 and 19:00). See [guide/SETUP.md](guide/SETUP.md#8-fetch-prices-from-your-mac-important).
+6. **Edit `config.json`** with your real freight rate, mandi fee, interest and godown costs: [guide/CONFIG.md](guide/CONFIG.md).
 
 **Mac app:** download `WheatWise-<version>.dmg` from [Releases](https://github.com/Sravankumartangudu/wheatwise/releases/latest), drag it to Applications, then on first open use *System Settings → Privacy & Security → Open Anyway*. Details: [guide/MAC_APP.md](guide/MAC_APP.md).
 
@@ -141,6 +143,7 @@ The **benchmark price** comes from Jabalpur, Indore and Kota, the mandis with th
 | `mac/` | The Mac menu-bar app (Swift): `build.sh`, `package.sh` |
 | `.github/workflows/monitor.yml` | The twice-daily schedule |
 | `.github/save.sh` | Commits new data, retrying if two runs overlap |
+| `scripts/mac-refresh.sh`, `scripts/mac-schedule.sh` | Fetch prices from your Mac and publish them, by hand or twice a day |
 | `guide/` | Setup, user guide, how it works, config, Mac app, FAQ |
 
 ## Privacy

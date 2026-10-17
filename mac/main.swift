@@ -166,7 +166,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
             guard let self = self else { return ("ok", "") }
             if let e = self.lastError { return ("error", e) }
             guard let l = self.latest else { return ("ok", "starting") }
-            if self.isStale { return ("warn", "data is \(self.ageHours)h old") }
+            if self.isStale { return ("warn", self.staleNote) }
             return ("ok", "\(l.signal.label) \(rs(l.benchmark.price))")
         }
         Settings.applyAppearance()
@@ -193,8 +193,19 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
     }
 
     var ageHours: Int { Int((Date().timeIntervalSince(latest?.generated ?? Date())) / 3600) }
+    /// Days since the newest mandi price. Mandis skip Sundays and holidays, so 3+ days means no new prices.
+    var priceAgeDays: Int {
+        let p = DateFormatter(); p.dateFormat = "yyyy-MM-dd"; p.timeZone = TimeZone(identifier: "Asia/Kolkata")
+        guard let a = latest.flatMap({ p.date(from: $0.asof) }) else { return 0 }
+        return Calendar.current.dateComponents([.day], from: a, to: Date()).day ?? 0
+    }
+    var pricesOld: Bool { latest != nil && priceAgeDays >= 3 }
     /// Actions runs at 12:30 and 19:30 IST, so anything older than a day and a half means it stopped.
-    var isStale: Bool { latest != nil && ageHours >= 36 }
+    /// It can also keep publishing without new prices (data.gov.in refuses it), so watch the price date too.
+    var isStale: Bool { latest != nil && (ageHours >= 36 || pricesOld) }
+    var staleNote: String {
+        pricesOld ? "prices are \(priceAgeDays) days old" : "data is \(ageHours)h old"
+    }
 
     // MARK: Fetch
 
@@ -284,7 +295,9 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
             menu.addItem(info(lastError.map { "Couldn't load today's call: \($0)" } ?? "Loading today's call…"))
         }
         if let e = lastError, latest != nil { menu.addItem(info(wrap("⚠︎ Last refresh failed: \(e) - showing the previous data."))) }
-        if isStale {
+        if pricesOld {
+            menu.addItem(info(wrap("⚠︎ The newest prices are from \(prettyDate(latest!.asof)) (\(priceAgeDays) days ago). data.gov.in isn't giving the agent new prices - on the Mac with the repo, run scripts/mac-refresh.sh.")))
+        } else if isStale {
             menu.addItem(info(wrap("⚠︎ This data is \(ageHours) hours old. The GitHub Actions monitor may have stopped - open the repo's Actions tab to check.")))
         }
         menu.addItem(.separator())

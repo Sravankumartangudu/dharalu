@@ -594,7 +594,9 @@ async function boot() {
   (A.track_record.rows || []).forEach(r => SIG[r.date] = { score: r.score, key: r.signal });
   const live = A.track_record.live || {};
   (live.rows || []).concat(live.pending || []).forEach(r => SIG[r.date] = { score: +r.score, key: r.signal });
-  $("#asof").textContent = `Srikakulam, AP · prices up to ${fmtDate(A.asof)} · ₹ per quintal`;
+  // Mandis skip Sundays and holidays, so 3+ days without a price means the feed isn't reaching the agent.
+  const oldDays = Math.floor((Date.now() - new Date(A.asof + "T00:00:00+05:30")) / 864e5);
+  $("#asof").textContent = `Srikakulam, AP · prices up to ${fmtDate(A.asof)}${oldDays >= 3 ? ` ⚠︎ ${oldDays} days old` : ""} · ₹ per quintal`;
   renderAll();
   show(location.hash.slice(1) || "today");
 }

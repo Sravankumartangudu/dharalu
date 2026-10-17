@@ -35,7 +35,7 @@ def _get(resource, params, tries=6):
     q = {"api-key": api_key(), "format": "json"}
     q.update(params)
     url = BASE + resource + "?" + urllib.parse.urlencode(q)
-    delay = 4
+    delay, why = 4, "no answer"
     for attempt in range(tries):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "WheatWise/1.0"})
@@ -44,11 +44,12 @@ def _get(resource, params, tries=6):
             data = json.loads(body)
             if "records" in data:
                 return data
-        except Exception:  # 503 rate-limit pages, timeouts, bad JSON
-            pass
+            why = "no records: %s" % (data.get("message") or body[:80])
+        except Exception as e:  # 503 rate-limit pages, timeouts, bad JSON
+            why = "%s: %s" % (type(e).__name__, str(e)[:80])
         time.sleep(delay)
         delay = min(delay * 2, 60)
-    raise RuntimeError("data.gov.in did not answer after %d tries" % tries)
+    raise RuntimeError("data.gov.in did not answer after %d tries (last: %s)" % (tries, why))
 
 
 def _paged(resource, filters, sort=None, max_rows=None, pace=1.2, log=None):

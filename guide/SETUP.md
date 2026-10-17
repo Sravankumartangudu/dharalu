@@ -1,6 +1,6 @@
 # Setup
 
-About 10 minutes, one time. When you're done, the agent runs by itself twice a day for free on GitHub, and the dashboard updates automatically.
+About 10 minutes, one time. When you're done, the agent runs by itself twice a day for free on GitHub, with your Mac fetching the prices (step 8), and the dashboard updates automatically.
 
 ## 1. Prerequisites
 
@@ -54,14 +54,33 @@ After a minute, your dashboard is at `https://<your-github-name>.github.io/wheat
 *Actions → WheatWise monitor → Run workflow*. **Tick "Re-seed price history first"** for the first run and press *Run workflow*.
 
 - With your own key, the history download takes a few minutes. With the sample key it can hit the 2½-hour limit. That's fine: whatever it downloaded is saved, and the next run continues from there.
-- After that, the agent runs by itself at **12:30 and 19:30 IST**. You don't need to tick bootstrap again.
+- After that, the agent runs by itself at **12:30 and 19:30 IST**. You don't need to tick bootstrap again. For new prices, also do step 8.
 - If GitHub shows *"Workflows aren't being run on this forked repository"*, click **I understand, enable them**.
 
-## 8. Put in your real costs
+## 8. Fetch prices from your Mac (important)
+
+data.gov.in refuses requests from GitHub's servers, which are outside India. A GitHub run then shows ✅ but logs `Today's feed failed … using saved data`, and the prices stop at the last day they arrived. The fix is to fetch from a computer in India, and let GitHub publish:
+
+```bash
+cd ~/WheatWise                       # your clone of the repository
+scripts/mac-schedule.sh install      # fetch + publish at 12:00 and 19:00 every day
+scripts/mac-schedule.sh run          # do one now
+scripts/mac-schedule.sh status       # installed? last lines of the log
+```
+
+- Each run takes 2-3 minutes. It pulls, runs `agent/run.py`, and pushes `data/` and `docs/data/` to GitHub. The dashboard and the Mac app pick that up a minute later.
+- If the Mac is asleep at 12:00 or 19:00, the job runs when it wakes.
+- The push uses your normal git login. Push once by hand first, so macOS keeps the password in the Keychain.
+- To fetch once without the schedule: `scripts/mac-refresh.sh`. To stop: `scripts/mac-schedule.sh uninstall`.
+- The log is `~/Library/Logs/WheatWise/refresh.log`.
+
+The GitHub runs keep going as before, and log why data.gov.in refused them. If they ever start getting prices, the Mac job does no harm.
+
+## 9. Put in your real costs
 
 Open `config.json` on GitHub (pencil icon to edit) and change the freight, mandi fee, interest and godown numbers to what you really pay. Every field is explained in [CONFIG.md](CONFIG.md). The next run uses them.
 
-## 9. The Mac app (optional)
+## 10. The Mac app (optional)
 
 See [MAC_APP.md](MAC_APP.md). If you use your own fork, set *Settings → Data Source…* in the app to your own dashboard's `data/latest.json`.
 
