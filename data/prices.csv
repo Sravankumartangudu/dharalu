@@ -15811,7 +15811,7 @@ date,state,district,market,variety,grade,min,max,modal
 2026-10-13,Madhya Pradesh,Khandwa,Harsood APMC,Wheat,FAQ,2650.0,3100.0,2741.0
 2026-10-13,Madhya Pradesh,Damoh,Hata APMC,Wheat,Non-FAQ,2525.0,2560.0,2525.0
 2026-10-13,Madhya Pradesh,Sehore,Ichhawar APMC,Wheat,FAQ,2450.0,2840.0,2651.0
-2026-10-13,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2571.0,3242.0,2800.0
+2026-10-13,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2526.0,3242.0,2800.0
 2026-10-13,Madhya Pradesh,Narmadapuram,Itarsi APMC,Mill Quality,FAQ,2621.0,2689.0,2660.0
 2026-10-13,Madhya Pradesh,Narmadapuram,Itarsi APMC,Wheat,FAQ,2000.0,2724.0,2710.0
 2026-10-13,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,Non-FAQ,2550.0,2600.0,2600.0
@@ -16339,3 +16339,596 @@ date,state,district,market,variety,grade,min,max,modal
 2026-10-13,West Bengal,Murshidabad,Kasimbazar APMC,Sonalika,FAQ,2700.0,2800.0,2750.0
 2026-10-13,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2750.0,2700.0
 2026-10-13,West Bengal,Birbhum,Rampurhat APMC,Other,FAQ,2590.0,2610.0,2600.0
+2026-10-14,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,1000.0,3372.0,3050.0
+2026-10-14,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2300.0,2781.0,2600.0
+2026-10-14,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,Non-FAQ,2300.0,2300.0,2300.0
+2026-10-14,Rajasthan,Kota,Kota APMC,Local,Local,2690.0,2690.0,2690.0
+2026-10-15,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2501.0,3270.0,2981.0
+2026-10-15,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,Non-FAQ,2250.0,2250.0,2250.0
+2026-10-15,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2543.0,3132.0,2650.0
+2026-10-16,Madhya Pradesh,Indore,Indore APMC,Malwa Shakti,Non-FAQ,2700.0,2700.0,2700.0
+2026-10-16,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2450.0,3494.0,2700.0
+2026-10-16,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2450.0,2801.0,2640.0
+2026-10-17,Assam,Kamrup,Fancy Bazaar APMC,Wheat Atta,FAQ,6600.0,9200.0,7600.0
+2026-10-17,Bihar,Sheikhpura,Barbigha APMC,147 Average,FAQ,2585.0,2730.0,2645.0
+2026-10-17,Bihar,Sheikhpura,Shekhpura APMC,147 Average,FAQ,2590.0,2735.0,2655.0
+2026-10-17,Chattisgarh,Mungeli,Mungeli APMC,Local,FAQ,2440.0,2440.0,2440.0
+2026-10-17,Chattisgarh,Raipur,Raipur APMC,Deshi,Non-FAQ,2400.0,2400.0,2400.0
+2026-10-17,Gujarat,Amreli,APMC Bagasara,Lokwan Gujrat,Grade Range-3,2550.0,2630.0,2590.0
+2026-10-17,Gujarat,Morbi,APMC HALVAD,Other,Local,2600.0,3010.0,2850.0
+2026-10-17,Gujarat,Sabarkantha,APMCKHEDBRAHMA,Lok-1,FAQ,2800.0,3000.0,2900.0
+2026-10-17,Gujarat,Banaskanth,Amirgadh APMC,147 Average,FAQ,2655.0,2655.0,2655.0
+2026-10-17,Gujarat,Amreli,Babra APMC,Medium,FAQ,2300.0,2830.0,2565.0
+2026-10-17,Gujarat,Bhavnagar,Bhavnagar APMC,Local,FAQ,2695.0,2695.0,2695.0
+2026-10-17,Gujarat,Sabarkantha,Bhiloda APMC,Other,FAQ,2700.0,2950.0,2825.0
+2026-10-17,Gujarat,Surendranagar,Chotila APMC,Local,FAQ,2500.0,3050.0,2850.0
+2026-10-17,Gujarat,Dahod,Dahod APMC,147 Average,Local,3000.0,3100.0,3050.0
+2026-10-17,Gujarat,Banaskanth,Deesa APMC,Other,FAQ,2700.0,2920.0,2825.0
+2026-10-17,Gujarat,Banaskanth,Deesa(Bhildi) APMC,Other,FAQ,2700.0,2765.0,2725.0
+2026-10-17,Gujarat,Gandhinagar,Dehgam APMC,Other,FAQ,2500.0,2830.0,2665.0
+2026-10-17,Gujarat,Gandhinagar,Dehgam(Rekhiyal) APMC,Other,FAQ,2475.0,2700.0,2587.0
+2026-10-17,Gujarat,Banaskanth,Dhanera APMC,Other,Local,2800.0,2800.0,2800.0
+2026-10-17,Gujarat,Amreli,Dhari APMC,Lokwan,FAQ,2500.0,2610.0,2610.0
+2026-10-17,Gujarat,Rajkot,Dhoraji APMC,Milbar,Non-FAQ,2290.0,2625.0,2410.0
+2026-10-17,Gujarat,Surendranagar,Dhragradhra APMC,Wheat,Local,2780.0,2780.0,2780.0
+2026-10-17,Gujarat,Sabarkantha,Himatnagar APMC,Sonalika,Local,2895.0,3065.0,2900.0
+2026-10-17,Gujarat,Rajkot,JASDAN APMC,2189 No. 2,FAQ,2680.0,3125.0,2725.0
+2026-10-17,Gujarat,Jamnagar,Jam Jodhpur APMC,Other,Local,2550.0,2760.0,2675.0
+2026-10-17,Gujarat,Devbhumi Dwarka,Jam Khambalia APMC,Other,Local,2350.0,2700.0,2600.0
+2026-10-17,Gujarat,Jamnagar,Jamnagar APMC,Other,Local,2600.0,2820.0,2775.0
+2026-10-17,Gujarat,Rajkot,Jetpur(Dist.Rajkot) APMC,Lokwan,FAQ,2550.0,2900.0,2850.0
+2026-10-17,Gujarat,Rajkot,Jetpur(Dist.Rajkot) APMC,Other,FAQ,2650.0,3050.0,2950.0
+2026-10-17,Gujarat,Dahod,Jhalod APMC,Lok-1,Local,2600.0,2600.0,2600.0
+2026-10-17,Gujarat,Mehsana,Kadi APMC,Other,FAQ,2655.0,3150.0,2850.0
+2026-10-17,Gujarat,Jamnagar,Kalawad APMC,Other,Local,2225.0,2850.0,2685.0
+2026-10-17,Gujarat,Gandhinagar,Kalol APMC,Other,Local,2805.0,3035.0,2900.0
+2026-10-17,Gujarat,Anand,Khambhat(Grain Market) APMC,Other,Local,2250.0,2750.0,2500.0
+2026-10-17,Gujarat,Dahod,Limkheda APMC,Local,Local,2260.0,2660.0,2460.0
+2026-10-17,Gujarat,Bhavnagar,Mahuva(Station Road) APMC,Kalyan,FAQ,2555.0,3315.0,2935.0
+2026-10-17,Gujarat,Gandhinagar,Mansa APMC,Local,Local,2750.0,3080.0,2850.0
+2026-10-17,Gujarat,Mehsana,Mehsana APMC,Local,Local,2600.0,2955.0,2900.0
+2026-10-17,Gujarat,Mehsana,Mehsana(Jornang) APMC,Other,Local,2800.0,3000.0,2900.0
+2026-10-17,Gujarat,Sabarkantha,Modasa APMC,Lokwan Gujrat,FAQ,2790.0,2930.0,2930.0
+2026-10-17,Gujarat,Sabarkantha,Modasa(Tintoi) APMC,Lokwan,FAQ,2700.0,2825.0,2825.0
+2026-10-17,Gujarat,Morbi,Morbi APMC,Other,FAQ,2700.0,3070.0,2885.0
+2026-10-17,Gujarat,Panchmahals,Morva Hafad APMC,Deshi,Local,2400.0,2500.0,2450.0
+2026-10-17,Gujarat,Banaskanth,Palanpur APMC,Deshi,Local,2785.0,2785.0,2785.0
+2026-10-17,Gujarat,Porbandar,Porbandar APMC,Deshi,FAQ,2810.0,2895.0,2850.0
+2026-10-17,Gujarat,Rajkot,Rajkot APMC,Lokwan,FAQ,2800.0,3170.0,2860.0
+2026-10-17,Gujarat,Rajkot,Rajkot APMC,Sharbati,FAQ,2820.0,3655.0,2890.0
+2026-10-17,Gujarat,Amreli,Rajula APMC,PISSI,Local,2000.0,3085.0,2542.0
+2026-10-17,Gujarat,Ahmedabad,Sanad APMC,Sharbati,FAQ,2785.0,2785.0,2785.0
+2026-10-17,Gujarat,Amreli,Savarkundla APMC,Bansi,Local,2700.0,3110.0,2900.0
+2026-10-17,Gujarat,Amreli,Savarkundla APMC,Lokwan,Local,2650.0,2850.0,2750.0
+2026-10-17,Gujarat,Bhavnagar,Taleja APMC,Kalyan,FAQ,2235.0,3105.0,2670.0
+2026-10-17,Gujarat,Sabarkantha,Talod(Harsol) APMC,Other,FAQ,2650.0,2855.0,2753.0
+2026-10-17,Gujarat,Banaskanth,Thara APMC,Other,FAQ,2725.0,2925.0,2825.0
+2026-10-17,Gujarat,Banaskanth,Thara(Shihori) APMC,Other,FAQ,2750.0,2875.0,2812.5
+2026-10-17,Gujarat,Amreli,The Agricultural Produce Market Committee-Amreli,Lokwan,FAQ,2750.0,2825.0,2800.0
+2026-10-17,Gujarat,Amreli,The Agricultural Produce Market Committee-Amreli,Rajasthan Tukdi,FAQ,2575.0,3625.0,2800.0
+2026-10-17,Gujarat,Rajkot,Upleta APMC,Local,Local,2475.0,2835.0,2600.0
+2026-10-17,Gujarat,Sabarkantha,Vadali APMC,Other,FAQ,2700.0,2850.0,2775.0
+2026-10-17,Gujarat,Banaskanth,Vadgam APMC,Other,FAQ,2690.0,2750.0,2750.0
+2026-10-17,Gujarat,Morbi,Vankaner APMC,Lokwan,FAQ,2500.0,2935.0,2825.0
+2026-10-17,Gujarat,Gir Somnath,Veraval APMC,Medium Fine,FAQ,2505.0,2705.0,2625.0
+2026-10-17,Gujarat,Sabarkantha,Vijaynagar(Kundlakap) APMC,Other,Local,2500.0,2540.0,2520.0
+2026-10-17,Gujarat,Ahmedabad,Viramgam APMC,Other,Local,2715.0,2750.0,2730.0
+2026-10-17,Gujarat,Mehsana,Visnagar APMC,Other,Local,2655.0,3025.0,2840.0
+2026-10-17,Karnataka,Bidar,Basava Kalayana APMC,Mill Quality,FAQ,4611.0,6480.0,6300.0
+2026-10-17,Karnataka,Bengaluru,Bengaluru APMC,Local,FAQ,3900.0,4800.0,4350.0
+2026-10-17,Karnataka,Davangere,Davangere APMC,Medium,Local,2300.0,2300.0,2300.0
+2026-10-17,Karnataka,Gadag,Gadag APMC,White,FAQ,1733.0,5021.0,3248.0
+2026-10-17,Karnataka,Vijayanagara,Hospet APMC,Medium,Local,3175.0,3725.0,3725.0
+2026-10-17,Karnataka,Kalaburagi,Kalaburagi APMC,Sharbati,Local,2100.0,3500.0,2800.0
+2026-10-17,Karnataka,Vijayapura,Sindagi APMC,Bansi,Local,3000.0,3000.0,3000.0
+2026-10-17,Madhya Pradesh,Ratlam,A lot APMC,Wheat,FAQ,2750.0,2955.0,2955.0
+2026-10-17,Madhya Pradesh,Shajapur,Agar APMC,Wheat,FAQ,2200.0,2980.0,2720.0
+2026-10-17,Madhya Pradesh,Panna,Ajaygarh APMC,Mill Quality,FAQ,2505.0,2560.0,2550.0
+2026-10-17,Madhya Pradesh,Bhind,Alampur APMC,Wheat,Non-FAQ,2555.0,2618.0,2618.0
+2026-10-17,Madhya Pradesh,Alirajpur,Alirajpur APMC,Mill Quality,FAQ,2300.0,2300.0,2300.0
+2026-10-17,Madhya Pradesh,Morena,Ambaha APMC,Wheat,Non-FAQ,2700.0,2700.0,2700.0
+2026-10-17,Madhya Pradesh,Badwani,Anjad APMC,Wheat,FAQ,2200.0,2300.0,2300.0
+2026-10-17,Madhya Pradesh,Guna,Aron APMC,Wheat,FAQ,2440.0,2670.0,2670.0
+2026-10-17,Madhya Pradesh,Sehore,Ashta APMC,Wheat,FAQ,2500.0,6296.0,3000.0
+2026-10-17,Madhya Pradesh,Narmadapuram,Babai (Makhan Nagar) APMC,Mill Quality,FAQ,2625.0,2625.0,2625.0
+2026-10-17,Madhya Pradesh,Chhatarpur,Badamalhera APMC,Mill Quality,Non-FAQ,2520.0,2550.0,2526.0
+2026-10-17,Madhya Pradesh,Shivpuri,Badarwas APMC,Wheat,Non-FAQ,2575.0,3800.0,3800.0
+2026-10-17,Madhya Pradesh,Ujjain,Badnagar APMC,Wheat,FAQ,2000.0,3290.0,2891.0
+2026-10-17,Madhya Pradesh,Dhar,Badnawar APMC,Wheat,FAQ,2605.0,3250.0,2700.0
+2026-10-17,Madhya Pradesh,Shajapur,Badod APMC,Wheat,Non-FAQ,2830.0,2830.0,2830.0
+2026-10-17,Madhya Pradesh,Khargone,Badwaha APMC,Wheat,FAQ,2500.0,2775.0,2770.0
+2026-10-17,Madhya Pradesh,Rewa,Baikunthpur APMC,Mill Quality,Non-FAQ,2470.0,2550.0,2550.0
+2026-10-17,Madhya Pradesh,Rewa,Baikunthpur APMC,Wheat,Non-FAQ,2540.0,2540.0,2540.0
+2026-10-17,Madhya Pradesh,Narmadapuram,Banapura APMC,Local,FAQ,2730.0,2800.0,2800.0
+2026-10-17,Madhya Pradesh,Shivpuri,Barad APMC,Wheat,FAQ,2426.0,2475.0,2450.0
+2026-10-17,Madhya Pradesh,Raisen,Bareli APMC,Mill Quality,FAQ,2651.0,2753.0,2753.0
+2026-10-17,Madhya Pradesh,Raisen,Begamganj APMC,Wheat,Non-FAQ,2625.0,2820.0,2820.0
+2026-10-17,Madhya Pradesh,Raisen,Begamganj APMC,Wheat,FAQ,2600.0,2915.0,2850.0
+2026-10-17,Madhya Pradesh,Shehdol,Beohari APMC,Mill Quality,FAQ,2480.0,2540.0,2500.0
+2026-10-17,Madhya Pradesh,Bhopal,Berasia APMC,Mill Quality,FAQ,2595.0,3139.0,3139.0
+2026-10-17,Madhya Pradesh,Bhopal,Berasia APMC,Wheat,FAQ,2550.0,2900.0,2630.0
+2026-10-17,Madhya Pradesh,Betul,Betul APMC,Mill Quality,FAQ,2660.0,3100.0,2825.0
+2026-10-17,Madhya Pradesh,Mandsaur,Bhanpura APMC,Mill Quality,FAQ,2600.0,2750.0,2750.0
+2026-10-17,Madhya Pradesh,Sehore,Bherunda (Nasrullaganj) APMC,Wheat,Non-FAQ,2701.0,3001.0,3001.0
+2026-10-17,Madhya Pradesh,Sehore,Bherunda (Nasrullaganj) APMC,Wheat,FAQ,2505.0,2991.0,2991.0
+2026-10-17,Madhya Pradesh,Khargone,Bhikangaon APMC,Wheat,FAQ,2800.0,3041.0,3041.0
+2026-10-17,Madhya Pradesh,Gwalior,Bhitarwar APMC,Mill Quality,Non-FAQ,2610.0,2645.0,2630.0
+2026-10-17,Madhya Pradesh,Bhopal,Bhopal APMC,Wheat,FAQ,1800.0,3051.0,2741.0
+2026-10-17,Madhya Pradesh,Rajgarh,Biaora APMC,Wheat,FAQ,2600.0,2800.0,2700.0
+2026-10-17,Madhya Pradesh,Guna,Binaganj APMC,Wheat,FAQ,1710.0,2760.0,2750.0
+2026-10-17,Madhya Pradesh,Rajgarh,Chhapiheda APMC,Wheat,FAQ,2670.0,2739.0,2736.0
+2026-10-17,Madhya Pradesh,Gwalior,Dabra APMC,Wheat,FAQ,2600.0,2690.0,2680.0
+2026-10-17,Madhya Pradesh,Mandsaur,Daloda APMC,Lokwan,FAQ,2926.0,3078.0,3000.0
+2026-10-17,Madhya Pradesh,Mandsaur,Daloda APMC,Wheat,FAQ,2400.0,3266.0,2901.0
+2026-10-17,Madhya Pradesh,Damoh,Damoh APMC,Mill Quality,Non-FAQ,2510.0,2510.0,2510.0
+2026-10-17,Madhya Pradesh,Damoh,Damoh APMC,Other,Non-FAQ,2510.0,2510.0,2510.0
+2026-10-17,Madhya Pradesh,Damoh,Damoh APMC,Wheat,Non-FAQ,2445.0,2560.0,2535.0
+2026-10-17,Madhya Pradesh,Datia,Datia APMC,Mill Quality,FAQ,2630.0,2680.0,2680.0
+2026-10-17,Madhya Pradesh,Datia,Datia APMC,Wheat,FAQ,2650.0,2650.0,2650.0
+2026-10-17,Madhya Pradesh,Dewas,Dewas APMC,Wheat,FAQ,2600.0,3232.0,2751.0
+2026-10-17,Madhya Pradesh,Dhar,Dhamnod APMC,Wheat,FAQ,2928.0,2951.0,2951.0
+2026-10-17,Madhya Pradesh,Dhar,Dhar APMC,Lokwan,Non-FAQ,2640.0,2640.0,2640.0
+2026-10-17,Madhya Pradesh,Dhar,Dhar APMC,Wheat,FAQ,2430.0,3134.0,2898.0
+2026-10-17,Madhya Pradesh,Narsinghpur,Gadarwada APMC,Mill Quality,FAQ,2475.0,2765.0,2686.0
+2026-10-17,Madhya Pradesh,Raisen,Gairatganj APMC,Mill Quality,Non-FAQ,2550.0,2550.0,2550.0
+2026-10-17,Madhya Pradesh,Raisen,Gairatganj APMC,Wheat,Non-FAQ,2600.0,3011.0,2989.0
+2026-10-17,Madhya Pradesh,Vidisha,Ganjbasoda APMC,Lokwan,FAQ,2589.0,2850.0,2850.0
+2026-10-17,Madhya Pradesh,Vidisha,Ganjbasoda APMC,Malwa Shakti,FAQ,2562.0,2742.0,2742.0
+2026-10-17,Madhya Pradesh,Vidisha,Ganjbasoda APMC,Mill Quality,FAQ,2480.0,2734.0,2734.0
+2026-10-17,Madhya Pradesh,Vidisha,Ganjbasoda APMC,PISSI,FAQ,2480.0,3445.0,2850.0
+2026-10-17,Madhya Pradesh,Vidisha,Ganjbasoda APMC,Sharbati,FAQ,2620.0,4640.0,4640.0
+2026-10-17,Madhya Pradesh,Vidisha,Ganjbasoda APMC,Sujatha,FAQ,2560.0,3500.0,3200.0
+2026-10-17,Madhya Pradesh,Mandsaur,Garoth APMC,Wheat,Non-FAQ,2770.0,2825.0,2825.0
+2026-10-17,Madhya Pradesh,Indore,Gautampura APMC,Wheat,FAQ,2611.0,2611.0,2611.0
+2026-10-17,Madhya Pradesh,Bhind,Gohad APMC,Mill Quality,Non-FAQ,2535.0,2535.0,2535.0
+2026-10-17,Madhya Pradesh,Bhind,Gohad APMC,Wheat,FAQ,2505.0,2650.0,2640.0
+2026-10-17,Madhya Pradesh,Narsinghpur,Gotegaon APMC,Wheat,FAQ,2500.0,2675.0,2670.0
+2026-10-17,Madhya Pradesh,Guna,Guna APMC,Wheat,FAQ,2500.0,6630.0,2700.0
+2026-10-17,Madhya Pradesh,Dewas,Haatpipliya APMC,Wheat,Non-FAQ,2551.0,3100.0,2741.0
+2026-10-17,Madhya Pradesh,Harda,Harda APMC,Mill Quality,FAQ,2613.0,2826.0,2740.0
+2026-10-17,Madhya Pradesh,Chhatarpur,Harpalpur APMC,Wheat,FAQ,1900.0,2722.0,2715.0
+2026-10-17,Madhya Pradesh,Khandwa,Harsood APMC,Mill Quality,Non-FAQ,2410.0,2708.0,2708.0
+2026-10-17,Madhya Pradesh,Damoh,Hata APMC,Wheat,Non-FAQ,2450.0,2560.0,2520.0
+2026-10-17,Madhya Pradesh,Sehore,Ichhawar APMC,Wheat,FAQ,2500.0,2831.0,2700.0
+2026-10-17,Madhya Pradesh,Indore,Indore APMC,Mill Quality,FAQ,2750.0,2800.0,2800.0
+2026-10-17,Madhya Pradesh,Indore,Indore APMC,Wheat,Non-FAQ,2495.0,2511.0,2511.0
+2026-10-17,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2173.0,3281.0,2900.0
+2026-10-17,Madhya Pradesh,Ashoknagar,Isagarh APMC,Wheat,FAQ,2590.0,2590.0,2590.0
+2026-10-17,Madhya Pradesh,Narmadapuram,Itarsi APMC,Mill Quality,FAQ,2710.0,2710.0,2710.0
+2026-10-17,Madhya Pradesh,Narmadapuram,Itarsi APMC,Wheat,FAQ,2664.0,2869.0,2726.0
+2026-10-17,Madhya Pradesh,Jabalpur,Jabalpur APMC,Mill Quality,Non-FAQ,2344.0,2400.0,2400.0
+2026-10-17,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2450.0,2991.0,2651.0
+2026-10-17,Madhya Pradesh,Ratlam,Jaora APMC,Wheat,FAQ,2051.0,3751.0,3100.0
+2026-10-17,Madhya Pradesh,Rajgarh,Jeerapur APMC,Wheat,FAQ,2650.0,2775.0,2755.0
+2026-10-17,Madhya Pradesh,Rajgarh,Jeerapur APMC,Wheat,Non-FAQ,2700.0,2725.0,2700.0
+2026-10-17,Madhya Pradesh,Alirajpur,Jobat APMC,Wheat,Non-FAQ,2600.0,2600.0,2600.0
+2026-10-17,Madhya Pradesh,Morena,Kailaras APMC,Wheat,FAQ,2675.0,2770.0,2756.0
+2026-10-17,Madhya Pradesh,Shajapur,Kalapipal APMC,Wheat,FAQ,2247.0,2930.0,2741.0
+2026-10-17,Madhya Pradesh,Narsinghpur,Kareli APMC,Wheat,FAQ,2500.0,2811.0,2734.0
+2026-10-17,Madhya Pradesh,Khargone,Karhi APMC,Wheat,FAQ,2905.0,2905.0,2905.0
+2026-10-17,Madhya Pradesh,Khargone,Kasrawad APMC,Wheat,FAQ,2460.0,2990.0,2950.0
+2026-10-17,Madhya Pradesh,Katni,Katni APMC,Local,Non-FAQ,2525.0,2525.0,2525.0
+2026-10-17,Madhya Pradesh,Katni,Katni APMC,Mill Quality,FAQ,2400.0,2640.0,2640.0
+2026-10-17,Madhya Pradesh,Katni,Katni APMC,Wheat,Non-FAQ,2590.0,2707.0,2675.0
+2026-10-17,Madhya Pradesh,Ujjain,Khachrod APMC,Wheat,FAQ,2626.0,2936.0,2936.0
+2026-10-17,Madhya Pradesh,Khandwa,Khandwa APMC,Mill Quality,FAQ,2767.0,3043.0,2889.0
+2026-10-17,Madhya Pradesh,Khandwa,Khandwa APMC,Wheat,FAQ,2753.0,2753.0,2753.0
+2026-10-17,Madhya Pradesh,Shivpuri,Khaniadhana APMC,Mill Quality,FAQ,2400.0,2610.0,2455.0
+2026-10-17,Madhya Pradesh,Tikamgarh,Khargapur APMC,Mill Quality,FAQ,2548.0,2600.0,2600.0
+2026-10-17,Madhya Pradesh,Khargone,Khargone APMC,Wheat,Non-FAQ,2600.0,2700.0,2700.0
+2026-10-17,Madhya Pradesh,Khargone,Khargone APMC,Wheat,FAQ,2726.0,3069.0,3069.0
+2026-10-17,Madhya Pradesh,Dewas,Khategaon APMC,Wheat,FAQ,1500.0,3001.0,2911.0
+2026-10-17,Madhya Pradesh,Shivpuri,Khatora APMC,Wheat,FAQ,2560.0,2560.0,2560.0
+2026-10-17,Madhya Pradesh,Rajgarh,Khilchipur APMC,Mill Quality,FAQ,2654.0,2779.0,2779.0
+2026-10-17,Madhya Pradesh,Harda,Khirkiya APMC,Mill Quality,Non-FAQ,2680.0,2700.0,2700.0
+2026-10-17,Madhya Pradesh,Harda,Khirkiya APMC,Wheat,Non-FAQ,2700.0,2700.0,2700.0
+2026-10-17,Madhya Pradesh,Rajgarh,Khujner APMC,Wheat,FAQ,2660.0,2801.0,2700.0
+2026-10-17,Madhya Pradesh,Shivpuri,Kolaras APMC,Wheat,Non-FAQ,2600.0,2600.0,2600.0
+2026-10-17,Madhya Pradesh,Mandla,Krishi Upaj Mandi Samiti Bichhiya,Wheat,Non-FAQ,2500.0,2500.0,2500.0
+2026-10-17,Madhya Pradesh,Mandla,Krishi Upaj Mandi Samiti Bichhiya,Wheat,FAQ,2500.0,2600.0,2500.0
+2026-10-17,Madhya Pradesh,Guna,Kumbhraj APMC,Wheat,FAQ,2700.0,3090.0,2700.0
+2026-10-17,Madhya Pradesh,Rajgarh,Kurawar APMC,Wheat,FAQ,2500.0,3070.0,2705.0
+2026-10-17,Madhya Pradesh,Bhind,Lahar APMC,Wheat,FAQ,2489.0,2700.0,2699.0
+2026-10-17,Madhya Pradesh,Gwalior,Lashkar APMC,Wheat,FAQ,2675.0,2725.0,2680.0
+2026-10-17,Madhya Pradesh,Vidisha,Lateri APMC,Wheat,FAQ,2685.0,2685.0,2685.0
+2026-10-17,Madhya Pradesh,Chhatarpur,LavKush Nagar(Laundi) APMC,Mill Quality,FAQ,2510.0,2600.0,2510.0
+2026-10-17,Madhya Pradesh,Chhatarpur,LavKush Nagar(Laundi) APMC,Mill Quality,Non-FAQ,2610.0,2610.0,2610.0
+2026-10-17,Madhya Pradesh,Dewas,Loharda APMC,Wheat,FAQ,2601.0,2850.0,2850.0
+2026-10-17,Madhya Pradesh,Shivpuri,Magroni APMC,Wheat,FAQ,2561.0,2601.0,2601.0
+2026-10-17,Madhya Pradesh,Ujjain,Mahidpur APMC,Wheat,FAQ,2225.0,3001.0,2751.0
+2026-10-17,Madhya Pradesh,Maihar,Maihar APMC,Local,Non-FAQ,2510.0,2530.0,2530.0
+2026-10-17,Madhya Pradesh,Maihar,Maihar APMC,Local,FAQ,2500.0,2550.0,2550.0
+2026-10-17,Madhya Pradesh,Guna,Maksudangarh APMC,Wheat,FAQ,2500.0,2951.0,2750.0
+2026-10-17,Madhya Pradesh,Guna,Maksudangarh APMC,Wheat,Non-FAQ,2750.0,2750.0,2750.0
+2026-10-17,Madhya Pradesh,Sagar,Malthone APMC,Wheat,FAQ,2480.0,2755.0,2510.0
+2026-10-17,Madhya Pradesh,Neemuch,Manasa APMC,Wheat,FAQ,2600.0,2900.0,2830.0
+2026-10-17,Madhya Pradesh,Dhar,Manawar APMC,Wheat,FAQ,2700.0,2941.0,2800.0
+2026-10-17,Madhya Pradesh,Mandla,Mandla APMC,Mill Quality,Non-FAQ,2400.0,2410.0,2400.0
+2026-10-17,Madhya Pradesh,Mandsaur,Mandsaur APMC,Wheat,Non-FAQ,2301.0,3341.0,3000.0
+2026-10-17,Madhya Pradesh,Bhind,Mehgaon APMC,Wheat,FAQ,2500.0,2515.0,2515.0
+2026-10-17,Madhya Pradesh,Indore,Mhow (Ambedkar Nagar) APMC,Mill Quality,Non-FAQ,2575.0,2600.0,2600.0
+2026-10-17,Madhya Pradesh,Indore,Mhow (Ambedkar Nagar) APMC,Wheat,FAQ,2550.0,3024.0,2901.0
+2026-10-17,Madhya Pradesh,Morena,Morena APMC,Local,Non-FAQ,2696.0,2696.0,2696.0
+2026-10-17,Madhya Pradesh,Morena,Morena APMC,Wheat,Non-FAQ,2650.0,2720.0,2700.0
+2026-10-17,Madhya Pradesh,Khandwa,Mundi APMC,Wheat,FAQ,2606.0,2818.0,2760.0
+2026-10-17,Madhya Pradesh,Ujjain,Nagda APMC,Wheat,Non-FAQ,2780.0,2870.0,2870.0
+2026-10-17,Madhya Pradesh,Ujjain,Nagda APMC,Wheat,FAQ,2615.0,2865.0,2835.0
+2026-10-17,Madhya Pradesh,Satna,Nagod APMC,Mill Quality,FAQ,2545.0,2560.0,2560.0
+2026-10-17,Madhya Pradesh,Satna,Nagod APMC,Wheat,FAQ,2540.0,2650.0,2625.0
+2026-10-17,Madhya Pradesh,Rajgarh,Narsinghgarh APMC,Wheat,FAQ,2500.0,2875.0,2750.0
+2026-10-17,Madhya Pradesh,Narsinghpur,Narsinghpur APMC,Mill Quality,FAQ,2660.0,2724.0,2681.0
+2026-10-17,Madhya Pradesh,Narsinghpur,Narsinghpur APMC,Mill Quality,Non-FAQ,2650.0,2705.0,2701.0
+2026-10-17,Madhya Pradesh,Neemuch,Neemuch APMC,Lokwan,FAQ,2971.0,2971.0,2971.0
+2026-10-17,Madhya Pradesh,Neemuch,Neemuch APMC,Wheat,FAQ,2750.0,3500.0,2950.0
+2026-10-17,Madhya Pradesh,Raisen,Obedullaganj APMC,Local,FAQ,2700.0,2890.0,2700.0
+2026-10-17,Madhya Pradesh,Raisen,Obedullaganj APMC,Malwa Shakti,FAQ,2650.0,2650.0,2650.0
+2026-10-17,Madhya Pradesh,Raisen,Obedullaganj APMC,Wheat,FAQ,2500.0,2874.0,2874.0
+2026-10-17,Madhya Pradesh,Jabalpur,Paatan APMC,Wheat,FAQ,2600.0,2675.0,2675.0
+2026-10-17,Madhya Pradesh,Jabalpur,Paatan APMC,Wheat,Non-FAQ,2570.0,2860.0,2720.0
+2026-10-17,Madhya Pradesh,Rajgarh,Pachaur APMC,Wheat,FAQ,2360.0,2905.0,2700.0
+2026-10-17,Madhya Pradesh,Rajgarh,Pachaur APMC,Wheat,Non-FAQ,2650.0,2850.0,2650.0
+2026-10-17,Madhya Pradesh,Panna,Panna APMC,Mill Quality,Non-FAQ,2500.0,2530.0,2510.0
+2026-10-17,Madhya Pradesh,Panna,Panna APMC,Mill Quality,FAQ,2500.0,2540.0,2534.0
+2026-10-17,Madhya Pradesh,Jhabua,Petlawad APMC,Wheat,FAQ,2693.0,2800.0,2800.0
+2026-10-17,Madhya Pradesh,Shivpuri,Pichhour APMC,Mill Quality,Non-FAQ,2548.0,2560.0,2548.0
+2026-10-17,Madhya Pradesh,Narmadapuram,Pipariya APMC,Wheat,FAQ,2400.0,2799.0,2730.0
+2026-10-17,Madhya Pradesh,Mandsaur,Piplya APMC,Wheat,FAQ,2600.0,3150.0,2886.0
+2026-10-17,Madhya Pradesh,Shivpuri,Pohari APMC,Wheat,FAQ,2520.0,2520.0,2520.0
+2026-10-17,Madhya Pradesh,Shivpuri,Pohari APMC,Wheat,Non-FAQ,2540.0,2580.0,2575.0
+2026-10-17,Madhya Pradesh,Sagar,Rahatgarh APMC,Lokwan,FAQ,2711.0,2711.0,2711.0
+2026-10-17,Madhya Pradesh,Sagar,Rahatgarh APMC,Lokwan,Non-FAQ,2701.0,2701.0,2701.0
+2026-10-17,Madhya Pradesh,Sagar,Rahatgarh APMC,Mill Quality,FAQ,2680.0,2780.0,2780.0
+2026-10-17,Madhya Pradesh,Sagar,Rahatgarh APMC,Mill Quality,Non-FAQ,2405.0,2900.0,2700.0
+2026-10-17,Madhya Pradesh,Sagar,Rahatgarh APMC,Sharbati,Non-FAQ,3200.0,3200.0,3200.0
+2026-10-17,Madhya Pradesh,Sagar,Rahatgarh APMC,Wheat,Non-FAQ,2715.0,2715.0,2715.0
+2026-10-17,Madhya Pradesh,Raisen,Raisen APMC,Mill Quality,Non-FAQ,2345.0,2400.0,2400.0
+2026-10-17,Madhya Pradesh,Raisen,Raisen APMC,Wheat,FAQ,2570.0,2900.0,2900.0
+2026-10-17,Madhya Pradesh,Dhar,Rajgarh APMC,Wheat,FAQ,2251.0,3151.0,2801.0
+2026-10-17,Madhya Pradesh,Chhatarpur,Rajnagar APMC,Mill Quality,FAQ,2450.0,2540.0,2500.0
+2026-10-17,Madhya Pradesh,Maihar,Ramnagar APMC,Mill Quality,Non-FAQ,2570.0,2605.0,2605.0
+2026-10-17,Madhya Pradesh,Ratlam,Ratlam APMC,Wheat,Non-FAQ,3032.0,3032.0,3032.0
+2026-10-17,Madhya Pradesh,Ratlam,Ratlam APMC,Wheat,FAQ,2430.0,3301.0,2867.0
+2026-10-17,Madhya Pradesh,Sagar,Rehli APMC,Mill Quality,FAQ,2150.0,2210.0,2210.0
+2026-10-17,Madhya Pradesh,Rewa,Rewa APMC,Malwa Shakti,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Madhya Pradesh,Rewa,Rewa APMC,Mill Quality,FAQ,2470.0,2660.0,2645.0
+2026-10-17,Madhya Pradesh,Rewa,Rewa APMC,Mill Quality,Non-FAQ,2250.0,2250.0,2250.0
+2026-10-17,Madhya Pradesh,Rewa,Rewa APMC,Wheat,FAQ,2550.0,2550.0,2550.0
+2026-10-17,Madhya Pradesh,Morena,Sabalgarh APMC,Mill Quality,Non-FAQ,2591.0,2661.0,2661.0
+2026-10-17,Madhya Pradesh,Sagar,Sagar APMC,Wheat,FAQ,1695.0,3655.0,2680.0
+2026-10-17,Madhya Pradesh,Sagar,Sagar APMC,Wheat Mix,FAQ,2680.0,2680.0,2680.0
+2026-10-17,Madhya Pradesh,Ratlam,Sailana APMC,Wheat,FAQ,2752.0,3195.0,3131.0
+2026-10-17,Madhya Pradesh,Khargone,Sanawad APMC,Wheat,FAQ,2700.0,3001.0,2864.0
+2026-10-17,Madhya Pradesh,Indore,Sanwer APMC,Wheat,FAQ,2650.0,2996.0,2996.0
+2026-10-17,Madhya Pradesh,Rajgarh,Sarangpur APMC,Lokwan,Non-FAQ,2690.0,2690.0,2690.0
+2026-10-17,Madhya Pradesh,Rajgarh,Sarangpur APMC,Mill Quality,FAQ,2670.0,2750.0,2750.0
+2026-10-17,Madhya Pradesh,Rajgarh,Sarangpur APMC,Mill Quality,Non-FAQ,2600.0,2600.0,2600.0
+2026-10-17,Madhya Pradesh,Rajgarh,Sarangpur APMC,Sujatha,FAQ,2675.0,2675.0,2675.0
+2026-10-17,Madhya Pradesh,Rajgarh,Sarangpur APMC,Wheat,FAQ,2526.0,2650.0,2650.0
+2026-10-17,Madhya Pradesh,Rajgarh,Sarangpur APMC,Wheat,Non-FAQ,2539.0,2725.0,2725.0
+2026-10-17,Madhya Pradesh,Satna,Satna APMC,Wheat,Non-FAQ,2575.0,2575.0,2575.0
+2026-10-17,Madhya Pradesh,Satna,Satna APMC,Wheat,FAQ,2550.0,2791.0,2638.0
+2026-10-17,Madhya Pradesh,Jabalpur,Sehora APMC,Mill Quality,FAQ,2400.0,2625.0,2400.0
+2026-10-17,Madhya Pradesh,Sehore,Sehore APMC,Lokwan,FAQ,2516.0,3131.0,3131.0
+2026-10-17,Madhya Pradesh,Sehore,Sehore APMC,Malwa Shakti,FAQ,2799.0,2880.0,2880.0
+2026-10-17,Madhya Pradesh,Sehore,Sehore APMC,Sharbati,FAQ,4000.0,4000.0,4000.0
+2026-10-17,Madhya Pradesh,Sehore,Sehore APMC,Wheat,FAQ,2478.0,5940.0,2630.0
+2026-10-17,Madhya Pradesh,Narmadapuram,Semriharchand APMC,Mill Quality,FAQ,2653.0,2653.0,2653.0
+2026-10-17,Madhya Pradesh,Datia,Sevda APMC,Mill Quality,FAQ,2650.0,2650.0,2650.0
+2026-10-17,Madhya Pradesh,Datia,Sevda APMC,Mill Quality,Non-FAQ,2650.0,2650.0,2650.0
+2026-10-17,Madhya Pradesh,Sagar,Shahagarh APMC,Mill Quality,Non-FAQ,2575.0,2625.0,2625.0
+2026-10-17,Madhya Pradesh,Sagar,Shahagarh APMC,Wheat,FAQ,2495.0,2500.0,2495.0
+2026-10-17,Madhya Pradesh,Shehdol,Shahdol APMC,Wheat,Non-FAQ,2500.0,2500.0,2500.0
+2026-10-17,Madhya Pradesh,Jabalpur,Shahpura Bhitoni (F&V) APMC,Mill Quality,FAQ,2475.0,2680.0,2680.0
+2026-10-17,Madhya Pradesh,Shajapur,Shajapur APMC,Wheat,FAQ,2565.0,2965.0,2701.0
+2026-10-17,Madhya Pradesh,Mandsaur,Shamgarh APMC,Wheat,Non-FAQ,2780.0,3300.0,3300.0
+2026-10-17,Madhya Pradesh,Vidisha,Shamshabad APMC,Wheat,FAQ,2540.0,2641.0,2641.0
+2026-10-17,Madhya Pradesh,Sheopur,Sheopurbadod APMC,Wheat,FAQ,2700.0,2766.0,2766.0
+2026-10-17,Madhya Pradesh,Sheopur,Sheopurkalan APMC,Wheat,FAQ,2640.0,2787.0,2777.0
+2026-10-17,Madhya Pradesh,Shajapur,Shujalpur APMC,Wheat,FAQ,2575.0,2796.0,2796.0
+2026-10-17,Madhya Pradesh,Shajapur,Shujalpur APMC,Wheat,Non-FAQ,2550.0,2550.0,2550.0
+2026-10-17,Madhya Pradesh,Sehore,Shyampur APMC,Mill Quality,FAQ,2550.0,2710.0,2710.0
+2026-10-17,Madhya Pradesh,Sehore,Shyampur APMC,Wheat,FAQ,2575.0,2600.0,2600.0
+2026-10-17,Madhya Pradesh,Sidhi,Sidhi APMC,Mill Quality,Non-FAQ,2400.0,2445.0,2440.0
+2026-10-17,Madhya Pradesh,Raisen,Silvani APMC,Wheat,FAQ,2700.0,2735.0,2720.0
+2026-10-17,Madhya Pradesh,Panna,Simariya APMC,Wheat,Non-FAQ,2490.0,2525.0,2525.0
+2026-10-17,Madhya Pradesh,Vidisha,Sironj APMC,Wheat,FAQ,2475.0,5705.0,2550.0
+2026-10-17,Madhya Pradesh,Mandsaur,Sitamau APMC,Lokwan,FAQ,2840.0,3091.0,3091.0
+2026-10-17,Madhya Pradesh,Mandsaur,Sitamau APMC,Wheat,FAQ,2720.0,3064.0,2900.0
+2026-10-17,Madhya Pradesh,Dewas,Sonkatch APMC,Wheat,FAQ,2500.0,2961.0,2641.0
+2026-10-17,Madhya Pradesh,Agar Malwa,Soyatkalan APMC,Wheat,FAQ,2565.0,2700.0,2675.0
+2026-10-17,Madhya Pradesh,Agar Malwa,Susner APMC,Wheat,Non-FAQ,2612.0,2751.0,2626.0
+2026-10-17,Madhya Pradesh,Mandsaur,Suvasra APMC,Mill Quality,FAQ,2681.0,2701.0,2701.0
+2026-10-17,Madhya Pradesh,Mandsaur,Suvasra APMC,Wheat,FAQ,2751.0,2751.0,2751.0
+2026-10-17,Madhya Pradesh,Ratlam,Taal APMC,Wheat,FAQ,2800.0,2950.0,2950.0
+2026-10-17,Madhya Pradesh,Jhabua,Thandla APMC,Mill Quality,FAQ,2831.0,2876.0,2876.0
+2026-10-17,Madhya Pradesh,Tikamgarh,Tikamgarh APMC,Wheat,FAQ,2300.0,2699.0,2680.0
+2026-10-17,Madhya Pradesh,Raisen,Udaipura APMC,Mill Quality,FAQ,2575.0,2750.0,2675.0
+2026-10-17,Madhya Pradesh,Ujjain,Ujjain APMC,Wheat,FAQ,1400.0,3341.0,2750.0
+2026-10-17,Madhya Pradesh,Umariya,Umariya APMC,Mill Quality,Non-FAQ,2351.0,2440.0,2440.0
+2026-10-17,Madhya Pradesh,Umariya,Umariya APMC,Mill Quality,FAQ,2300.0,2300.0,2300.0
+2026-10-17,Madhya Pradesh,Umariya,Umariya APMC,Wheat,Non-FAQ,2300.0,2550.0,2550.0
+2026-10-17,Madhya Pradesh,Ujjain,Unhel APMC,Wheat,FAQ,2621.0,2831.0,2741.0
+2026-10-17,Madhya Pradesh,Vidisha,Vidisha APMC,Other,FAQ,2961.0,3000.0,2961.0
+2026-10-17,Madhya Pradesh,Vidisha,Vidisha APMC,Wheat,FAQ,2025.0,5841.0,2700.0
+2026-10-17,Maharashtra,Akola,APMC Akola,Other,FAQ,2675.0,2800.0,2700.0
+2026-10-17,Maharashtra,Akola,APMC Akola,Sharbati,FAQ,3150.0,4000.0,3750.0
+2026-10-17,Maharashtra,Akola,APMC Akot,147 Average,FAQ,2700.0,2870.0,2800.0
+2026-10-17,Maharashtra,Amarawati,APMC Amarawati,Other,FAQ,2610.0,2700.0,2655.0
+2026-10-17,Maharashtra,Jalna,APMC Ambad (Vadigodri),Other,Non-FAQ,2151.0,2584.0,2296.0
+2026-10-17,Maharashtra,Jalna,APMC Ashti(Jalna),Maharashtra 2189,FAQ,2810.0,2810.0,2810.0
+2026-10-17,Maharashtra,Jalna,APMC BHOKARDAN,Other,FAQ,2625.0,2750.0,2700.0
+2026-10-17,Maharashtra,Chattrapati Sambhajinagar,APMC Chattrapati Sambhajinagar,Other,FAQ,2770.0,3400.0,3085.0
+2026-10-17,Maharashtra,Buldhana,APMC Chikali,Other,FAQ,2610.0,3000.0,2725.0
+2026-10-17,Maharashtra,Buldhana,APMC Deoulgaon Raja,Other,FAQ,2700.0,3100.0,2800.0
+2026-10-17,Maharashtra,Wardha,APMC Hinganghat,Other,FAQ,2610.0,2795.0,2720.0
+2026-10-17,Maharashtra,Wardha,APMC Hinganghat,Other,Non-FAQ,2590.0,2600.0,2595.0
+2026-10-17,Maharashtra,Jalna,APMC Jalana,Other,FAQ,2750.0,3500.0,2900.0
+2026-10-17,Maharashtra,Ahilyanagar,APMC Jamkhed,Other,FAQ,2700.0,3500.0,3100.0
+2026-10-17,Maharashtra,Ahilyanagar,APMC Jamkhed,Other,Non-FAQ,2300.0,2500.0,2400.0
+2026-10-17,Maharashtra,Ahilyanagar,APMC Karjat,Other,FAQ,2610.0,3400.0,3000.0
+2026-10-17,Maharashtra,Ahilyanagar,APMC Karjat,Other,Non-FAQ,2400.0,2600.0,2500.0
+2026-10-17,Maharashtra,Buldhana,APMC Khamgaon,Other,FAQ,2700.0,2800.0,2750.0
+2026-10-17,Maharashtra,Buldhana,APMC Khamgaon,Other,Non-FAQ,2550.0,2600.0,2575.0
+2026-10-17,Maharashtra,Ahilyanagar,APMC Kopargaon,Other,FAQ,2851.0,3121.0,2990.0
+2026-10-17,Maharashtra,Nanded,APMC Loha,Other,Non-FAQ,2601.0,2602.0,2602.0
+2026-10-17,Maharashtra,Buldhana,APMC Lonar,Other,Non-FAQ,2300.0,2390.0,2345.0
+2026-10-17,Maharashtra,Beed,APMC Majalgaon,Other,FAQ,2620.0,3630.0,2900.0
+2026-10-17,Maharashtra,Nashik,APMC Malegaon,Other,FAQ,2851.0,3419.0,3000.0
+2026-10-17,Maharashtra,Buldhana,APMC Malkapur,Other,FAQ,2650.0,2835.0,2720.0
+2026-10-17,Maharashtra,Mumbai,APMC Mumbai,Other,FAQ,2900.0,6600.0,4750.0
+2026-10-17,Maharashtra,Nagpur,APMC Nagpur,Other,FAQ,2610.0,2800.0,2752.0
+2026-10-17,Maharashtra,Nagpur,APMC Nagpur,Other,Non-FAQ,2600.0,2609.0,2606.0
+2026-10-17,Maharashtra,Nagpur,APMC Nagpur,Sharbati,FAQ,3200.0,3500.0,3425.0
+2026-10-17,Maharashtra,Nashik,APMC Nandgaon,Maharashtra 2189,FAQ,2900.0,3600.0,3450.0
+2026-10-17,Maharashtra,Jalgaon,APMC Pachora,Other,FAQ,2610.0,2875.0,2721.0
+2026-10-17,Maharashtra,Jalgaon,APMC Pachora,Other,Non-FAQ,2051.0,2600.0,2321.0
+2026-10-17,Maharashtra,Chattrapati Sambhajinagar,APMC Paithan,Bansi,FAQ,2820.0,2820.0,2820.0
+2026-10-17,Maharashtra,Ahilyanagar,APMC Pathardi,Maharashtra 2189,FAQ,2610.0,3200.0,2950.0
+2026-10-17,Maharashtra,Ahilyanagar,APMC Rahata,Other,FAQ,2750.0,2800.0,2775.0
+2026-10-17,Maharashtra,Sangli,APMC Sangli,Other,FAQ,3300.0,4500.0,3900.0
+2026-10-17,Maharashtra,Ahilyanagar,APMC Shevgaon,Maharashtra 2189,FAQ,3100.0,3200.0,3200.0
+2026-10-17,Maharashtra,Solapur,APMC Solapur,Sharbati,FAQ,2695.0,4200.0,3660.0
+2026-10-17,Maharashtra,Akola,APMC Telhara,Other,Non-FAQ,2400.0,2600.0,2540.0
+2026-10-17,Maharashtra,Dharashiv,APMC Tuljapur,Other,FAQ,2610.0,2700.0,2650.0
+2026-10-17,Maharashtra,Nagpur,APMC Umared,Other,FAQ,2650.0,2850.0,2750.0
+2026-10-17,Maharashtra,Dharashiv,APMC Umarga,Maharashtra 2189,Non-FAQ,2400.0,2400.0,2400.0
+2026-10-17,Maharashtra,Satara,APMC Vaduj,Maharashtra 2189,FAQ,2750.0,3000.0,2850.0
+2026-10-17,Maharashtra,Chattrapati Sambhajinagar,APMC Vaijpur,Other,FAQ,2820.0,3685.0,2860.0
+2026-10-17,Maharashtra,Buldhana,"Bsk Krishi Bazar Private Limited, Mehkar, Dist Buldhana",Other,Local,2500.0,2750.0,2730.0
+2026-10-17,Maharashtra,Kolhapur,Kolhapur(Laxmipuri),Other,FAQ,3300.0,4400.0,3850.0
+2026-10-17,Maharashtra,Washim,"Krushna Krishi Bazar, Washim",Other,Local,2000.0,2750.0,2726.0
+2026-10-17,Maharashtra,Nashik,Lasalgaon(Niphad),Maharashtra 2189,FAQ,2751.0,3011.0,2800.0
+2026-10-17,Maharashtra,Ahilyanagar,Rahuri(Vambori),Other,FAQ,2780.0,2780.0,2780.0
+2026-10-17,Maharashtra,Ahilyanagar,Shevgaon(Bodhegaon),Maharashtra 2189,FAQ,2800.0,2800.0,2800.0
+2026-10-17,Maharashtra,Wardha,Sindi (Selu),Other,Non-FAQ,2550.0,2600.0,2590.0
+2026-10-17,Rajasthan,Jaipur,Bassi APMC,Other,Local,2600.0,2750.0,2675.0
+2026-10-17,Rajasthan,Hanumangarh,Bhadara APMC,1482,Non-FAQ,2850.0,2850.0,2850.0
+2026-10-17,Rajasthan,Bundi,Bundi APMC,Other,FAQ,2680.0,2906.0,2793.0
+2026-10-17,Rajasthan,Jhalawar,Choumahla APMC,Other,Non-FAQ,2600.0,2850.0,2675.0
+2026-10-17,Rajasthan,Bundi,Dei APMC,Other,Local,2631.0,2790.0,2700.0
+2026-10-17,Rajasthan,Tonk,Deoli APMC,147 Average,FAQ,2680.0,2730.0,2705.0
+2026-10-17,Rajasthan,Udaipur,Fatehnagar APMC,Local,FAQ,2800.0,3029.0,2975.0
+2026-10-17,Rajasthan,Ganganagar,Gajsinghpur APMC,Other,Local,2620.0,2620.0,2620.0
+2026-10-17,Rajasthan,Swai Madhopur,Gangapur City APMC,Other,Non-FAQ,2650.0,2700.0,2680.0
+2026-10-17,Rajasthan,Ganganagar,Gharsana APMC,Other,FAQ,2735.0,2735.0,2735.0
+2026-10-17,Rajasthan,Jhalawar,Iklera APMC,Other,Local,2550.0,2850.0,2700.0
+2026-10-17,Rajasthan,Bundi,Keshoraipatan APMC,Local,FAQ,2600.0,2930.0,2800.0
+2026-10-17,Rajasthan,Jhalawar,Khanpur APMC,Other,FAQ,2500.0,2921.0,2701.0
+2026-10-17,Rajasthan,Alwar,Kherli APMC,Other,Non-FAQ,2755.0,2790.0,2780.0
+2026-10-17,Rajasthan,Tonk,Malpura APMC,Other,FAQ,2690.0,2716.0,2700.0
+2026-10-17,Rajasthan,Dausa,Mandawar APMC,Other,FAQ,2691.0,2731.0,2713.0
+2026-10-17,Rajasthan,Jodhpur,Osiyan Mathania APMC,Local,Local,2300.0,2700.0,2500.0
+2026-10-17,Rajasthan,Kota,Ramganjmandi APMC,Other,Local,2680.0,2790.0,2728.0
+2026-10-17,Rajasthan,Hanumangarh,Rawatsar APMC,Other,FAQ,2726.0,2752.0,2740.0
+2026-10-17,Rajasthan,Ganganagar,Sadulshahar APMC,Other,FAQ,2720.0,2743.0,2725.0
+2026-10-17,Rajasthan,Pali,Sumerpur APMC,Other,Non-FAQ,2980.0,3275.0,3131.0
+2026-10-17,Rajasthan,Tonk,Todaraisingh APMC,Other,FAQ,2700.0,2742.0,2721.0
+2026-10-17,Rajasthan,Tonk,Tonk APMC,Deshi,FAQ,2667.0,2667.0,2667.0
+2026-10-17,Rajasthan,Tonk,Uniyara APMC,Other,FAQ,2500.0,2760.0,2630.0
+2026-10-17,Uttar Pradesh,Auraiya,Achalda APMC,Dara,FAQ,2410.0,2410.0,2410.0
+2026-10-17,Uttar Pradesh,Jalaun (Orai),Ait APMC,Dara Mill Quality,FAQ,2600.0,2601.0,2600.5
+2026-10-17,Uttar Pradesh,Jalaun (Orai),Ait APMC,Other,FAQ,2620.0,2620.0,2620.0
+2026-10-17,Uttar Pradesh,Ambedkarnagar,Akbarpur APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Ambedkarnagar,Akbarpur APMC,Medium Fine,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Etah,Aliganj APMC,Dara,FAQ,2500.0,2600.0,2505.19
+2026-10-17,Uttar Pradesh,Aligarh,Aligarh APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Banda,Atarra APMC,Deshi,FAQ,2450.0,2600.0,2483.71
+2026-10-17,Uttar Pradesh,Auraiya,Auraiya APMC,Other,FAQ,2570.0,2570.0,2570.0
+2026-10-17,Uttar Pradesh,Ayodhya,Ayodhya APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Ayodhya,Ayodhya APMC,Dara Mill Quality,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Ayodhya,Ayodhya APMC,Deshi,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Ayodhya,Ayodhya APMC,Local,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Ayodhya,Ayodhya APMC,Medium,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Azamgarh,Azamgarh APMC,Dara,FAQ,2585.0,2600.0,2589.29
+2026-10-17,Uttar Pradesh,Azamgarh,Azamgarh APMC,Medium,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Banda,Baberu APMC,Dara,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Badaun,Babrala APMC,Other,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Raebarelli,Bachranwa APMC,Medium,FAQ,2450.0,2450.0,2450.0
+2026-10-17,Uttar Pradesh,Badaun,Badayoun APMC,Other,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Bahraich,Bahraich APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Bahraich,Bahraich APMC,Other,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Balrampur,Balrampur APMC,Dara,FAQ,2650.0,2700.0,2676.56
+2026-10-17,Uttar Pradesh,Balrampur,Balrampur APMC,Medium,FAQ,2550.0,2550.0,2550.0
+2026-10-17,Uttar Pradesh,Balrampur,Balrampur APMC,Other,FAQ,2700.0,2700.0,2700.0
+2026-10-17,Uttar Pradesh,Banda,Banda APMC,Dara,FAQ,2425.0,2426.0,2425.11
+2026-10-17,Uttar Pradesh,Banda,Banda APMC,Other,FAQ,2430.0,2450.0,2439.25
+2026-10-17,Uttar Pradesh,Unnao,Bangarmau APMC,Dara,FAQ,2550.0,2610.0,2559.02
+2026-10-17,Uttar Pradesh,Siddharth Nagar,Bansi APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Lucknow,Banthara APMC,Dara,FAQ,2550.0,2840.0,2707.85
+2026-10-17,Uttar Pradesh,Barabanki,Barabanki APMC,Dara Mill Quality,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Barabanki,Barabanki APMC,Hybrid,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Baghpat,Baraut APMC,Medium,FAQ,2640.0,2680.0,2658.26
+2026-10-17,Uttar Pradesh,Bareilly,Bareilly APMC,Deshi,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Bareilly,Bareilly APMC,Mill Quality,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Bareilly,Bareilly APMC,Other,FAQ,2602.0,2603.0,2602.52
+2026-10-17,Uttar Pradesh,Kanpur,Baripaal APMC,Dara,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Kanpur,Baripaal APMC,Local,FAQ,2550.0,2550.0,2550.0
+2026-10-17,Uttar Pradesh,Basti,Basti APMC,Dara,FAQ,2450.0,2600.0,2482.68
+2026-10-17,Uttar Pradesh,Basti,Basti APMC,Other,FAQ,2450.0,2500.0,2452.71
+2026-10-17,Uttar Pradesh,Basti,Basti APMC,PBW-343,FAQ,2450.0,2450.0,2450.0
+2026-10-17,Uttar Pradesh,Etawah,Bharthna APMC,Other,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Hamirpur,Bharuasumerpur APMC,Dara,FAQ,2540.0,2550.0,2543.57
+2026-10-17,Uttar Pradesh,Hamirpur,Bharuasumerpur APMC,Medium,FAQ,2540.0,2600.0,2568.06
+2026-10-17,Uttar Pradesh,Kaushambi,Bharwari APMC,Other,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Sambhal,Bhehjoi APMC,Mill Quality,FAQ,2601.0,2609.0,2603.8
+2026-10-17,Uttar Pradesh,Shravasti,Bhinga APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Shravasti,Bhinga APMC,Other,FAQ,2550.0,2550.0,2550.0
+2026-10-17,Uttar Pradesh,Bijnor,Bijnaur APMC,Other,FAQ,2674.97,2674.97,2674.97
+2026-10-17,Uttar Pradesh,Badaun,Bilsi APMC,Dara,FAQ,2600.0,2800.0,2655.56
+2026-10-17,Uttar Pradesh,Badaun,Bilsi APMC,Other,FAQ,2800.0,2800.0,2800.0
+2026-10-17,Uttar Pradesh,Fatehpur,Bindki APMC,Dara,FAQ,2500.0,2610.0,2561.51
+2026-10-17,Uttar Pradesh,Fatehpur,Bindki APMC,Dara Mill Quality,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Fatehpur,Bindki APMC,Other,FAQ,2500.0,2630.0,2584.23
+2026-10-17,Uttar Pradesh,Pillibhit,Bishalpur APMC,Dara,FAQ,2550.0,2550.0,2550.0
+2026-10-17,Uttar Pradesh,Saharanpur,CHHUTMALPUR APMC,Local,FAQ,2645.0,2650.0,2647.8
+2026-10-17,Uttar Pradesh,Mahoba,Charkhari APMC,Dara,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Mahoba,Charkhari APMC,Dara Mill Quality,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttar Pradesh,Mahoba,Charkhari APMC,Deshi,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttar Pradesh,Gorakhpur,Chorichora APMC,Dara,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttar Pradesh,Kanpur,Choubepur APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Gautam Budh Nagar,Dankaur APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Badaun,Dataganj APMC,Dara,FAQ,2500.0,2600.0,2550.0
+2026-10-17,Uttar Pradesh,Deoria,Devariya APMC,Dara,FAQ,2450.0,2570.0,2489.28
+2026-10-17,Uttar Pradesh,Deoria,Devariya APMC,Hybrid,FAQ,2770.02,2770.02,2770.02
+2026-10-17,Uttar Pradesh,Deoria,Devariya APMC,Other,FAQ,2450.0,2450.0,2450.0
+2026-10-17,Uttar Pradesh,Deoria,Devariya APMC,Sharbati,FAQ,2771.03,2771.03,2771.03
+2026-10-17,Uttar Pradesh,Deoria,Devariya APMC,Sonalika,FAQ,2770.36,2773.29,2772.24
+2026-10-17,Uttar Pradesh,Deoria,Devariya APMC,White,FAQ,2750.0,2760.0,2753.07
+2026-10-17,Uttar Pradesh,Amroha,Dhanaura APMC,Dara,FAQ,2600.0,2650.0,2621.28
+2026-10-17,Uttar Pradesh,Auraiya,Dibiapur APMC,Dara,FAQ,2550.0,2650.0,2582.1
+2026-10-17,Uttar Pradesh,Etah,Etah APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Farukhabad,Farukhabad APMC,Other,FAQ,2585.0,2585.0,2585.0
+2026-10-17,Uttar Pradesh,Fatehpur,Fatehpur APMC,Hybrid,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Fatehpur,Fatehpur APMC,Medium,FAQ,2525.0,2525.0,2525.0
+2026-10-17,Uttar Pradesh,Agra,Fatehpur Sikri APMC,Dara,FAQ,2550.0,2550.0,2550.0
+2026-10-17,Uttar Pradesh,Firozabad,Firozabad APMC,Dara,FAQ,2740.0,2830.0,2817.88
+2026-10-17,Uttar Pradesh,Firozabad,Firozabad APMC,Dara Mill Quality,FAQ,2850.0,2850.0,2850.0
+2026-10-17,Uttar Pradesh,Firozabad,Firozabad APMC,Hybrid,FAQ,2830.0,2835.0,2832.0
+2026-10-17,Uttar Pradesh,Maharajganj,Gadaura APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Lakhimpur,Golagokarnath APMC,Dara,FAQ,2550.0,3000.0,2833.92
+2026-10-17,Uttar Pradesh,Gonda,Gonda APMC,Dara Mill Quality,FAQ,2730.0,2730.0,2730.0
+2026-10-17,Uttar Pradesh,Gorakhpur,Gorakhpur APMC,Dara,FAQ,2500.0,2550.0,2524.04
+2026-10-17,Uttar Pradesh,Gorakhpur,Gorakhpur APMC,Dara Mill Quality,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Hathras,Haathras APMC,Dara,FAQ,2700.0,2700.0,2700.0
+2026-10-17,Uttar Pradesh,Bijnor,Haldaur APMC,Medium,FAQ,2850.0,2850.0,2850.0
+2026-10-17,Uttar Pradesh,Ghaziabad,Hapur APMC,Dara,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Ghaziabad,Hapur APMC,Other,FAQ,2610.0,2610.0,2610.0
+2026-10-17,Uttar Pradesh,Hardoi,Hardoi APMC,Dara,FAQ,2450.0,2570.0,2465.52
+2026-10-17,Uttar Pradesh,Hardoi,Hardoi APMC,Dara Mill Quality,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Amroha,Hasanpur APMC,Dara Mill Quality,FAQ,2590.0,2590.0,2590.0
+2026-10-17,Uttar Pradesh,Amethi,Jafarganj APMC,Dara,FAQ,2449.94,2450.0,2449.99
+2026-10-17,Uttar Pradesh,Fatehpur,Jahanabad APMC,Dara,FAQ,2500.0,2550.0,2517.5
+2026-10-17,Uttar Pradesh,Fatehpur,Jahanabad APMC,Medium,FAQ,2550.0,2560.0,2554.92
+2026-10-17,Uttar Pradesh,Shahjahanpur,Jalalabad APMC,Dara,FAQ,2430.0,2450.0,2442.5
+2026-10-17,Uttar Pradesh,Shahjahanpur,Jalalabad APMC,Deshi,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Jalaun (Orai),Jalaun APMC,Mill Quality,FAQ,2580.0,2580.0,2580.0
+2026-10-17,Uttar Pradesh,Ghazipur,Jangipura APMC,Dara,FAQ,2450.0,2450.0,2450.0
+2026-10-17,Uttar Pradesh,Jaunpur,Jaunpur APMC,Dara,FAQ,2560.0,2560.0,2560.0
+2026-10-17,Uttar Pradesh,Jaunpur,Jaunpur APMC,Dara Mill Quality,FAQ,2652.0,2709.0,2676.75
+2026-10-17,Uttar Pradesh,Raebarelli,Jayas APMC,Dara,FAQ,2400.0,2650.0,2521.32
+2026-10-17,Uttar Pradesh,Jhansi,Jhansi APMC,Other,FAQ,2500.0,2505.0,2501.2
+2026-10-17,Uttar Pradesh,Jhansi,Jhansi APMC,White,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Kanpur Dehat,Jhijhank APMC,Dara,FAQ,2450.0,2600.0,2574.91
+2026-10-17,Uttar Pradesh,Jalaun (Orai),Kadaura APMC,Deshi,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Jalaun (Orai),Kadaura APMC,Medium,FAQ,2350.0,2350.0,2350.0
+2026-10-17,Uttar Pradesh,Jalaun (Orai),Kalpi APMC,Dara,FAQ,2400.0,2500.0,2441.38
+2026-10-17,Uttar Pradesh,Jalaun (Orai),Kalpi APMC,Other,FAQ,2500.0,2600.0,2558.85
+2026-10-17,Uttar Pradesh,Kannuj,Kannauj APMC,Dara,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Kanpur,Kanpur(Grain) APMC,Dara,FAQ,2650.0,2755.0,2744.45
+2026-10-17,Uttar Pradesh,Kanpur,Kanpur(Grain) APMC,Dara Mill Quality,FAQ,2360.0,2360.0,2360.0
+2026-10-17,Uttar Pradesh,Chitrakut,Karvi APMC,Deshi,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Chitrakut,Karvi APMC,Medium,FAQ,2550.0,2550.0,2550.0
+2026-10-17,Uttar Pradesh,Chitrakut,Karvi APMC,Other,FAQ,2430.0,2430.0,2430.0
+2026-10-17,Uttar Pradesh,Farukhabad,Kayamganj APMC,Dara,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Farukhabad,Kayamganj APMC,Other,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Sant Kabir Nagar,Khalilabad APMC,Dara,FAQ,2530.0,2530.0,2530.0
+2026-10-17,Uttar Pradesh,Sant Kabir Nagar,Khalilabad APMC,Other,FAQ,2530.0,2530.0,2530.0
+2026-10-17,Uttar Pradesh,Baghpat,Khekda APMC,Other,FAQ,2700.0,2700.0,2700.0
+2026-10-17,Uttar Pradesh,Mau(Maunathbhanjan),Kopaganj APMC,Dara,FAQ,2650.0,2660.0,2653.93
+2026-10-17,Uttar Pradesh,Mathura,Kosikalan APMC,Dara,FAQ,2500.0,2700.0,2600.0
+2026-10-17,Uttar Pradesh,Mathura,Kosikalan APMC,Local,FAQ,2600.01,2650.0,2625.01
+2026-10-17,Uttar Pradesh,Hamirpur,Kurara APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Kushinagar,Kushinagar APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Raebarelli,Lalganj APMC,Dara,FAQ,2650.0,2650.0,2650.0
+2026-10-17,Uttar Pradesh,Lalitpur,Lalitpur APMC,Dara,FAQ,2350.0,2550.0,2490.8
+2026-10-17,Uttar Pradesh,Lalitpur,Lalitpur APMC,Mill Quality,FAQ,2350.0,2350.0,2350.0
+2026-10-17,Uttar Pradesh,Lucknow,Lucknow APMC,Coarse,FAQ,2660.0,2660.0,2660.0
+2026-10-17,Uttar Pradesh,Lucknow,Lucknow APMC,Deshi,FAQ,2660.0,2660.0,2660.0
+2026-10-17,Uttar Pradesh,Lucknow,Lucknow APMC,Local,FAQ,2610.0,2610.0,2610.0
+2026-10-17,Uttar Pradesh,Lucknow,Lucknow APMC,Medium,FAQ,2660.0,2660.0,2660.0
+2026-10-17,Uttar Pradesh,Lucknow,Lucknow APMC,Medium Fine,FAQ,2660.0,2660.0,2660.0
+2026-10-17,Uttar Pradesh,Khiri (Lakhimpur),Maigalganj APMC,Sharbati,FAQ,2680.0,2680.0,2680.0
+2026-10-17,Uttar Pradesh,Mainpuri,Mainpuri APMC,Dara Mill Quality,FAQ,2551.0,2551.0,2551.0
+2026-10-17,Uttar Pradesh,Kaushambi,Manjhanpur APMC,Other,FAQ,2550.0,2550.0,2550.0
+2026-10-17,Uttar Pradesh,Mathura,Mathura APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Chitrakut,Mau(Chitrakut) APMC,Dara,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttar Pradesh,Chitrakut,Mau(Chitrakut) APMC,Deshi,FAQ,2400.0,2500.0,2458.82
+2026-10-17,Uttar Pradesh,Chitrakut,Mau(Chitrakut) APMC,Other,FAQ,2400.0,2600.0,2591.23
+2026-10-17,Uttar Pradesh,Hamirpur,Maudaha APMC,Dara Mill Quality,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Hamirpur,Maudaha APMC,Deshi,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Hamirpur,Maudaha APMC,Other,FAQ,2500.0,2600.0,2509.2
+2026-10-17,Uttar Pradesh,Meerut,Meerut APMC,Dara,FAQ,2620.0,2620.0,2620.0
+2026-10-17,Uttar Pradesh,Sitapur,Mehmoodabad APMC,Other,FAQ,2610.0,2610.0,2610.0
+2026-10-17,Uttar Pradesh,Khiri (Lakhimpur),Mohammdi APMC,Dara,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Khiri (Lakhimpur),Mohammdi APMC,Other,FAQ,2505.0,2560.0,2520.11
+2026-10-17,Uttar Pradesh,Sambhal,Muradabad APMC,Other,FAQ,2510.0,2510.0,2510.0
+2026-10-17,Uttar Pradesh,Hamirpur,Muskara APMC,Other,FAQ,2500.0,2630.0,2519.03
+2026-10-17,Uttar Pradesh,Siddharth Nagar,Naugarh APMC,Dara,FAQ,2600.0,2800.0,2675.7
+2026-10-17,Uttar Pradesh,Gonda,Nawabganj APMC,Dara,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Jalaun (Orai),Orai APMC,Other,FAQ,2550.0,2650.0,2599.37
+2026-10-17,Uttar Pradesh,Lakhimpur,Paliakala APMC,Other,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttar Pradesh,Maharajganj,Partaval APMC,Dara,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttar Pradesh,Shravasti,Payagpur APMC,Other,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Shahjahanpur,Powayan APMC,Dara,FAQ,2500.0,2700.0,2632.63
+2026-10-17,Uttar Pradesh,Shahjahanpur,Powayan APMC,Other,FAQ,2700.0,2700.0,2700.0
+2026-10-17,Uttar Pradesh,Pratapgarh,Pratapgarh APMC,Dara,FAQ,2400.0,2500.0,2467.92
+2026-10-17,Uttar Pradesh,Pratapgarh,Pratapgarh APMC,Local,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Prayagraj,Prayagraj APMC,Dara,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttar Pradesh,Prayagraj,Prayagraj APMC,Deshi,FAQ,2250.0,2250.0,2250.0
+2026-10-17,Uttar Pradesh,Prayagraj,Prayagraj APMC,Medium,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttar Pradesh,Prayagraj,Prayagraj APMC,Other,FAQ,2250.0,2600.0,2443.51
+2026-10-17,Uttar Pradesh,Kanpur Dehat,Pukharayan APMC,Dara,FAQ,2450.0,2630.0,2541.47
+2026-10-17,Uttar Pradesh,Kanpur Dehat,Pukharayan APMC,Other,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Pillibhit,Puranpur APMC,Dara,FAQ,2600.0,2800.0,2607.58
+2026-10-17,Uttar Pradesh,Unnao,Purwa APMC,Dara,FAQ,2460.0,2500.0,2487.03
+2026-10-17,Uttar Pradesh,Unnao,Purwa APMC,Other,FAQ,2560.0,2560.0,2560.0
+2026-10-17,Uttar Pradesh,Hamirpur,Raath APMC,Deshi,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttar Pradesh,Hamirpur,Raath APMC,Medium,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttar Pradesh,Raebarelli,Raibareilly APMC,Dara,FAQ,2400.0,2550.0,2528.55
+2026-10-17,Uttar Pradesh,Bahraich,Risia APMC,Other,FAQ,2550.0,2550.0,2550.0
+2026-10-17,Uttar Pradesh,Ayodhya,Rudauli APMC,Dara,FAQ,2475.0,2702.0,2560.87
+2026-10-17,Uttar Pradesh,Ayodhya,Rudauli APMC,Other,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Kanpur Dehat,Rura APMC,Dara,FAQ,2450.0,2500.0,2459.83
+2026-10-17,Uttar Pradesh,Kanpur Dehat,Rura APMC,Medium,FAQ,2450.0,2520.0,2468.85
+2026-10-17,Uttar Pradesh,Kanpur Dehat,Rura APMC,Other,FAQ,2500.0,2700.0,2658.7
+2026-10-17,Uttar Pradesh,Barabanki,Safdarganj APMC,Dara,FAQ,2500.0,2700.0,2517.7
+2026-10-17,Uttar Pradesh,Barabanki,Safdarganj APMC,Medium,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Siddharth Nagar,Sahiyapur APMC,Other,FAQ,2430.0,2500.0,2466.28
+2026-10-17,Uttar Pradesh,Siddharth Nagar,Sahiyapur APMC,Sharbati,FAQ,2430.0,2430.0,2430.0
+2026-10-17,Uttar Pradesh,Raebarelli,Salon APMC,Medium,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Hardoi,Sandila APMC,Dara,FAQ,2600.0,2635.0,2614.2
+2026-10-17,Uttar Pradesh,Hardoi,Sandila APMC,Dara Mill Quality,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Gorakhpur,Sehjanwa APMC,Dara,FAQ,2400.0,2808.0,2663.39
+2026-10-17,Uttar Pradesh,Gorakhpur,Sehjanwa APMC,Deshi,FAQ,2520.0,2520.0,2520.0
+2026-10-17,Uttar Pradesh,Gorakhpur,Sehjanwa APMC,Mill Quality,FAQ,2520.0,2520.0,2520.0
+2026-10-17,Uttar Pradesh,Jaunpur,Shahganj APMC,Dara,FAQ,2580.0,2710.0,2619.23
+2026-10-17,Uttar Pradesh,Shahjahanpur,Shahjahanpur APMC,Dara,FAQ,2525.0,2525.0,2525.0
+2026-10-17,Uttar Pradesh,Shahjahanpur,Shahjahanpur APMC,Dara Mill Quality,FAQ,2600.0,2600.0,2600.0
+2026-10-17,Uttar Pradesh,Muzaffarnagar,Shahpur APMC,Dara,FAQ,2587.0,2587.0,2587.0
+2026-10-17,Uttar Pradesh,Sitapur,Sitapur APMC,Dara,FAQ,2660.0,2660.0,2660.0
+2026-10-17,Uttar Pradesh,Sitapur,Sitapur APMC,Medium,FAQ,2470.0,2500.0,2479.57
+2026-10-17,Uttar Pradesh,Amethi,Sultanpur APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Amethi,Sultanpur APMC,Other,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Ambedkarnagar,Tanda Akbarpur APMC,Dara,FAQ,2450.0,2600.0,2453.31
+2026-10-17,Uttar Pradesh,Balrampur,Tulsipur APMC,Other,FAQ,2500.0,2500.0,2500.0
+2026-10-17,Uttar Pradesh,Unnao,Unnao APMC,Dara,FAQ,2570.0,2570.0,2570.0
+2026-10-17,Uttar Pradesh,Unnao,Unnao APMC,Dara Mill Quality,FAQ,2550.0,2550.0,2550.0
+2026-10-17,Uttar Pradesh,Unnao,Unnao APMC,Other,FAQ,2585.0,2585.0,2585.0
+2026-10-17,Uttar Pradesh,Kanpur,Uttaripura APMC,Other,FAQ,2400.0,2400.0,2400.0
+2026-10-17,Uttarakhand,Haridwar,Lakshar APMC,Other,Local,2585.0,2600.0,2600.0
+2026-10-17,West Bengal,Paschim Bardhaman,Asansol APMC,Kalyan,FAQ,2600.0,2850.0,2765.0
+2026-10-17,West Bengal,Bankura,Bishnupur(Bankura) APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
+2026-10-17,West Bengal,Paschim Bardhaman,Durgapur APMC,Kalyan,FAQ,2600.0,2850.0,2765.0
+2026-10-17,West Bengal,Murshidabad,Jangipur APMC,Deshi,FAQ,2600.0,2700.0,2650.0
+2026-10-17,West Bengal,Nadia,Karimpur APMC,Other,Grade Range-1,2500.0,2700.0,2600.0
+2026-10-17,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
