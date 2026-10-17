@@ -2,6 +2,8 @@
 
 Dashboard: https://sravankumartangudu.github.io/wheatwise/ · All prices are **₹ per quintal (100 kg)**.
 
+The header at the top always shows the latest mandi day, the **benchmark** price (median of Jabalpur, Indore, Kota) and the cheapest **landed** price at Srikakulam (mandi price + freight).
+
 ## A daily routine
 
 | When | What to do | Where |

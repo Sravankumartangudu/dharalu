@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1 - 18 Oct 2026
+
+- **Dashboard header shows the price.** It ended in "₹ per quintal" with no number. It now shows today's benchmark price and the cheapest landed price at Srikakulam, e.g. *17 Oct 2026 · benchmark ₹2,693/qtl · landed ₹2,906/qtl*. The Mac app's window shows the same header (it opens the dashboard), so the app needs no update.
+
 ## 1.3.0 - 18 Oct 2026
 
 **Prices kept refreshing on GitHub but stopped at 13 Oct.** data.gov.in refuses GitHub's servers, which are outside India. Each run showed ✅ but brought no new prices, and the dashboard looked fresh because only the "published" time changed.
