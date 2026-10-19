@@ -1,6 +1,6 @@
 # Setup
 
-About 10 minutes, one time. When you're done, the agent runs by itself twice a day for free on GitHub, with your Mac fetching the prices (step 8), and the dashboard updates automatically.
+About 10 minutes, one time. When you're done, your Mac checks wheat, gold, silver and platinum every 5 minutes and publishes to GitHub Pages (step 8), GitHub runs a backup twice a day for free, and the dashboard updates automatically.
 
 ## 1. Prerequisites
 
@@ -10,7 +10,7 @@ About 10 minutes, one time. When you're done, the agent runs by itself twice a d
 
 ## 2. Get your own copy
 
-Open https://github.com/Sravankumartangudu/wheatwise and click **Fork**. If you own the repository already, skip this step.
+Open https://github.com/Sravankumartangudu/dharalu and click **Fork**. If you own the repository already, skip this step.
 
 ## 3. Get a data.gov.in key
 
@@ -20,7 +20,7 @@ Open https://github.com/Sravankumartangudu/wheatwise and click **Fork**. If you 
    - Name: `DATA_GOV_IN_KEY`
    - Value: the key
 
-Without your own key, WheatWise uses the public sample key, which returns only 10 rows per call. Today's prices still work, but the first history download can take hours.
+Without your own key, Dharalu uses the public sample key, which returns only 10 rows per call. Today's prices still work, but the first history download can take hours.
 
 ## 4. Telegram alerts (optional)
 
@@ -32,9 +32,9 @@ Without your own key, WheatWise uses the public sample key, which returns only 1
 
 **Family or partner group:** add the bot to the group, send a message in the group, and use the group's chat id (a negative number like `-100…`).
 
-You get an alert when:
-- the call changes (for example BUY → HOLD);
-- the benchmark price moves 2.5% or more in a day;
+You get an alert, for each of wheat, gold, silver and platinum, when:
+- the call changes (for example BUY → HOLD). For metals the new call must hold for two checks in a row, so a price wobbling on a threshold doesn't spam you;
+- the price moves a lot in a day: wheat 2.5%, gold 2%, silver and platinum 3%;
 - every Monday, as a weekly summary.
 
 ## 5. AI briefing (optional)
@@ -47,52 +47,58 @@ Create a key at https://console.anthropic.com and save it as the secret `ANTHROP
 - **Source:** Deploy from a branch
 - **Branch:** `main`, folder `/docs`
 
-After a minute, your dashboard is at `https://<your-github-name>.github.io/wheatwise/`.
+After a minute, your dashboard is at `https://<your-github-name>.github.io/dharalu/`.
 
 ## 7. First run
 
-*Actions → WheatWise monitor → Run workflow*. **Tick "Re-seed price history first"** for the first run and press *Run workflow*.
+*Actions → Dharalu monitor → Run workflow*. **Tick "Re-seed price history first"** for the first run and press *Run workflow*. Metal history (10 years from Yahoo Finance) downloads by itself on the first run; no key is needed.
 
 - With your own key, the history download takes a few minutes. With the sample key it can hit the 2½-hour limit. That's fine: whatever it downloaded is saved, and the next run continues from there.
-- After that, the agent runs by itself at **12:30 and 19:30 IST**. You don't need to tick bootstrap again. For new prices, also do step 8.
+- After that, GitHub runs a backup at **12:30 and 19:30 IST**, and skips it when your Mac published in the last 3 hours. You don't need to tick bootstrap again. For wheat prices and 5-minute checks, do step 8.
 - If GitHub shows *"Workflows aren't being run on this forked repository"*, click **I understand, enable them**.
 
-## 8. Fetch prices from your Mac (important)
+## 8. Run the agent from your Mac (important)
 
-data.gov.in refuses requests from GitHub's servers, which are outside India. A GitHub run then shows ✅ but logs `Today's feed failed … using saved data`, and the prices stop at the last day they arrived. The fix is to fetch from a computer in India, and let GitHub publish:
+data.gov.in refuses requests from GitHub's servers, which are outside India. A GitHub run then shows ✅ but logs `Today's feed failed … using saved data`, and wheat prices stop at the last day they arrived. So the agent runs on a computer in India, and GitHub only publishes:
 
 ```bash
-cd ~/WheatWise                       # your clone of the repository
-scripts/mac-schedule.sh install      # fetch + publish at 12:00 and 19:00 every day
-scripts/mac-schedule.sh run          # do one now
+cd ~/Dharalu                         # your clone of the repository
+scripts/mac-schedule.sh install      # check every 5 minutes and publish
+scripts/mac-schedule.sh run          # do one full run now
 scripts/mac-schedule.sh status       # installed? last lines of the log
 ```
 
-- Each run takes 2-3 minutes. It pulls, runs `agent/run.py`, and pushes `data/` and `docs/data/` to GitHub. The dashboard and the Mac app pick that up a minute later.
-- If the Mac is asleep at 12:00 or 19:00, the job runs when it wakes.
-- The push uses your normal git login. Push once by hand first, so macOS keeps the password in the Keychain.
-- To fetch once without the schedule: `scripts/mac-refresh.sh`. To stop: `scripts/mac-schedule.sh uninstall`.
-- The log is `~/Library/Logs/WheatWise/refresh.log`.
+Every 5 minutes the job runs `agent/run.py --quick`:
+- **Gold, silver, platinum:** fetched and re-analysed every time.
+- **Wheat:** one quick call per benchmark mandi. The full fetch runs only when they have new prices, or every 6 hours.
+- **Publishing** (commit + push to GitHub): within 10 minutes of something that matters (a new day of prices, a call change, new mandi rows), otherwise once an hour. GitHub Pages allows about 10 site builds an hour, and the dashboard and the Mac app fetch live metal prices themselves in between.
 
-The GitHub runs keep going as before, and log why data.gov.in refused them. If they ever start getting prices, the Mac job does no harm.
+Notes:
+- If the Mac is asleep, the job runs when it wakes. If GitHub can't be reached, the run commits locally and a later run pushes it.
+- The push uses your normal git login. Push once by hand first, so macOS keeps the password in the Keychain.
+- To run once without the schedule: `scripts/mac-refresh.sh --full`. To stop: `scripts/mac-schedule.sh uninstall`.
+- The log is `~/Library/Logs/Dharalu/refresh.log`.
+- Coming from WheatWise 1.x? `install` also removes the old twice-a-day job.
+
+The GitHub runs keep going as a backup, and log why data.gov.in refused them.
 
 ## 9. Put in your real costs
 
-Open `config.json` on GitHub (pencil icon to edit) and change the freight, mandi fee, interest and godown numbers to what you really pay. Every field is explained in [CONFIG.md](CONFIG.md). The next run uses them.
+Open `config.json` on GitHub (pencil icon to edit) and change the freight, mandi fee, interest and godown numbers to what you really pay. For metals, check the import duty, GST and bank interest. Every field is explained in [CONFIG.md](CONFIG.md). The next run uses them.
 
 ## 10. The Mac app (optional)
 
-See [MAC_APP.md](MAC_APP.md). If you use your own fork, set *Settings → Data Source…* in the app to your own dashboard's `data/latest.json`.
+See [MAC_APP.md](MAC_APP.md). If you use your own fork, set *Settings → Data Source…* in the app to your own dashboard's `data/summary.json`.
 
 ## Run on your own computer instead (optional)
 
 You need Python 3.9 or newer. Nothing else is required; `pip install anthropic` adds the AI briefing.
 
 ```bash
-git clone https://github.com/<you>/wheatwise && cd wheatwise
+git clone https://github.com/<you>/dharalu && cd dharalu
 export DATA_GOV_IN_KEY=...          # optional but recommended
-python3 agent/bootstrap.py          # one time: download history
-python3 agent/run.py                # fetch, analyse, alert, write docs/data/latest.json
+python3 agent/bootstrap.py          # one time: download wheat history
+python3 agent/run.py                # fetch all four, analyse, alert, write docs/data/*.json
 python3 -m http.server -d docs      # dashboard at http://localhost:8000
 ```
 

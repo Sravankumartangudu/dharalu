@@ -1,8 +1,9 @@
 """Telegram alerts (optional). Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID.
 
-Sends a message when:
-  * the BUY/SELL signal changes,
-  * the benchmark price moves more than alerts.daily_move_pct in a day,
+Sends a message, per commodity (wheat, gold, silver, platinum), when:
+  * the BUY/SELL call changes (metals: only once the new call has held for two
+    checks in a row, so a price wobbling on a threshold doesn't spam you),
+  * the price moves more than the commodity's alert % in a day,
   * once a week (alerts.weekly_summary_weekday, 0 = Monday) as a summary.
 State is kept in data/state.json so the same alert is not sent twice.
 """
@@ -17,16 +18,20 @@ from fetch import ROOT
 STATE = os.path.join(ROOT, "data", "state.json")
 
 
-def _load():
+def load_state():
     try:
-        return json.load(open(STATE, encoding="utf-8"))
+        s = json.load(open(STATE, encoding="utf-8"))
     except (OSError, ValueError):
         return {}
+    if "signal" in s or "move_alert_for" in s:  # 1.x kept wheat's state at the top level
+        s = {"wheat": s}
+    return s
 
 
-def _save(s):
+def save_state(s):
     with open(STATE, "w", encoding="utf-8") as f:
-        json.dump(s, f, indent=2)
+        json.dump(s, f, indent=2, sort_keys=True)
+        f.write("\n")
 
 
 def telegram_ready():
@@ -46,9 +51,9 @@ def send(text):
         return False
 
 
-def message(a, brief, reasons, site):
+def message(a, brief, reasons, site, title):
     s = a["signal"]
-    lines = ["🌾 WheatWise - " + " / ".join(reasons), "", brief["english"], "", brief["telugu"], "",
+    lines = ["%s - %s" % (title, " / ".join(reasons)), "", brief["english"], "", brief["telugu"], "",
              "Proof (rule -> points):"]
     for e in s["evidence"]:
         lines.append("%+d  %s: %s" % (e["points"], e["rule"], e["value"]))
@@ -60,14 +65,28 @@ def message(a, brief, reasons, site):
     return text
 
 
-def maybe_alert(a, brief, cfg, site=None):
-    st = _load()
+def maybe_alert(a, brief, cfg, site=None, key="wheat", title="🌾 Dharalu · Wheat", move=None,
+                move_limit=None, confirm=1, state=None):
+    """state: the whole state dict (shared by all commodities); saved by the caller
+    when given, otherwise loaded and saved here."""
+    own = state is None
+    allst = load_state() if own else state
+    st = allst.setdefault(key, {})
+    move_limit = move_limit if move_limit is not None else cfg["alerts"]["daily_move_pct"]
     reasons = []
-    key = a["signal"]["key"]
-    if st.get("signal") and st["signal"] != key:
-        reasons.append("signal changed %s -> %s" % (st["signal"], a["signal"]["label"]))
-    move = a["benchmark"].get("chg_1d")
-    if move is not None and abs(move) >= cfg["alerts"]["daily_move_pct"] and st.get("move_alert_for") != a["asof"]:
+    sig = a["signal"]["key"]
+    changed = bool(st.get("signal")) and st["signal"] != sig
+    if changed and confirm > 1:  # needs the same new call on `confirm` checks in a row
+        n = st.get("pending_n", 0) + 1 if st.get("pending") == sig else 1
+        st["pending"], st["pending_n"] = sig, n
+        changed = n >= confirm
+    elif not changed:
+        st.pop("pending", None)
+        st.pop("pending_n", None)
+    if changed:
+        reasons.append("call changed %s -> %s" % (st["signal"].replace("_", " "), a["signal"]["label"]))
+    big = move is not None and abs(move) >= move_limit
+    if big and st.get("move_alert_for") != a["asof"]:
         reasons.append("price moved %+.1f%% in a day" % move)
     today = date.today()
     week = list(today.isocalendar()[:2])
@@ -79,13 +98,17 @@ def maybe_alert(a, brief, cfg, site=None):
     sent = False
     if reasons:
         b = brief.get("ai") or brief["rules"]
-        sent = send(message(a, b, reasons, site))
+        sent = send(message(a, b, reasons, site, title))
     # Only remember what was sent; a failed send is retried on the next run.
     if sent or not telegram_ready():
-        st["signal"] = key
-        if move is not None and abs(move) >= cfg["alerts"]["daily_move_pct"]:
+        if changed or not st.get("signal"):
+            st["signal"] = sig
+            st.pop("pending", None)
+            st.pop("pending_n", None)
+        if big:
             st["move_alert_for"] = a["asof"]
         if weekly:
             st["weekly"] = week
-        _save(st)
+    if own:
+        save_state(allst)
     return reasons, sent

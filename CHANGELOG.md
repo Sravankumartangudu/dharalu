@@ -1,5 +1,40 @@
 # Changelog
 
+## 2.0.0 - 19 Oct 2026
+
+**WheatWise is now Dharalu (ధరలు, "prices"), and it watches gold, silver and platinum as well as wheat.** The new address is https://sravankumartangudu.github.io/dharalu/. The old `/wheatwise/` address no longer updates.
+
+**Gold, silver, platinum**
+- Each gets the full wheat treatment: the call with proof, a 45-day forecast tested against the past, the seasonal pattern, the replayed track record, live grading, the briefing in English and తెలుగు, *Before you trade* and *My trades*.
+- The India price is the world price × the ₹ rate + import duty: gold per 10 g, silver per kg, platinum per 10 g, with GST shown on top. History is 10 years of COMEX closes, lined up with today's spot price.
+- The metal rules add a long trend (200-day), the rupee's 30-day move and, for silver, the gold/silver ratio. Holding cost is the bank interest you give up.
+- *Before you trade* for metals has the making charge, GST, the buy-back cut and the break-even rate.
+- *What to watch* for metals: the rupee, duty, US rates, central-bank buying, ETF flows, industrial demand and festivals.
+
+**Timeline (new tab)**
+- Past, today and the forecast on one chart: the real price, the call strip, today's live price, the forecast with its likely range, and what was predicted 30 days earlier for each day.
+- Range 1M / 3M / 1Y / 3Y / All years, with Past / Present / Future tiles and tables.
+
+**Every 5 minutes**
+- The Mac job (`scripts/mac-schedule.sh install`) now checks every 5 minutes instead of twice a day. Metals are re-analysed every time; wheat makes a quick check, with a full fetch on new prices or every 6 hours. It publishes within 10 minutes of a change that matters, otherwise hourly. `install` removes the old WheatWise job.
+- The dashboard and the Mac app fetch live metal prices every 5 minutes (● live).
+- GitHub Actions is now a backup, and skips its run when the Mac published in the last 3 hours.
+
+**Dashboard**
+- A commodity picker with an **All** overview: four cards and a "100 = a year ago" comparison chart.
+- Links such as `#gold/timeline` can be bookmarked. Old `#today` links still open wheat.
+- Trades and settings from WheatWise carry over in the same browser. Trades are kept per commodity.
+
+**Mac app: Dharalu 2.0.0**
+- ⚖️ in the menu bar, showing the commodity you pick (wheat, gold, silver or platinum) with its call and price.
+- Each commodity has its own submenu: the live price, the proof, the track record, the briefing (with Copy), timing, and links to its dashboard and timeline.
+- Alerts for each commodity on call changes and big moves (wheat 2.5%, gold 2%, silver and platinum 3%). Checks every 5 minutes by default.
+- It reads the new `summary.json` and has a new icon: a gold balance weighing wheat against a ₹ coin.
+- It replaces WheatWise.app; see guide/MAC_APP.md for upgrading.
+
+**Agent**
+- New `agent/metals.py`. `run.py` has `--quick` and `--if-stale`, writes `docs/data/summary.json`, and sends per-commodity Telegram alerts. A metal's new call must hold for two checks before it alerts.
+
 ## 1.3.1 - 18 Oct 2026
 
 - **Dashboard header shows the price.** It ended in "₹ per quintal" with no number. It now shows today's benchmark price and the cheapest landed price at Srikakulam, e.g. *17 Oct 2026 · benchmark ₹2,693/qtl · landed ₹2,906/qtl*. The Mac app's window opens the dashboard, so it shows the new header too. The app itself is unchanged apart from the version number. The page now loads its script and styles with a version tag, so browsers and the app pick up changes straight away instead of running an old cached copy.

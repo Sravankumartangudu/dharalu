@@ -1,7 +1,8 @@
-// Draws the WheatWise app icon and writes Icon/AppIcon.icns.
+// Draws the Dharalu app icon and writes Icon/AppIcon.icns.
 // Run: swift Icon/make_icon.swift   (from the mac/ folder)
 //
-// Motif: a golden ear of wheat over a faint rising price line, on a deep field-green tile.
+// Motif: a gold balance (⚖️) weighing an ear of wheat against a gold coin, over a faint price
+// line, on a deep indigo tile - "what is it worth today".
 
 import AppKit
 
@@ -17,6 +18,7 @@ func drawIcon(in ctx: CGContext) {
         CGGradient(colorsSpace: cs, colors: stops.map { color($0.0, $0.1) } as CFArray,
                    locations: stops.map { $0.2 })!
     }
+    let goldGrad = grad([(0xffe08a, 1, 0), (0xf2b424, 1, 0.55), (0xc98500, 1, 1)])
 
     // Tile: macOS-style rounded square.
     let inset: CGFloat = 100
@@ -24,53 +26,83 @@ func drawIcon(in ctx: CGContext) {
     let tilePath = CGPath(roundedRect: tile, cornerWidth: 185, cornerHeight: 185, transform: nil)
     ctx.saveGState()
     ctx.setShadow(offset: CGSize(width: 0, height: -14), blur: 30, color: color(0x000000, 0.45))
-    ctx.addPath(tilePath); ctx.setFillColor(color(0x123d2a)); ctx.fillPath()
+    ctx.addPath(tilePath); ctx.setFillColor(color(0x1b1f4a)); ctx.fillPath()
     ctx.restoreGState()
     ctx.saveGState()
     ctx.addPath(tilePath); ctx.clip()
-    ctx.drawLinearGradient(grad([(0x1f6b45, 1, 0), (0x0d2b1e, 1, 1)]),
+    ctx.drawLinearGradient(grad([(0x2e3a8c, 1, 0), (0x121433, 1, 1)]),
                            start: CGPoint(x: 0, y: tile.maxY), end: CGPoint(x: 0, y: tile.minY), options: [])
 
-    // Faint price line rising left to right.
-    let line = CGMutablePath()
-    let pts: [(CGFloat, CGFloat)] = [(150, 330), (260, 300), (360, 380), (470, 350), (580, 470), (690, 430), (874, 640)]
-    line.move(to: CGPoint(x: pts[0].0, y: pts[0].1))
-    for p in pts.dropFirst() { line.addLine(to: CGPoint(x: p.0, y: p.1)) }
-    ctx.addPath(line)
-    ctx.setLineWidth(22); ctx.setLineCap(.round); ctx.setLineJoin(.round)
-    ctx.setStrokeColor(color(0x7fe0a8, 0.35)); ctx.strokePath()
+    // Faint price line: past (solid) then forecast (dashed).
+    let pts: [(CGFloat, CGFloat)] = [(130, 300), (240, 340), (330, 290), (430, 360), (520, 330)]
+    let past = CGMutablePath()
+    past.move(to: CGPoint(x: pts[0].0, y: pts[0].1))
+    for p in pts.dropFirst() { past.addLine(to: CGPoint(x: p.0, y: p.1)) }
+    ctx.addPath(past)
+    ctx.setLineWidth(18); ctx.setLineCap(.round); ctx.setLineJoin(.round)
+    ctx.setStrokeColor(color(0x9fb3ff, 0.30)); ctx.strokePath()
+    ctx.move(to: CGPoint(x: 520, y: 330)); ctx.addLine(to: CGPoint(x: 900, y: 420))
+    ctx.setLineDash(phase: 0, lengths: [26, 26])
+    ctx.setStrokeColor(color(0x9fb3ff, 0.22)); ctx.strokePath()
+    ctx.setLineDash(phase: 0, lengths: [])
 
-    // Stalk.
-    let base = CGPoint(x: 512, y: 170), top = CGPoint(x: 512, y: 760)
-    ctx.move(to: base); ctx.addLine(to: top)
-    ctx.setLineWidth(26); ctx.setStrokeColor(color(0xd9a520)); ctx.strokePath()
+    // Fills a path with the gold gradient.
+    func gold(_ path: CGPath) {
+        ctx.saveGState()
+        ctx.addPath(path); ctx.clip()
+        let b = path.boundingBox
+        ctx.drawLinearGradient(goldGrad, start: CGPoint(x: b.minX, y: b.maxY), end: CGPoint(x: b.maxX, y: b.minY), options: [])
+        ctx.restoreGState()
+    }
 
-    // Grains: pairs of golden ellipses angled out from the stalk, smaller towards the tip.
+    // Base and post.
+    gold(CGPath(roundedRect: CGRect(x: 372, y: 176, width: 280, height: 46), cornerWidth: 23, cornerHeight: 23, transform: nil))
+    gold(CGPath(roundedRect: CGRect(x: 492, y: 210, width: 40, height: 520), cornerWidth: 20, cornerHeight: 20, transform: nil))
+    gold(CGPath(ellipseIn: CGRect(x: 478, y: 716, width: 68, height: 68), transform: nil))
+
+    // Beam.
+    gold(CGPath(roundedRect: CGRect(x: 236, y: 690, width: 552, height: 30), cornerWidth: 15, cornerHeight: 15, transform: nil))
+
+    // Strings and pans.
+    for cx in [276, 748] as [CGFloat] {
+        ctx.move(to: CGPoint(x: cx, y: 700)); ctx.addLine(to: CGPoint(x: cx - 92, y: 468))
+        ctx.move(to: CGPoint(x: cx, y: 700)); ctx.addLine(to: CGPoint(x: cx + 92, y: 468))
+        ctx.setLineWidth(9); ctx.setStrokeColor(color(0xf2b424)); ctx.strokePath()
+        let pan = CGMutablePath()
+        pan.move(to: CGPoint(x: cx - 120, y: 468))
+        pan.addQuadCurve(to: CGPoint(x: cx + 120, y: 468), control: CGPoint(x: cx, y: 360))
+        pan.closeSubpath()
+        gold(pan)
+    }
+
+    // Left pan: an ear of wheat.
     func grain(at c: CGPoint, angle: CGFloat, w: CGFloat, h: CGFloat) {
         ctx.saveGState()
         ctx.translateBy(x: c.x, y: c.y); ctx.rotate(by: angle)
-        let r = CGRect(x: -w / 2, y: -h / 2, width: w, height: h)
-        ctx.addPath(CGPath(ellipseIn: r, transform: nil)); ctx.clip()
-        ctx.drawLinearGradient(grad([(0xffe08a, 1, 0), (0xf2b424, 1, 0.55), (0xc98500, 1, 1)]),
-                               start: CGPoint(x: -w / 2, y: h / 2), end: CGPoint(x: w / 2, y: -h / 2), options: [])
+        ctx.addPath(CGPath(ellipseIn: CGRect(x: -w / 2, y: -h / 2, width: w, height: h), transform: nil))
+        ctx.setFillColor(color(0xfff1c2)); ctx.fillPath()
         ctx.restoreGState()
     }
-    for i in 0..<6 {
-        let y = 380 + CGFloat(i) * 62
-        let k = 1 - CGFloat(i) * 0.07
-        grain(at: CGPoint(x: 512 - 46 * k, y: y), angle: 0.5, w: 74 * k, h: 140 * k)
-        grain(at: CGPoint(x: 512 + 46 * k, y: y), angle: -0.5, w: 74 * k, h: 140 * k)
+    ctx.move(to: CGPoint(x: 276, y: 470)); ctx.addLine(to: CGPoint(x: 276, y: 640))
+    ctx.setLineWidth(9); ctx.setStrokeColor(color(0xfff1c2)); ctx.strokePath()
+    for i in 0..<4 {
+        let y = 512 + CGFloat(i) * 34, k = 1 - CGFloat(i) * 0.1
+        grain(at: CGPoint(x: 276 - 20 * k, y: y), angle: 0.5, w: 30 * k, h: 58 * k)
+        grain(at: CGPoint(x: 276 + 20 * k, y: y), angle: -0.5, w: 30 * k, h: 58 * k)
     }
-    grain(at: CGPoint(x: 512, y: 770), angle: 0, w: 62, h: 124)
+    grain(at: CGPoint(x: 276, y: 648), angle: 0, w: 26, h: 52)
 
-    // Two leaves at the base.
-    for (dx, ang) in [(-1.0, 0.9), (1.0, -0.9)] as [(CGFloat, CGFloat)] {
-        ctx.saveGState()
-        ctx.translateBy(x: 512 + dx * 62, y: 265); ctx.rotate(by: ang)
-        ctx.addPath(CGPath(ellipseIn: CGRect(x: -28, y: -100, width: 56, height: 200), transform: nil))
-        ctx.setFillColor(color(0x5cc98a)); ctx.fillPath()
-        ctx.restoreGState()
-    }
+    // Right pan: a gold coin with a ₹ mark.
+    let coin = CGRect(x: 748 - 70, y: 470, width: 140, height: 140)
+    ctx.addPath(CGPath(ellipseIn: coin, transform: nil)); ctx.setFillColor(color(0xfff1c2)); ctx.fillPath()
+    ctx.addPath(CGPath(ellipseIn: coin.insetBy(dx: 14, dy: 14), transform: nil))
+    ctx.setLineWidth(8); ctx.setStrokeColor(color(0xc98500)); ctx.strokePath()
+    let rupee = NSAttributedString(string: "₹", attributes: [.font: NSFont.systemFont(ofSize: 86, weight: .bold),
+                                                             .foregroundColor: NSColor(cgColor: color(0xa86f00))!])
+    let line = CTLineCreateWithAttributedString(rupee)
+    let lb = CTLineGetBoundsWithOptions(line, .useGlyphPathBounds)
+    ctx.textPosition = CGPoint(x: coin.midX - lb.midX, y: coin.midY - lb.midY)
+    CTLineDraw(line, ctx)
 
     ctx.restoreGState()   // end tile clip
 }

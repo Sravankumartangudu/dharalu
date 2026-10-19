@@ -1,6 +1,6 @@
 # How it works
 
-Everything is plain Python in `agent/`, using only the standard library. Every number on the dashboard can be traced to a rule here.
+Everything is plain Python in `agent/`, using only the standard library. Every number on the dashboard can be traced to a rule here. Sections 1-8 describe wheat; [section 9](#9-gold-silver-platinum) covers what is different for gold, silver and platinum.
 
 ## 1. Data
 
@@ -89,7 +89,9 @@ The replay re-runs the rules on every past day using **only what was known on th
 
 It then checks the price 30 days later. Results are shown for the last year and for the whole history.
 
-**Live record:** every real call is appended to `data/signals_log.csv`. It is graded on the first real price 30-37 days later (mandis skip holidays):
+The same replay also records each day's 30-day forecast. The *Timeline* tab draws it as the "predicted 30 days earlier" line next to the real price, up to today.
+
+**Live record:** every real call is appended to `data/signals_log.csv` (metals: `data/signals_<metal>.csv`). It is graded on the first real price 30-37 days later (mandis skip holidays):
 - BUY and HOLD are right if the price rose;
 - SELL is right if it fell;
 - WAIT is right if it moved less than 3%.
@@ -102,22 +104,57 @@ landed = mandi price + mandi fee % + km × freight rate (or freight_override) + 
 
 This is worked out for each of the 16 source mandis, using its latest report from the last 7 days. The cheapest source is highlighted.
 
-## 9. Briefing and alerts
+## 9. Gold, silver, platinum
 
-- **Briefing** (`briefing.py`):
+`agent/metals.py` runs the same analysis (indicators, forecast + backtest, seasonality, scored call with proof, replay) on a different price.
+
+**Data** (free, no key):
+- **History:** COMEX futures daily closes from Yahoo Finance (`GC=F`, `SI=F`, `PL=F`, US$ per troy ounce, 10 years) and the US$/₹ rate (`INR=X`). Stored in `data/metals/`, topped up with the last 5 days each run.
+- **Live:** the spot price from gold-api.com (`XAU`, `XAG`, `XPT`).
+- **Basis:** futures trade a little above spot (interest until delivery). The history is scaled by today's spot ÷ futures ratio (only if it is within ±10%), so it lines up with today's price, and today's point *is* the spot price.
+
+**India price:**
+```
+India price = US$ per oz × ₹ per US$ ÷ 31.1035 g × grams × (1 + import duty)
+```
+Gold per 10 g, silver per kg, platinum per 10 g. GST is shown separately ("with GST"), because it is paid on top when you buy.
+
+**Season:** metals have no harvest. The seasonal index starts from "no season" (flat) and learns from the price with the long trend taken out, weighted the same way as wheat: one-third with 1 year of data, 82% with 9.
+
+**Holding cost:** the bank interest the money would have earned (`interest_pct_per_month`, 0.6% = about 7.2% a year).
+
+**The score** (max ±8; silver ±9):
+| Rule | Points |
+|---|---|
+| 30-day forecast edge = expected change − holding cost | as wheat: ±2 at ±3%, ±1 at ±1% (capped at ±1 if the forecast is weak) |
+| Season: next-60-day seasonal change | +1 at ≥ +1.5%, −1 at ≤ −1.5% |
+| Trend (weeks): 7-day vs 30-day average, and the 30-day change | +1 both up, −1 both down |
+| Long trend (months): price and the 50-day average vs the 200-day average | +1 both above, −1 both below |
+| Price level: 52-week percentile | +1 at ≤ 25, −1 at ≥ 85 |
+| RSI-14 (trading days only) | +1 below 30, −1 above 70 |
+| Rupee: US$/₹ change over 30 days | +1 at ≥ +1% (rupee weaker), −1 at ≤ −1% |
+| Silver only: gold/silver ratio | +1 at ≥ 85 (silver cheap vs gold), −1 at ≤ 65 |
+
+The score → call table is the same as wheat's, including HOLD.
+
+**Live prices between runs:** the dashboard and the Mac app fetch gold-api.com themselves every 5 minutes, and convert with the agent's own factor (₹ rate × duty ÷ ounce). A live price more than 15% away from the agent's price is ignored as a bad tick. Only the agent changes the call.
+
+## 10. Briefing and alerts
+
+
+- **Briefing** (`briefing.py`), one per commodity:
   - A rule-based English + Telugu note is always made.
   - With `ANTHROPIC_API_KEY`, Claude (`claude-opus-5-5`) also writes a trader's note from the same JSON. It is told to use only those numbers. If it fails, the rule-based note is used.
-- **Alerts** (`notify.py`): Telegram is sent on a call change, a daily move of 2.5% or more, the weekly summary, and the first run. The alert state is only saved once a message is really sent, so a failed send is retried on the next run.
+- **Alerts** (`notify.py`), per commodity: Telegram is sent on a call change, a big daily move (wheat 2.5%, gold 2%, silver and platinum 3%), the weekly summary, and the first run. A metal's new call must hold for two checks in a row before it alerts. The alert state is only saved once a message is really sent, so a failed send is retried on the next run.
 
-## 10. Schedule
+## 11. Schedule
 
-`.github/workflows/monitor.yml` runs at 07:00 and 14:00 UTC (12:30 and 19:30 IST):
-1. Fetch today's feed.
-2. Merge it into `data/prices.csv`.
-3. Analyse, and write `docs/data/latest.json`.
-4. Alert.
-5. Commit, via `.github/save.sh`, which pulls and retries if two runs overlap.
+**On the Mac, every 5 minutes** (`scripts/mac-refresh.sh` via launchd, set up by `scripts/mac-schedule.sh install`). data.gov.in refuses GitHub's servers, which are outside India, so this is where wheat prices come from. Each run is `agent/run.py --quick`:
+1. Metals: top up the closes, fetch the live spot, re-analyse.
+2. Wheat: one quick call per benchmark mandi. The full fetch + analysis runs only when there's a new day of prices, or every 6 hours. Otherwise the published wheat analysis is kept as it is.
+3. Compare with the last published `docs/data/summary.json`, and print `MATERIAL: …` when something matters (a new prices day, a call change, new mandi rows).
+4. Publish (commit + push) within 10 minutes of a material change, otherwise once an hour. GitHub Pages allows about 10 site builds an hour.
 
-The save step runs even if the analysis fails, so fetched prices are never lost.
+**GitHub Actions backup** (`.github/workflows/monitor.yml`) at 07:00 and 14:00 UTC (12:30 and 19:30 IST). It runs `agent/run.py --if-stale 3`, which does nothing when the Mac published in the last 3 hours. Otherwise it fetches, analyses, alerts and commits via `.github/save.sh`, which pulls and retries if two runs overlap. The save step runs even if the analysis fails, so fetched prices are never lost. When a request fails, the log line says why (for example the HTTP error).
 
-**Fetching from the Mac.** data.gov.in refuses GitHub's servers, which are outside India. So `scripts/mac-refresh.sh` does the same fetch → analyse → publish on your Mac at 12:00 and 19:00 IST. That's half an hour before each GitHub run, and the GitHub run then re-publishes the Mac's prices. When a request fails, the log line now says why (for example the HTTP error).
+**Output:** `docs/data/latest.json` (wheat, as in 1.x), `docs/data/<metal>.json` (+ `<metal>-history.json`, the long price history and day-by-day replay, loaded only when a tab needs it), and `docs/data/summary.json`, the small file with all four calls that the Mac app reads.

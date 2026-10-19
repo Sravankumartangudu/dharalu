@@ -1,4 +1,4 @@
-"""Fetch wheat mandi prices from data.gov.in (Agmarknet feeds).
+"""Dharalu - fetch wheat mandi prices from data.gov.in (Agmarknet feeds).
 
 Two feeds are used:
   * CURRENT  - today's prices from every reporting mandi (refreshed daily).
@@ -38,7 +38,7 @@ def _get(resource, params, tries=6):
     delay, why = 4, "no answer"
     for attempt in range(tries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "WheatWise/1.0"})
+            req = urllib.request.Request(url, headers={"User-Agent": "Dharalu/2.0"})
             with urllib.request.urlopen(req, timeout=40) as r:
                 body = r.read().decode("utf-8", "replace")
             data = json.loads(body)
@@ -52,7 +52,7 @@ def _get(resource, params, tries=6):
     raise RuntimeError("data.gov.in did not answer after %d tries (last: %s)" % (tries, why))
 
 
-def _paged(resource, filters, sort=None, max_rows=None, pace=1.2, log=None):
+def _paged(resource, filters, sort=None, max_rows=None, pace=1.2, log=None, tries=6):
     params = {"filters[%s]" % k: v for k, v in filters.items()}
     if sort:
         params["sort[%s]" % sort[0]] = sort[1]
@@ -60,7 +60,7 @@ def _paged(resource, filters, sort=None, max_rows=None, pace=1.2, log=None):
     offset, rows, total = 0, [], None
     while True:
         params.update({"limit": want, "offset": offset})
-        data = _get(resource, params)
+        data = _get(resource, params, tries)
         total = int(data.get("total") or 0)
         recs = data.get("records") or []
         rows.extend(recs)
@@ -110,10 +110,10 @@ def fetch_current(log=print):
     return [r for r in (_norm(x) for x in recs) if r]
 
 
-def fetch_market_history(market, max_rows=1500, log=print):
+def fetch_market_history(market, max_rows=1500, log=print, tries=6):
     log("History for %s ..." % market)
     recs = _paged(ARCHIVE, {"Commodity": "Wheat", "Market": market},
-                  sort=("Arrival_Date", "desc"), max_rows=max_rows, log=log)
+                  sort=("Arrival_Date", "desc"), max_rows=max_rows, log=log, tries=tries)
     return [r for r in (_norm(x) for x in recs) if r]
 
 

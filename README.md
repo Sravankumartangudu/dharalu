@@ -1,50 +1,69 @@
-# 🌾 WheatWise - a wheat buy/hold/sell agent for Srikakulam
+# ⚖️ Dharalu · ధరలు - buy / hold / sell calls for wheat, gold, silver and platinum
 
-WheatWise watches wheat prices twice a day in the mandis that supply Srikakulam, Andhra Pradesh. It tells you **when to buy, when to hold and when to sell**, and shows the **proof** behind every call: the real number behind each rule, where it came from, and how often the same call worked in the past.
+Dharalu ("prices" in Telugu) watches four prices for a trader and family in Srikakulam, Andhra Pradesh:
 
-- **Live dashboard:** https://sravankumartangudu.github.io/wheatwise/ (works on phone and computer)
-- **Mac menu-bar app:** [download the latest DMG](https://github.com/Sravankumartangudu/wheatwise/releases/latest) - see [guide/MAC_APP.md](guide/MAC_APP.md)
-- **Alerts:** Telegram, when the call changes, the price jumps, and once a week
+| | What it watches | Price shown |
+|---|---|---|
+| 🌾 **Wheat** | The mandis that supply Srikakulam (Agmarknet) | ₹ per quintal, landed at Srikakulam |
+| 🥇 **Gold** | World spot price × ₹ rate + import duty | ₹ per 10 g, 24 carat (GST shown on top) |
+| 🥈 **Silver** | The same | ₹ per kg, 999 fine |
+| 💠 **Platinum** | The same | ₹ per 10 g, 999.5 fine |
+
+For each one it tells you **when to buy, when to hold and when to sell**, and shows the **proof** behind every call: the real number behind each rule, where it came from, and how often the same call worked in the past. A **timeline** puts the past, today's live price and the forecast on one chart, together with the calls the agent would have made.
+
+- **Live dashboard:** https://sravankumartangudu.github.io/dharalu/ (works on phone and computer)
+- **Mac menu-bar app:** [download the latest DMG](https://github.com/Sravankumartangudu/dharalu/releases/latest) - see [guide/MAC_APP.md](guide/MAC_APP.md)
+- **Prices are checked every 5 minutes.** Gold, silver and platinum are live; wheat updates when the mandis report.
+- **Alerts:** Telegram and Mac notifications when a call changes or a price jumps, plus once a week
+
+> Formerly **WheatWise** (1.x, wheat only). The old address `…github.io/wheatwise/` no longer updates - use the new one above.
 
 | Stage | What you get |
 |---|---|
-| **Prediction** | A 45-day price forecast with a likely range, tested against past data so you can see how accurate it really is |
-| **Pre-analysis** (before a trade) | Landed cost at Srikakulam, total money needed, holding cost, the break-even sell price, profit in bad / likely / good cases, and a go/no-go checklist |
-| **Post-analysis** (after trades) | Your profit and loss (first-in-first-out, after holding costs), a timing score for each trade, whether you followed the agent's call that day, and lessons |
-| **Monitoring** | Runs by itself at 12:30 and 19:30 IST. Telegram + Mac notifications when the call changes or the price jumps |
+| **Overview** | All four on one page: today's call, live price, 1-year sparkline with the 30-day forecast, and a "100 = a year ago" chart to compare them |
+| **Timeline** | Past prices → today → forecast with its likely range, the call on every day (a coloured strip), and what each past 30-day forecast said vs what happened |
+| **Prediction** | A 45-day forecast with a likely range, tested against past data so you can see how accurate it really is |
+| **Pre-analysis** (before a trade) | Wheat: landed cost, money needed, holding cost, break-even. Metals: GST + making charge, the bank interest you give up, the buy-back cut, break-even. Both: bad / likely / good cases and a go/no-go checklist |
+| **Post-analysis** (after trades) | Your profit and loss (first-in-first-out, after holding costs), a timing score for each trade, whether you followed the agent's call that day, and lessons - per commodity |
+| **Monitoring** | A job on the Mac every 5 minutes; Telegram + Mac notifications on call changes and big moves |
 | **Sharing** | One link (Share button → WhatsApp). The briefing is in English and తెలుగు |
 
 ## The calls
 
-| Call | Score | If you are buying | If you are holding stock |
+| Call | Score | If you are buying | If you are holding |
 |---|---|---|---|
-| 🟢 **STRONG BUY** | +3 or more | Good time to buy and stock up | Hold - prices likely to rise |
-| 🟢 **BUY** | +1 / +2 | Buy gradually (2-3 lots) | Hold - don't rush to sell |
-| 🟠 **HOLD** | 0, outlook up | Don't add stock at today's price | **Keep your stock** - the outlook beats your holding cost |
-| ⚪ **WAIT** | 0 | Buy only what you need now | No clear edge - sell in parts only if you need cash |
-| 🔴 **SELL** | −1 / −2 | Avoid stocking - buy hand-to-mouth | Sell gradually - prices may soften |
-| 🔴 **STRONG SELL** | −3 or less | Do not stock now | Sell / clear stock now |
+| 🟢 **STRONG BUY** | +3 or more | Good time to buy - in 2-3 parts | Hold - prices likely to rise |
+| 🟢 **BUY** | +1 / +2 | Buy gradually, in parts | Hold - don't rush to sell |
+| 🟠 **HOLD** | 0, outlook up | Don't add at today's price | **Keep it** - the outlook beats your holding cost |
+| ⚪ **WAIT** | 0 | Buy only what you need now | No clear edge - sell only if you need cash |
+| 🔴 **SELL** | −1 / −2 | Avoid stocking - wait for a dip | Sell gradually / book part profit |
+| 🔴 **STRONG SELL** | −3 or less | Do not buy now | Sell / book profit now |
 
-**HOLD vs WAIT:** both have a total score of 0. It is HOLD when the two forward-looking rules (the 30-day forecast and the season) still point up. That usually means today's price is too high to buy, but prices should rise from here, so keep what you have. In the replay since 2016, HOLD days beat the holding cost 42% of the time, against 36% for WAIT and 33% for SELL.
+**HOLD vs WAIT:** both have a total score of 0. It is HOLD when the two forward-looking rules (the 30-day forecast and the season) still point up: today's price is no bargain, but it should rise from here, so keep what you have.
+
+**Holding cost** is what holding costs you for 30 days. For wheat that's interest, godown rent and losses. For metals it's the bank interest the money would have earned.
 
 ## How a call is made - and proved
 
-Each rule looks at real Agmarknet prices and adds or removes points. The dashboard shows each rule's **actual number, source and threshold**, so you can check it yourself.
+Each rule adds or removes points. The dashboard shows each rule's **actual number, source and threshold**, so you can check it yourself.
 
-| Rule | Points |
-|---|---|
-| 30-day forecast vs **cost of holding stock** (interest + godown + losses) | ±1 at ±1%, ±2 at ±3% (only ±1 if the forecast hasn't beaten "no change" in its backtest) |
-| **Season**: are prices usually higher 60 days from now? | ±1 at ±3% |
-| **Trend**: 7-day average vs 30-day average, plus the 30-day change | ±1 |
-| **Price level** vs the last 12 months | +1 if in the cheapest 25%, −1 if in the dearest 15% |
-| **Momentum** (RSI-14) | +1 if oversold (<30), −1 if overbought (>70) |
-| **MSP floor**: price within 4% of MSP | +1 |
-| **FCI OMSS ceiling**: price at or above the OMSS reserve price | −1 |
+| Rule | Wheat | Gold / silver / platinum |
+|---|---|---|
+| 30-day forecast vs **holding cost** | ±1 at ±1%, ±2 at ±3% (only ±1 if the forecast hasn't beaten "no change" in its backtest) | same |
+| **Season**: are prices usually higher 60 days from now? | ±1 at ±3% | ±1 at ±1.5% |
+| **Trend** (weeks): 7-day vs 30-day average, plus the 30-day change | ±1 | ±1 |
+| **Long trend** (months): price and 50-day average vs the 200-day | - | ±1 |
+| **Price level** vs the last 12 months | +1 if in the cheapest 25%, −1 if in the dearest 15% | same |
+| **Momentum** (RSI-14) | +1 if oversold (<30), −1 if overbought (>70) | same |
+| **Rupee**: US$/₹ over 30 days (a weaker rupee makes metal dearer) | - | ±1 at ±1% |
+| **Gold/silver ratio** (silver only): ounces of silver one ounce of gold buys | - | +1 at ≥ 85 (silver cheap), −1 at ≤ 65 |
+| **MSP floor**: price within 4% of MSP | +1 | - |
+| **FCI OMSS ceiling**: price at or above the reserve price | −1 | - |
 
 **Proof it works:**
 
-- **Replay.** Every past day is re-run using only the data known on that day: prices, seasonal pattern, and the MSP of that time. The track record shows what the price did 30 days after BUY, HOLD, WAIT and SELL days. It covers both the last year and the whole history since 2016.
-- **Live record.** Every real call is saved in `data/signals_log.csv` and graded automatically 30 days later.
+- **Replay.** Every past day is re-run using only the data known on that day. The track record shows what the price did 30 days after each kind of call: last year, and the whole history (wheat since 2016, metals about 10 years).
+- **Live record.** Every real call is saved in `data/signals_log.csv` (wheat) or `data/signals_<metal>.csv`, and graded automatically 30 days later.
 
 How it all works in detail: [guide/HOW_IT_WORKS.md](guide/HOW_IT_WORKS.md).
 
@@ -53,17 +72,18 @@ How it all works in detail: [guide/HOW_IT_WORKS.md](guide/HOW_IT_WORKS.md).
 | For | You need |
 |---|---|
 | The dashboard | Any browser. Nothing to install |
-| The automatic agent | A free GitHub account (it runs on GitHub Actions, free for public repos) and a free [data.gov.in](https://data.gov.in) API key (recommended) |
-| Fresh prices | A Mac (or any computer) in India that's on most days: data.gov.in refuses GitHub's servers, so the Mac fetches the prices and GitHub publishes them |
+| The agent | A Mac (or any computer) in India that's on most days - it checks every 5 minutes and publishes to GitHub Pages. GitHub Actions is a twice-a-day backup |
+| Wheat prices | A free [data.gov.in](https://data.gov.in) API key (recommended). data.gov.in refuses GitHub's servers, so wheat comes from the Mac |
+| Metal prices | Nothing - Yahoo Finance and gold-api.com are free and need no key |
 | Telegram alerts (optional) | A Telegram account |
 | AI briefing (optional) | An Anthropic API key |
 | The Mac app (optional) | macOS 13 Ventura or newer, Apple Silicon or Intel |
-| Running it on your own computer (optional) | Python 3.9+ (standard library only; `pip install anthropic` for the AI briefing) |
+| Running the agent | Python 3.9+ (standard library only; `pip install anthropic` for the AI briefing) |
 | Building the Mac app yourself (optional) | Xcode Command Line Tools (`xcode-select --install`) |
 
 ## Install
 
-This repository is already set up and running. To run your own copy (for example for another town), follow **[guide/SETUP.md](guide/SETUP.md)**, which takes about 10 minutes. In short:
+This repository is already set up and running. To run your own copy, follow **[guide/SETUP.md](guide/SETUP.md)** (about 10 minutes). In short:
 
 1. **Fork** this repository on GitHub (or use it as-is).
 2. Add the secrets under *Settings → Secrets and variables → Actions*:
@@ -76,33 +96,34 @@ This repository is already set up and running. To run your own copy (for example
    | `ANTHROPIC_API_KEY` | Optional | Claude writes the daily note; without it a rule-based note is used |
 
 3. *Settings → Pages*: deploy from the `main` branch, `/docs` folder.
-4. *Actions → WheatWise monitor → Run workflow* (tick **bootstrap** the first time to download price history).
-5. **Fetch prices from your Mac:** `scripts/mac-schedule.sh install` (fetches and publishes at 12:00 and 19:00). See [guide/SETUP.md](guide/SETUP.md#8-fetch-prices-from-your-mac-important).
-6. **Edit `config.json`** with your real freight rate, mandi fee, interest and godown costs: [guide/CONFIG.md](guide/CONFIG.md).
+4. *Actions → Dharalu monitor → Run workflow* (tick **bootstrap** the first time to download wheat history).
+5. **Run the agent from your Mac:** `scripts/mac-schedule.sh install` (checks every 5 minutes). See [guide/SETUP.md](guide/SETUP.md#8-run-the-agent-from-your-mac-important).
+6. **Edit `config.json`** with your real wheat costs and the metal duty / GST / bank interest: [guide/CONFIG.md](guide/CONFIG.md).
 
-**Mac app:** download `WheatWise-<version>.dmg` from [Releases](https://github.com/Sravankumartangudu/wheatwise/releases/latest), drag it to Applications, then on first open use *System Settings → Privacy & Security → Open Anyway*. Details: [guide/MAC_APP.md](guide/MAC_APP.md).
+**Mac app:** download `Dharalu-<version>.dmg` from [Releases](https://github.com/Sravankumartangudu/dharalu/releases/latest), drag it to Applications, then on first open use *System Settings → Privacy & Security → Open Anyway*. Details: [guide/MAC_APP.md](guide/MAC_APP.md).
 
 ## Use
 
 Read **[guide/USER_GUIDE.md](guide/USER_GUIDE.md)** for every tab and a daily routine. The 2-minute version:
 
-1. **Every morning:** open the dashboard (or click 🌾 in the Mac menu bar). Read the call and the advice for your case (buying or holding stock).
-2. **Before a big buy:** open *Before you trade*, pick the mandi, and check the break-even price and the go/no-go checklist.
+1. **Every morning:** open the dashboard (or click ⚖️ in the Mac menu bar). The overview shows all four calls; click one for its advice (buying or holding).
+2. **Before a big buy:** open *Before you trade* and check the break-even price and the go/no-go checklist.
 3. **After every trade:** enter it in *My trades*. You will see your real profit after holding costs, and whether your timing was good.
-4. **Once a week:** look at *Agent track record* to see whether the calls are still working, and *What to watch* for government moves (MSP, OMSS sales, stock limits).
+4. **Once a week:** look at *Timeline* and *Agent track record* to see whether the calls are still working, and *What to watch* for the outside things that move each price.
 
 ### Run on your own computer
 
 ```bash
-python3 agent/bootstrap.py        # one time: download price history (slow without your own key)
-python3 agent/run.py              # fetch today's prices, analyse, write docs/data/latest.json
+python3 agent/bootstrap.py        # one time: download wheat history (slow without your own key)
+python3 agent/run.py              # fetch all prices, analyse, write docs/data/*.json
+python3 agent/run.py --quick      # the 5-minute check: metals every time, wheat when the mandis have news
 python3 agent/run.py --offline    # re-analyse saved data without downloading
 python3 -m http.server -d docs    # open http://localhost:8000
 ```
 
-## Why landed cost, not a "Srikakulam price"
+## Wheat: landed cost, not a "Srikakulam price"
 
-Andhra Pradesh has reported no wheat mandi prices since 2017, because the state buys its wheat from other states. So WheatWise works out what the wheat costs at your door:
+Andhra Pradesh has reported no wheat mandi prices since 2017, because the state buys its wheat from other states. So Dharalu works out what the wheat costs at your door:
 
 ```
 landed = mandi price + mandi fee (1.7%) + freight (km × ₹0.30/qtl/km) + handling ₹25 + bags ₹15 + brokerage ₹10
@@ -112,38 +133,49 @@ landed = mandi price + mandi fee (1.7%) + freight (km × ₹0.30/qtl/km) + handl
 
 The **benchmark price** comes from Jabalpur, Indore and Kota, the mandis with the longest unbroken history. Each is chain-linked to a common level, so a day when one mandi doesn't report doesn't make the price jump. Sixteen source mandis are compared for landed cost.
 
+## Metals: the India price
+
+```
+India price = world price (US$ per troy ounce) × ₹ per US$ ÷ 31.1035 g × grams × (1 + import duty)
+```
+
+- Import duty is 6% for gold and silver and 6.4% for platinum (customs + AIDC since the July 2024 Budget). 3% GST is shown on top.
+- Your jeweller's rate will differ a little (local premium, purity, making charge). The *Before you trade* tab lets you add making charge and the buy-back cut.
+- History is COMEX futures closes (Yahoo Finance), lined up with today's spot price.
+
 ## What to watch (also in the dashboard)
 
-- **Prices:** MP and Rajasthan mandi prices, landed cost vs your local rate, diesel and freight.
-- **Government:**
+- **Wheat:**
   - MSP: ₹2,585 for RMS 2026-27 and ₹2,610 for RMS 2027-28.
-  - FCI procurement (Apr–Jun).
-  - **FCI OMSS e-auctions**, which cap prices in the lean season.
-  - Central pool stocks vs buffer norms.
-  - Trader **stock limits**.
-  - The export ban and import duty.
-- **Crop and weather:** rabi sowing area (Oct–Dec), heatwaves in Feb–Mar (IMD), harvest arrivals (Mar–May).
-- **Demand:** Sankranti, Dussehra/Diwali, wedding seasons, flour mills, PDS.
-- **Calendar:** usually **buy in Apr–May** (harvest) and **sell in parts Oct–Feb** (lean season). Only hold stock if the expected rise beats your holding cost.
+  - FCI procurement and **OMSS e-auctions**, central pool stocks, trader stock limits, trade policy.
+  - Sowing and weather.
+  - The calendar: usually **buy in Apr–May** and **sell in parts Oct–Feb**.
+- **Gold / silver / platinum:**
+  - The world price and the rupee.
+  - US interest rates and the dollar; central-bank buying.
+  - Wars and market falls, which push gold up as a safe haven.
+  - Silver: industrial demand (solar, electronics, EVs) and the gold/silver ratio. Platinum: car catalysts, South African mine supply, and how hard it is to sell back.
+  - Import duty in the Union Budget.
+  - Dhanteras, Akshaya Tritiya and wedding seasons.
 
 ## Files
 
 | Path | What |
 |---|---|
 | `agent/fetch.py` | data.gov.in (Agmarknet) client: today's all-India feed and the history archive |
-| `agent/analyze.py` | Benchmark, indicators, seasonality, forecast + backtest, the scored call with proof, landed cost, track record |
+| `agent/analyze.py` | Wheat benchmark, indicators, seasonality, forecast + backtest, the scored call with proof, landed cost, track record |
+| `agent/metals.py` | Gold, silver, platinum: Yahoo + gold-api.com, the India price, and the same analysis |
 | `agent/briefing.py` | English + Telugu briefing (rules, or Claude when a key is set) |
-| `agent/notify.py` | Telegram alerts |
-| `agent/run.py` | The daily pipeline |
-| `agent/bootstrap.py` | One-time history download |
-| `config.json` | **Your costs**, source mandis and distances, MSP, OMSS |
-| `data/prices.csv` | Price history (grows every run) |
-| `data/signals_log.csv` | Every call the agent has made (for live grading) |
-| `docs/` | The dashboard (GitHub Pages) |
+| `agent/notify.py` | Telegram alerts, per commodity |
+| `agent/run.py` | The pipeline (`--quick` every 5 minutes, full, `--offline`) |
+| `agent/bootstrap.py` | One-time wheat history download |
+| `config.json` | **Your costs**, source mandis and distances, MSP, OMSS, metal duty / GST / interest |
+| `data/prices.csv`, `data/metals/` | Price history (grows every run) |
+| `data/signals_*.csv` | Every call the agent has made (for live grading) |
+| `docs/` | The dashboard (GitHub Pages). `docs/data/summary.json` is the one file the Mac app reads |
 | `mac/` | The Mac menu-bar app (Swift): `build.sh`, `package.sh` |
-| `.github/workflows/monitor.yml` | The twice-daily schedule |
-| `.github/save.sh` | Commits new data, retrying if two runs overlap |
-| `scripts/mac-refresh.sh`, `scripts/mac-schedule.sh` | Fetch prices from your Mac and publish them, by hand or twice a day |
+| `scripts/mac-refresh.sh`, `scripts/mac-schedule.sh` | Run the agent on your Mac and publish, by hand or every 5 minutes |
+| `.github/workflows/monitor.yml` | The twice-a-day backup run (skipped when the Mac published recently) |
 | `guide/` | Setup, user guide, how it works, config, Mac app, FAQ |
 
 ## Privacy
@@ -152,6 +184,6 @@ This repository and dashboard are public, but **your trades never leave your pho
 
 ## Disclaimer
 
-WheatWise is a decision-support tool built on public government data and simple, open rules. It is not financial advice. Mandi data can be late or wrong. Always check with your brokers and local market before you trade.
+Dharalu is a decision-support tool built on public data and simple, open rules. It is not financial advice. Prices can be late or wrong. Always check with your brokers, local market or jeweller before you trade.
 
 Licence: MIT. Changes: [CHANGELOG.md](CHANGELOG.md).

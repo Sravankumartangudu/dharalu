@@ -60,9 +60,29 @@ When FCI starts weekly OMSS e-auctions (usually in the lean season), open-market
 ```
 Set both back to `null` when sales stop. The −1 rule only counts on days on or after `active_from`.
 
+## Gold, silver, platinum
+
+Each metal has its own block under `metals` (`gold`, `silver`, `platinum`):
+
+| Key | Default | Meaning |
+|---|---|---|
+| `grams` | 10 / 1000 / 10 | The unit the price is shown for: gold per 10 g, silver per kg, platinum per 10 g |
+| `duty_pct` | 6 / 6 / 6.4 | Import duty (basic customs duty + AIDC) since the July 2024 Budget. **Check after every Union Budget** (1 Feb) |
+| `gst_pct` | 3 | GST paid on top when you buy, shown as "with GST" |
+| `sell_discount_pct` | 1 | What a jeweller or dealer usually knocks off when you sell back. Used in *Before you trade* |
+| `interest_pct_per_month` | 0.6 | What the money would earn in the bank (about 7.2% a year). This is the metal's holding cost |
+| `move_alert_pct` | 2 / 3 / 3 | Alert if the price moves this much in a day |
+| `futures` | `GC=F` / `SI=F` / `PL=F` | Yahoo Finance symbol for the price history. Change with care: the track record is built on it |
+| `spot` | `XAU` / `XAG` / `XPT` | gold-api.com symbol for the live price |
+| `label`, `telugu`, `emoji`, `unit`, `purity` | | How it is named and shown |
+
+`metals.fx_symbol` (`INR=X`) is the Yahoo Finance symbol for the US$/₹ rate.
+
+After a Budget changes duty or GST: edit the numbers, then run `python3 agent/run.py --offline` (or wait for the next run). The whole price history is recomputed with the new duty, so the chart and the track record stay consistent.
+
 ## Alerts
 
 | Key | Default | Meaning |
 |---|---|---|
-| `alerts.daily_move_pct` | 2.5 | Telegram alert if the benchmark moves this much in a day |
+| `alerts.daily_move_pct` | 2.5 | Wheat: Telegram (and Mac) alert if the benchmark moves this much in a day |
 | `alerts.weekly_summary_weekday` | 0 | Day for the weekly summary (0 = Monday … 6 = Sunday) |

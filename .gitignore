@@ -6,6 +6,7 @@ __pycache__/
 *trades*.csv
 
 # Mac app build output
+mac/Dharalu.app/
 mac/WheatWise.app/
 mac/dist/
 mac/Icon/AppIcon.iconset/

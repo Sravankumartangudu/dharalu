@@ -1,4 +1,4 @@
-"""WheatWise analysis engine - pure Python (no numpy), so it runs anywhere.
+"""Dharalu analysis engine - pure Python (no numpy), so it runs anywhere.
 
 Pipeline:
   prices.csv -> per-mandi daily price -> BENCHMARK series (median of the
@@ -181,8 +181,11 @@ def indicators(cal):
 
 
 # --------------------------------------------------------------------------- seasonality
-def seasonality(series):
-    """Monthly index (avg = 1.0). Ratio of each month to its own year's average."""
+def seasonality(series, prior=SEASONAL_PRIOR, detrend=False):
+    """Monthly index (avg = 1.0). Ratio of each month to its own year's average.
+
+    detrend=True compares each month with a centred 12-month average instead, so a
+    steady long rise (gold) doesn't show up as "December is always dearest"."""
     by_ym = defaultdict(list)
     for k, p in series.items():
         by_ym[(int(k[:4]), int(k[5:7]))].append(p)
@@ -192,15 +195,25 @@ def seasonality(series):
             years[y][m] = st.mean(v)
     ratios = defaultdict(list)
     used = 0
-    for y, months in years.items():
-        if len(months) >= 10:
-            used += 1
-            avg = st.mean(months.values())
-            for m, v in months.items():
-                ratios[m].append(v / avg)
-    data = [st.median(ratios[m]) if ratios.get(m) else SEASONAL_PRIOR[m - 1] for m in range(1, 13)]
+    if detrend:
+        mon = {y * 12 + m - 1: v for y, ms in years.items() for m, v in ms.items()}
+        for k, v in mon.items():
+            win = [mon.get(k + j) for j in range(-6, 7)]
+            if None in win:
+                continue
+            centred = (sum(win[1:-1]) + 0.5 * (win[0] + win[-1])) / 12.0  # 2x12 moving average
+            ratios[k % 12 + 1].append(v / centred)
+        used = min(len(r) for r in ratios.values()) if len(ratios) == 12 else 0
+    else:
+        for y, months in years.items():
+            if len(months) >= 10:
+                used += 1
+                avg = st.mean(months.values())
+                for m, v in months.items():
+                    ratios[m].append(v / avg)
+    data = [st.median(ratios[m]) if ratios.get(m) else prior[m - 1] for m in range(1, 13)]
     w = used / (used + 2.0)
-    idx = [w * a + (1 - w) * b for a, b in zip(data, SEASONAL_PRIOR)]
+    idx = [w * a + (1 - w) * b for a, b in zip(data, prior)]
     norm = st.mean(idx)
     idx = [x / norm for x in idx]
     return {"index": idx, "years_used": used, "weight_on_data": round(w, 2)}
@@ -222,14 +235,16 @@ class SeasonAsOf:
     """Seasonal index using only prices before the 1st of the given day's month,
     so backtests and replays never peek at the future."""
 
-    def __init__(self, series):
+    def __init__(self, series, prior=SEASONAL_PRIOR, detrend=False):
         self.series, self.cache = series, {}
+        self.prior, self.detrend = prior, detrend
 
     def __call__(self, day):
         key = (day.year, day.month)
         if key not in self.cache:
             cut = "%04d-%02d-01" % key
-            self.cache[key] = seasonality({k: v for k, v in self.series.items() if k < cut})
+            self.cache[key] = seasonality({k: v for k, v in self.series.items() if k < cut},
+                                          self.prior, self.detrend)
         return self.cache[key]
 
 
@@ -372,7 +387,7 @@ def score_signal(cal, idx, cfg, fc=None, bt=None):
             "edge >= +3%: +2 | >= +1%: +1 | <= -1%: -1 | <= -3%: -2" + (
                 " (capped at 1 point: backtest error %.1f%% is not better than no-change %.1f%%)" % (
                     acc["mape_pct"], acc["naive_mape_pct"]) if weak else ""),
-            pts, "WheatWise forecast (backtest error %s%% vs no-change %s%%, %s tests)" % (
+            pts, "Dharalu forecast (backtest error %s%% vs no-change %s%%, %s tests)" % (
                 acc.get("mape_pct", "n/a"), acc.get("naive_mape_pct", "n/a"), acc.get("tests", 0)),
             "Stocking only pays if the expected rise beats interest + godown + losses.", most=2, forward=True)
 
@@ -436,9 +451,9 @@ def outlook_points(evidence):
     return sum(e["points"] for e in evidence if e.get("forward"))
 
 
-def action_for(score, evidence=()):
+def action_for(score, evidence=(), actions=ACTIONS):
     hold = score == 0 and outlook_points(evidence) > 0
-    for mn, key, en, te, buy, hold_adv in ACTIONS:
+    for mn, key, en, te, buy, hold_adv in actions:
         if key == "HOLD" and not hold:
             continue
         if score >= mn:
@@ -546,32 +561,45 @@ def state_table(cfg, rows):
 
 
 # --------------------------------------------------------------------------- track record
-def track_record(cal, season_asof, cfg, bt, lookback=365, step=1):
+def track_record(cal, season_asof, cfg, bt, lookback=365, step=1, scorer=score_signal,
+                 carry=carrying_cost_pct, actions=ACTIONS, days=None):
     """Replay the signal on every past day (using only data up to that day, and the
     MSP/OMSS that applied then) and check what the price did over the next 30 days.
-    This is the proof of how useful the signal has been."""
+    This is the proof of how useful the signal has been.
+
+    days: only replay these dates (real trading days, for metals that skip weekends).
+    Each row also keeps the 30-day forecast made that day (pred30), so the timeline
+    can show what the agent expected next to what really happened.
+    The last 30 days are replayed too (for the timeline's call strip) with after30 =
+    None; only days whose 30 days are over count in the summaries."""
     n = len(cal)
     rows = []
-    for t in range(120, n - 30, step):  # whole history; the headline table is the last `lookback` days
+    for t in range(120, n, step):  # whole history; the headline table is the last `lookback` days
         hist = cal[: t + 1]
-        if not hist[-1][1] or not cal[t + 30][1]:
+        later = cal[t + 30][1] if t + 30 < n else None
+        if not hist[-1][1] or (t + 30 < n and not later):
+            continue
+        if days is not None and hist[-1][0].isoformat() not in days:
             continue
         idx = season_asof(hist[-1][0])
         fc = forecast(hist, idx["index"], {}, horizon=30)
         if not fc:
             continue
-        score, ev, ind = score_signal(hist, idx, cfg, fc, bt)
-        rows.append({"date": hist[-1][0].isoformat(), "score": score, "signal": action_for(score, ev)["key"],
-                     "price": round(hist[-1][1]),
-                     "after30": round(cal[t + 30][1]), "move_pct": round(pct(cal[t + 30][1], hist[-1][1]), 2)})
+        score, ev, ind = scorer(hist, idx, cfg, fc, bt)
+        rows.append({"date": hist[-1][0].isoformat(), "score": score,
+                     "signal": action_for(score, ev, actions)["key"],
+                     "price": round(hist[-1][1]), "pred30": fc[29]["price"],
+                     "after30": round(later) if later else None,
+                     "move_pct": round(pct(later, hist[-1][1]), 2) if later else None})
+    done = [r for r in rows if r["after30"] is not None]
     cut = (cal[-31][0] - timedelta(days=lookback)).isoformat()
-    recent = [r for r in rows if r["date"] > cut]
+    recent = [r for r in done if r["date"] > cut]
 
     def grp(f, rows=recent):
         g = [r for r in rows if f(r)]
         if not g:
             return None
-        cc = carrying_cost_pct(cfg, st.mean(r["price"] for r in g))
+        cc = carry(cfg, st.mean(r["price"] for r in g))
         return {"days": len(g), "avg_move_pct": round(st.mean(r["move_pct"] for r in g), 2),
                 "rose_pct": round(100.0 * sum(r["move_pct"] > 0 for r in g) / len(g), 1),
                 "beat_holding_cost_pct": round(100.0 * sum(r["move_pct"] > cc for r in g) / len(g), 1)}
@@ -583,8 +611,23 @@ def track_record(cal, season_asof, cfg, bt, lookback=365, step=1):
         "all_days": lambda r: True,
     }
     return {"summary": {k: grp(f) for k, f in groups.items()},
-            "summary_all": {k: grp(f, rows) for k, f in groups.items()},
-            "since": rows[0]["date"] if rows else None, "rows": rows[-400:]}
+            "summary_all": {k: grp(f, done) for k, f in groups.items()},
+            "since": done[0]["date"] if done else None, "rows": rows[-1130:]}
+
+
+def predictions_made(cal, season_asof, back=60, days=None):
+    """The 30-day forecast the agent made on each recent day, so the timeline can
+    show it (also for days whose 30 days aren't over yet)."""
+    out = []
+    for t in range(max(120, len(cal) - back), len(cal)):
+        dy, p = cal[t]
+        if not p or (days is not None and dy.isoformat() not in days):
+            continue
+        fc = forecast(cal[: t + 1], season_asof(dy)["index"], {}, horizon=30)
+        if fc:
+            out.append({"date": dy.isoformat(), "target": fc[29]["date"], "pred30": fc[29]["price"]})
+    return out
+
 
 
 # --------------------------------------------------------------------------- main entry
@@ -609,6 +652,7 @@ def run(rows, cfg, current_rows=None):
     feed_day, states = state_table(cfg, current_rows or rows)
     sell_ref = median([s["median"] for s in states if s["role"] == "selling"])
     tr = track_record(cal, season_asof, cfg, bt)
+    preds = predictions_made(cal, season_asof, days=set(bench))
 
     all_watched_today = median([r["mandi_price"] for r in lt])
     return {
@@ -633,6 +677,7 @@ def run(rows, cfg, current_rows=None):
         "selling_reference": sell_ref,
         "margin_vs_selling_ref": (sell_ref - lt[0]["landed"]) if (sell_ref and lt) else None,
         "track_record": tr,
+        "predictions": preds,
         "series": [{"date": dy.isoformat(), "price": round(p) if p else None} for dy, p in cal[-1100:]],
         "markets": {m["name"]: [{"date": k, "price": round(v)} for k, v in sorted(mdaily.get(m["name"], {}).items())[-180:]]
                     for m in cfg["source_markets"]},

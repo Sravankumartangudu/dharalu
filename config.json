@@ -190,6 +190,56 @@
   ],
   "alerts": {
     "daily_move_pct": 2.5,
-    "weekly_summary_weekday": 0
+    "weekly_summary_weekday": 0,
+    "note_metals": "Each metal alerts on its own move_alert_pct (vs the previous close) and on a call change."
+  },
+  "metals": {
+    "gold": {
+      "label": "Gold",
+      "telugu": "బంగారం",
+      "emoji": "🥇",
+      "futures": "GC=F",
+      "spot": "XAU",
+      "grams": 10,
+      "unit": "Rs per 10 g",
+      "purity": "24 carat (999)",
+      "duty_pct": 6.0,
+      "gst_pct": 3.0,
+      "sell_discount_pct": 1.0,
+      "interest_pct_per_month": 0.6,
+      "move_alert_pct": 2.0
+    },
+    "silver": {
+      "label": "Silver",
+      "telugu": "వెండి",
+      "emoji": "🥈",
+      "futures": "SI=F",
+      "spot": "XAG",
+      "grams": 1000,
+      "unit": "Rs per kg",
+      "purity": "999 fine",
+      "duty_pct": 6.0,
+      "gst_pct": 3.0,
+      "sell_discount_pct": 1.0,
+      "interest_pct_per_month": 0.6,
+      "move_alert_pct": 3.0
+    },
+    "platinum": {
+      "label": "Platinum",
+      "telugu": "ప్లాటినం",
+      "emoji": "💠",
+      "futures": "PL=F",
+      "spot": "XPT",
+      "grams": 10,
+      "unit": "Rs per 10 g",
+      "purity": "999.5 fine",
+      "duty_pct": 6.4,
+      "gst_pct": 3.0,
+      "sell_discount_pct": 1.0,
+      "interest_pct_per_month": 0.6,
+      "move_alert_pct": 3.0
+    },
+    "fx_symbol": "INR=X",
+    "note": "India price = world price (US$ per troy ounce) x US$/Rs rate / 31.1035 g x grams x (1 + duty_pct). duty_pct = basic customs duty + AIDC on imports (gold/silver 6%, platinum 6.4% since the July 2024 budget) - change it when the Budget does. GST (gst_pct) is added on top when you buy. sell_discount_pct = what a jeweller/dealer usually knocks off when you sell back. interest_pct_per_month = what the money would earn in the bank (fixed deposit), the cost of holding metal instead. History: COMEX futures closes (Yahoo Finance) lined up with today's spot price (gold-api.com); US$/Rs from Yahoo Finance."
   }
 }

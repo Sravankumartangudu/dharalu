@@ -1,9 +1,11 @@
-name: WheatWise monitor
+name: Dharalu monitor
 
 on:
   schedule:
-    - cron: "0 7 * * *"    # 12:30 IST - after morning mandi reports
-    - cron: "0 14 * * *"   # 19:30 IST - after the day's reports
+    # Backup only: the Mac checks every 5 minutes (scripts/mac-schedule.sh). These runs
+    # do nothing when the Mac published in the last 3 hours (--if-stale 3).
+    - cron: "0 7 * * *"    # 12:30 IST
+    - cron: "0 14 * * *"   # 19:30 IST
   workflow_dispatch:
     inputs:
       bootstrap:
@@ -15,7 +17,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: wheatwise
+  group: dharalu
   cancel-in-progress: false
 
 jobs:
@@ -43,7 +45,9 @@ jobs:
         run: |
           ./.github/save.sh "data: seed history"
       - name: Fetch, analyse, alert
-        run: python agent/run.py
+        # Manual runs always go; scheduled ones skip if the Mac published recently.
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then python agent/run.py --if-stale 3; else python agent/run.py; fi
       - name: Save data
         # Runs even if the analysis failed, so fetched prices are never thrown away.
         if: ${{ !cancelled() }}

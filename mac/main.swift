@@ -1,19 +1,21 @@
-// WheatWise for Mac - a menu-bar companion to the WheatWise dashboard.
+// Dharalu for Mac - a menu-bar companion to the Dharalu dashboard (ధరలు, "prices").
 //
-// It reads the same latest.json that GitHub Actions publishes twice a day, shows today's
-// BUY / SELL call in the menu bar with the proof behind it, notifies you when the call
-// changes or the price jumps, and opens the full dashboard in its own window.
-// Nothing is computed here - the agent runs on GitHub; this app only reads its output.
+// It reads the summary.json the agent publishes (wheat, gold, silver, platinum), checks the
+// world gold / silver / platinum price live every few minutes, shows the call you pick in the
+// menu bar with the proof behind it, notifies you when a call changes or a price jumps, and
+// opens the full dashboard in its own window.
+// Nothing is predicted here - the agent does that; this app only reads its output.
 
 import AppKit
 import ServiceManagement
 import UserNotifications
 import WebKit
 
-let appName = "WheatWise"
-let defaultDataURL = "https://sravankumartangudu.github.io/wheatwise/data/latest.json"
-let repoURL = "https://github.com/Sravankumartangudu/wheatwise"
-let moveAlertPct = 2.5
+let appName = "Dharalu"
+let defaultDataURL = "https://sravankumartangudu.github.io/dharalu/data/summary.json"
+let repoURL = "https://github.com/Sravankumartangudu/dharalu"
+let liveURL = "https://api.gold-api.com/price/"
+let defaultOrder = ["wheat", "gold", "silver", "platinum"]
 
 // MARK: - Settings
 
@@ -24,8 +26,16 @@ enum Settings {
         set { d.set(newValue, forKey: "dataURL") }
     }
     static var siteURL: URL {
-        let s = dataURL.replacingOccurrences(of: "data/latest.json", with: "")
-        return URL(string: s) ?? URL(string: "https://sravankumartangudu.github.io/wheatwise/")!
+        let s = dataURL.replacingOccurrences(of: "data/summary.json", with: "")
+        return URL(string: s) ?? URL(string: "https://sravankumartangudu.github.io/dharalu/")!
+    }
+    static func pageURL(_ hash: String) -> URL {
+        URL(string: siteURL.absoluteString + "#" + hash) ?? siteURL
+    }
+    /// Which commodity the menu bar shows.
+    static var barItem: String {
+        get { let v = d.string(forKey: "barItem") ?? "wheat"; return defaultOrder.contains(v) ? v : "wheat" }
+        set { d.set(newValue, forKey: "barItem") }
     }
     static var showPrice: Bool {
         get { d.object(forKey: "showPrice") as? Bool ?? true }
@@ -35,8 +45,9 @@ enum Settings {
         get { d.object(forKey: "notify") as? Bool ?? true }
         set { d.set(newValue, forKey: "notify") }
     }
+    static let minuteOptions = [5, 15, 30, 60]
     static var minutes: Int {
-        get { d.object(forKey: "minutes") as? Int ?? 30 }
+        get { let v = d.object(forKey: "minutes") as? Int ?? 5; return minuteOptions.contains(v) ? v : 5 }
         set { d.set(newValue, forKey: "minutes") }
     }
     /// "system" (follow macOS, Auto included), "light" or "dark".
@@ -51,66 +62,83 @@ enum Settings {
         default: NSApp.appearance = nil
         }
     }
-    /// JS that makes the dashboard page match the choice (same `ww.theme` key the page's own toggle uses).
+    /// JS that makes the dashboard page match the choice (same `dh.theme` key the page's own toggle uses).
     static var themeScript: String {
         let v = appearance
         return v == "system"
-            ? "try{localStorage.removeItem('ww.theme');delete document.documentElement.dataset.theme;}catch(e){}"
-            : "try{localStorage.setItem('ww.theme','\"\(v)\"');document.documentElement.dataset.theme='\(v)';}catch(e){}"
+            ? "try{localStorage.removeItem('dh.theme');delete document.documentElement.dataset.theme;}catch(e){}"
+            : "try{localStorage.setItem('dh.theme','\"\(v)\"');document.documentElement.dataset.theme='\(v)';}catch(e){}"
     }
-    static var lastSignal: String? {
-        get { d.string(forKey: "lastSignal") }
-        set { d.set(newValue, forKey: "lastSignal") }
-    }
-    static var lastMoveAlert: String? {
-        get { d.string(forKey: "lastMoveAlert") }
-        set { d.set(newValue, forKey: "lastMoveAlert") }
-    }
+    static func lastSignal(_ k: String) -> String? { d.string(forKey: "lastSignal.\(k)") }
+    static func setLastSignal(_ k: String, _ v: String?) { d.set(v, forKey: "lastSignal.\(k)") }
+    static func lastMove(_ k: String) -> String? { d.string(forKey: "lastMove.\(k)") }
+    static func setLastMove(_ k: String, _ v: String) { d.set(v, forKey: "lastMove.\(k)") }
 }
 
-// MARK: - The agent's output (a subset of docs/data/latest.json)
+// MARK: - The agent's output (docs/data/summary.json)
 
-struct Latest: Decodable {
-    struct Bench: Decodable { let price: Double; let chg_1d: Double?; let chg_7d: Double?; let chg_30d: Double? }
-    struct Evidence: Decodable { let rule: String; let value: String; let test: String; let points: Int; let source: String; let why: String }
+struct Summary: Decodable {
+    struct Evidence: Decodable { let rule: String; let value: String; let test: String; let points: Int; let source: String; let why: String? }
     struct Signal: Decodable {
         let score: Int; let max_score: Int; let confidence: String; let key: String
         let label: String; let telugu: String; let buyer: String; let holder: String
-        let evidence: [Evidence]
     }
     struct Point: Decodable { let date: String; let price: Double; let low: Double; let high: Double }
-    struct Source: Decodable { let market: String; let landed: Double; let mandi_price: Double; let km: Double }
-    struct MSP: Decodable { let floor: Double; let season: String? }
-    struct Group: Decodable { let days: Int; let avg_move_pct: Double; let rose_pct: Double; let beat_holding_cost_pct: Double }
-    struct Summary: Decodable { let buy_days: Group?; let hold_days: Group?; let wait_days: Group?; let sell_days: Group? }
-    struct Live: Decodable { let calls: Int; let graded: Int; let right_pct: Double? }
-    struct Record: Decodable { let summary: Summary; let summary_all: Summary?; let since: String?; let live: Live? }
-    struct Brief: Decodable { let english: String; let telugu: String }
-    struct Briefing: Decodable { let rules: Brief; let ai: Brief? }
-    struct Timing: Decodable { let cheapest_months: [String]; let dearest_months: [String]; let days_to_buy_window: Int }
+    struct Group: Decodable { let scope: String?; let days: Int; let avg_move_pct: Double; let rose_pct: Double; let beat_holding_cost_pct: Double? }
+    struct Record: Decodable { let same_call: Group?; let live_right_pct: Double?; let live_graded: Int? }
+    struct Briefing: Decodable { let source: String?; let english: String; let telugu: String }
+    struct Timing: Decodable { let cheapest_months: [String]; let dearest_months: [String]; let days_to_buy_window: Int? }
+    /// Metals only: the agent's world price and the factor that turns US$/oz into ₹ for the unit shown.
+    struct Live: Decodable { let symbol: String; let usd: Double; let factor: Double; let prev_close: Double?; let updated: String? }
+    struct Item: Decodable {
+        let key: String
+        let asof: String
+        let generated_at: String?
+        let signal: Signal
+        let evidence: [Evidence]
+        let forecast30: Point?
+        let record: Record?
+        let briefing: Briefing
+        let timing: Timing?
+        let carrying_cost_30d_pct: Double?
+        let label: String
+        let telugu_name: String?
+        let emoji: String
+        let unit: String
+        let unit_short: String
+        let price: Double
+        let chg_1d: Double?
+        let chg_7d: Double?
+        let chg_30d: Double?
+        let move_alert_pct: Double?
+        let live: Live?
+        let lines: [String]?
+    }
 
-    let asof: String
-    let generated_at: String?
-    let benchmark: Bench
-    let signal: Signal
-    let forecast_points: [String: Point]
-    let best_source: Source?
-    let msp: MSP
-    let track_record: Record
-    let briefing: Briefing
-    let timing: Timing
-    let carrying_cost_30d_pct: Double?
+    let generated_at: String
+    let order: [String]?
+    let items: [String: Item]
 
-    var brief: Brief { briefing.ai ?? briefing.rules }
-    var generated: Date? { generated_at.flatMap { ISO8601DateFormatter().date(from: $0) } }
+    var generated: Date? { isoDate(generated_at) }
+    var keys: [String] { (order ?? defaultOrder).filter { items[$0] != nil } }
 }
 
+/// A live price from gold-api.com, already turned into ₹ for the commodity's unit.
+struct LivePrice { let rs: Double; let at: Date }
+
 // MARK: - Formatting
+
+func isoDate(_ s: String) -> Date? {
+    let f = ISO8601DateFormatter()
+    if let d = f.date(from: s) { return d }
+    f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    return f.date(from: s)
+}
 
 func rs(_ v: Double) -> String {
     let f = NumberFormatter()
     f.numberStyle = .decimal
-    f.locale = Locale(identifier: "en_IN")   // 2,92,784 - the Indian grouping
+    f.locale = Locale(identifier: "en_IN")   // 1,34,631 - the Indian grouping
     f.maximumFractionDigits = 0
     return "₹" + (f.string(from: NSNumber(value: v.rounded())) ?? "\(Int(v))")
 }
@@ -129,6 +157,8 @@ func prettyDate(_ iso: String) -> String {
     return f.string(from: d)
 }
 
+func hm(_ d: Date) -> String { let f = DateFormatter(); f.dateFormat = "HH:mm"; return f.string(from: d) }
+
 /// Menus don't wrap text, so long lines are broken by hand.
 func wrap(_ text: String, _ width: Int = 64) -> String {
     text.components(separatedBy: "\n").map { para -> String in
@@ -141,6 +171,9 @@ func wrap(_ text: String, _ width: Int = 64) -> String {
         return lines.joined(separator: "\n")
     }.joined(separator: "\n")
 }
+
+/// The agent writes "Rs 1,234"; the menu shows "₹1,234".
+func rupee(_ s: String) -> String { s.replacingOccurrences(of: "Rs ", with: "₹") }
 
 func signalColor(_ key: String) -> NSColor {
     switch key {
@@ -156,7 +189,8 @@ func signalColor(_ key: String) -> NSColor {
 final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotificationCenterDelegate {
     let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     let dashboard = Dashboard()
-    var latest: Latest?
+    var summary: Summary?
+    var live: [String: LivePrice] = [:]
     var lastError: String?
     var fetchedAt: Date?
     var timer: Timer?
@@ -165,9 +199,9 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         NexusBeacon.start(name: appName) { [weak self] in
             guard let self = self else { return ("ok", "") }
             if let e = self.lastError { return ("error", e) }
-            guard let l = self.latest else { return ("ok", "starting") }
-            if self.isStale { return ("warn", self.staleNote) }
-            return ("ok", "\(l.signal.label) \(rs(l.benchmark.price))")
+            guard let s = self.summary, let it = s.items[Settings.barItem] else { return ("ok", "starting") }
+            if self.isStale { return ("warn", "data is \(self.ageHours)h old") }
+            return ("ok", "\(it.label) \(it.signal.label) \(rs(self.now(it)))")
         }
         Settings.applyAppearance()
         installEditMenu()
@@ -175,14 +209,14 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         menu.delegate = self
         item.menu = menu
         NexusBeacon.attach(item)   // lets the app live in Nexus's menu
-        item.button?.toolTip = "WheatWise - wheat buy/sell agent"
+        item.button?.toolTip = "Dharalu - wheat, gold, silver and platinum buy/sell agent"
         updateTitle()
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
         schedule()
         refresh()
-        if CommandLine.arguments.contains("--dashboard") { dashboard.show() }
+        if CommandLine.arguments.contains("--dashboard") { dashboard.show(Settings.barItem) }
     }
 
     func schedule() {
@@ -192,19 +226,23 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         timer = t
     }
 
-    var ageHours: Int { Int((Date().timeIntervalSince(latest?.generated ?? Date())) / 3600) }
-    /// Days since the newest mandi price. Mandis skip Sundays and holidays, so 3+ days means no new prices.
-    var priceAgeDays: Int {
+    var ageHours: Int { Int((Date().timeIntervalSince(summary?.generated ?? Date())) / 3600) }
+    /// The Mac job runs every 5 minutes and publishes at least hourly, so 6 hours old means it stopped.
+    var isStale: Bool { summary != nil && ageHours >= 6 }
+    /// Days since an item's newest price. Mandis skip Sundays and holidays; metals skip weekends.
+    func priceAgeDays(_ it: Summary.Item) -> Int {
         let p = DateFormatter(); p.dateFormat = "yyyy-MM-dd"; p.timeZone = TimeZone(identifier: "Asia/Kolkata")
-        guard let a = latest.flatMap({ p.date(from: $0.asof) }) else { return 0 }
+        guard let a = p.date(from: it.asof) else { return 0 }
         return Calendar.current.dateComponents([.day], from: a, to: Date()).day ?? 0
     }
-    var pricesOld: Bool { latest != nil && priceAgeDays >= 3 }
-    /// Actions runs at 12:30 and 19:30 IST, so anything older than a day and a half means it stopped.
-    /// It can also keep publishing without new prices (data.gov.in refuses it), so watch the price date too.
-    var isStale: Bool { latest != nil && (ageHours >= 36 || pricesOld) }
-    var staleNote: String {
-        pricesOld ? "prices are \(priceAgeDays) days old" : "data is \(ageHours)h old"
+    func pricesOld(_ it: Summary.Item) -> Bool { priceAgeDays(it) >= (it.live == nil ? 3 : 4) }
+
+    /// Price right now: the live world price for metals (when it looks sane), else the agent's price.
+    func now(_ it: Summary.Item) -> Double { live[it.key]?.rs ?? it.price }
+    /// Change since the last daily close, for metals with a live price.
+    func liveMove(_ it: Summary.Item) -> Double? {
+        guard let l = live[it.key], let prev = it.live?.prev_close, prev > 0 else { return nil }
+        return (l.rs / prev - 1) * 100
     }
 
     // MARK: Fetch
@@ -212,65 +250,112 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
     @objc func refresh() {
         guard var comps = URLComponents(string: Settings.dataURL) else { lastError = "bad data URL"; updateTitle(); return }
         comps.queryItems = [URLQueryItem(name: "t", value: String(Int(Date().timeIntervalSince1970)))]   // skip caches
-        var req = URLRequest(url: comps.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
-        req.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
-        URLSession.shared.dataTask(with: req) { data, resp, err in
-            var result: Latest?, problem: String?
+        URLSession.shared.dataTask(with: request(comps.url!)) { data, resp, err in
+            var result: Summary?, problem: String?
             if let err = err {
                 problem = err.localizedDescription
             } else if let h = resp as? HTTPURLResponse, h.statusCode != 200 {
                 problem = "HTTP \(h.statusCode) from the dashboard"
             } else if let data = data {
-                do { result = try JSONDecoder().decode(Latest.self, from: data) } catch { problem = "couldn't read latest.json (\(error))" }
+                do { result = try JSONDecoder().decode(Summary.self, from: data) } catch { problem = "couldn't read summary.json (\(error))" }
             }
             DispatchQueue.main.async {
                 if let r = result {
-                    self.notifyIfNeeded(r)
-                    self.latest = r
+                    self.summary = r
                     self.lastError = nil
                     self.fetchedAt = Date()
+                    self.live = self.live.filter { r.items[$0.key]?.live != nil }
                 } else {
                     self.lastError = problem ?? "no data"
                 }
                 self.updateTitle()
                 NexusBeacon.beat()
+                if let r = result { self.refreshLive(r) }
             }
         }.resume()
     }
 
+    func request(_ u: URL) -> URLRequest {
+        var req = URLRequest(url: u, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
+        req.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        return req
+    }
+
+    /// Live world prices for the metals. A tick more than 15% away from the agent's price is ignored.
+    func refreshLive(_ s: Summary) {
+        let group = DispatchGroup()
+        var got: [String: LivePrice] = [:]
+        let lock = NSLock()
+        for k in s.keys {
+            guard let it = s.items[k], let l = it.live, let u = URL(string: liveURL + l.symbol) else { continue }
+            group.enter()
+            URLSession.shared.dataTask(with: request(u)) { data, _, _ in
+                defer { group.leave() }
+                guard let data = data,
+                      let o = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+                      let usd = o["price"] as? Double, usd > 0 else { return }
+                let price = usd * l.factor
+                guard abs(price / it.price - 1) <= 0.15 else { return }
+                let at = (o["updatedAt"] as? String).flatMap(isoDate) ?? Date()
+                lock.lock(); got[k] = LivePrice(rs: price, at: at); lock.unlock()
+            }.resume()
+        }
+        group.notify(queue: .main) {
+            for (k, v) in got { self.live[k] = v }
+            self.updateTitle()
+            self.notifyIfNeeded(s)
+        }
+    }
+
     func updateTitle() {
         guard let b = item.button else { return }
-        guard let l = latest else {
-            b.title = lastError == nil ? "🌾 …" : "🌾 ⚠︎"
+        guard let s = summary, let it = s.items[Settings.barItem] ?? s.keys.first.flatMap({ s.items[$0] }) else {
+            b.title = lastError == nil ? "⚖️ …" : "⚖️ ⚠︎"
             return
         }
-        var t = "🌾 " + l.signal.label
-        if Settings.showPrice { t += " " + rs(l.benchmark.price) }
+        var t = "⚖️ \(it.emoji) \(it.signal.label)"
+        if Settings.showPrice { t += " " + rs(now(it)) }
         if isStale || lastError != nil { t += " ⚠︎" }
         b.title = t
     }
 
     // MARK: Notifications
 
-    func notifyIfNeeded(_ l: Latest) {
-        defer { Settings.lastSignal = l.signal.key }
-        guard Settings.notify else { return }
-        if let prev = Settings.lastSignal, prev != l.signal.key {
-            post(id: "signal-\(l.asof)", title: "WheatWise: now \(l.signal.label) · \(l.signal.telugu)",
-                 body: "Was \(prev.replacingOccurrences(of: "_", with: " ")). Score \(signed(l.signal.score)) of ±\(l.signal.max_score), confidence \(l.signal.confidence). If buying: \(l.signal.buyer) If holding: \(l.signal.holder)")
-        }
-        if let m = l.benchmark.chg_1d, abs(m) >= moveAlertPct, Settings.lastMoveAlert != l.asof {
-            Settings.lastMoveAlert = l.asof
-            post(id: "move-\(l.asof)", title: "WheatWise: price \(m > 0 ? "up" : "down") \(pc(m)) in a day",
-                 body: "Benchmark \(rs(l.benchmark.price))/qtl on \(prettyDate(l.asof)). Signal: \(l.signal.label).")
+    /// Per commodity: tell when the call changes, and once a day when the price moves a lot.
+    func notifyIfNeeded(_ s: Summary) {
+        for k in s.keys {
+            guard let it = s.items[k] else { continue }
+            let sig = it.signal
+            defer { Settings.setLastSignal(k, sig.key) }
+            guard Settings.notify else { continue }
+            if let prev = Settings.lastSignal(k), prev != sig.key {
+                post(id: "signal-\(k)-\(it.asof)-\(sig.key)", key: k,
+                     title: "Dharalu: \(it.emoji) \(it.label) now \(sig.label) · \(sig.telugu)",
+                     body: "Was \(prev.replacingOccurrences(of: "_", with: " ")). Score \(signed(sig.score)) of ±\(sig.max_score), confidence \(sig.confidence). If buying: \(sig.buyer) If holding: \(sig.holder)")
+            }
+            let limit = it.move_alert_pct ?? 2.5
+            let move = liveMove(it) ?? it.chg_1d
+            let day = live[k] != nil ? dayStamp() : it.asof
+            if let m = move, abs(m) >= limit, Settings.lastMove(k) != day {
+                Settings.setLastMove(k, day)
+                post(id: "move-\(k)-\(day)", key: k,
+                     title: "Dharalu: \(it.emoji) \(it.label) \(m > 0 ? "up" : "down") \(pc(m)) today",
+                     body: "\(rs(now(it)))\(it.unit_short)\(live[k] != nil ? " (live)" : " on \(prettyDate(it.asof))"). Call: \(sig.label).")
+            }
         }
     }
 
-    func post(id: String, title: String, body: String) {
+    func dayStamp() -> String {
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = TimeZone(identifier: "Asia/Kolkata")
+        return f.string(from: Date())
+    }
+
+    func post(id: String, key: String, title: String, body: String) {
         let c = UNMutableNotificationContent()
         c.title = title
         c.body = body
         c.sound = .default
+        c.userInfo = ["key": key]
         UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: id, content: c, trigger: nil))
     }
 
@@ -281,7 +366,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
 
     func userNotificationCenter(_ c: UNUserNotificationCenter, didReceive r: UNNotificationResponse,
                                 withCompletionHandler done: @escaping () -> Void) {
-        dashboard.show()
+        dashboard.show(r.notification.request.content.userInfo["key"] as? String ?? Settings.barItem)
         done()
     }
 
@@ -289,16 +374,14 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
 
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
-        if let l = latest {
-            buildSignal(menu, l)
+        if let s = summary {
+            for k in s.keys { if let it = s.items[k] { menu.addItem(commodityRow(it)) } }
         } else {
-            menu.addItem(info(lastError.map { "Couldn't load today's call: \($0)" } ?? "Loading today's call…"))
+            menu.addItem(info(lastError.map { "Couldn't load today's calls: \($0)" } ?? "Loading today's calls…"))
         }
-        if let e = lastError, latest != nil { menu.addItem(info(wrap("⚠︎ Last refresh failed: \(e) - showing the previous data."))) }
-        if pricesOld {
-            menu.addItem(info(wrap("⚠︎ The newest prices are from \(prettyDate(latest!.asof)) (\(priceAgeDays) days ago). data.gov.in isn't giving the agent new prices - on the Mac with the repo, run scripts/mac-refresh.sh.")))
-        } else if isStale {
-            menu.addItem(info(wrap("⚠︎ This data is \(ageHours) hours old. The GitHub Actions monitor may have stopped - open the repo's Actions tab to check.")))
+        if let e = lastError, summary != nil { menu.addItem(info(wrap("⚠︎ Last refresh failed: \(e) - showing the previous data."))) }
+        if isStale {
+            menu.addItem(info(wrap("⚠︎ This data is \(ageHours) hours old. The Mac refresh job may have stopped - on the Mac with the repo, run scripts/mac-schedule.sh status.")))
         }
         menu.addItem(.separator())
         menu.addItem(action("Open Dashboard…", #selector(openDashboard), "d"))
@@ -306,58 +389,79 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         menu.addItem(action("Refresh Now", #selector(refresh), "r"))
         if let f = fetchedAt {
             let fmt = DateFormatter(); fmt.dateFormat = "d MMM, HH:mm"
-            let gen = latest?.generated.map { fmt.string(from: $0) } ?? "?"
-            menu.addItem(info("Checked \(fmt.string(from: f)) · agent ran \(gen)"))
+            let gen = summary?.generated.map { fmt.string(from: $0) } ?? "?"
+            menu.addItem(info("Checked \(fmt.string(from: f)) · agent ran \(gen) · every \(Settings.minutes) min"))
         }
         menu.addItem(.separator())
         menu.addItem(settingsItem())
         menu.addItem(action("Help - How to Use", #selector(openHelp)))
-        menu.addItem(action("Quit WheatWise", #selector(quit), "q"))
+        menu.addItem(action("Quit Dharalu", #selector(quit), "q"))
     }
 
-    func buildSignal(_ menu: NSMenu, _ l: Latest) {
-        let s = l.signal
+    /// One line per commodity ("🥇 Gold  STRONG SELL  ₹1,34,631/10 g  +0.4%"), the full call in its submenu.
+    func commodityRow(_ it: Summary.Item) -> NSMenuItem {
+        let row = NSMenuItem(title: it.label, action: nil, keyEquivalent: "")
+        let t = NSMutableAttributedString(string: "\(it.emoji)  \(it.label)   ", attributes: [.font: NSFont.menuFont(ofSize: 14)])
+        t.append(NSAttributedString(string: it.signal.label, attributes: [.font: NSFont.boldSystemFont(ofSize: 14), .foregroundColor: signalColor(it.signal.key)]))
+        t.append(NSAttributedString(string: "   \(rs(now(it)))\(it.unit_short)", attributes: [.font: NSFont.monospacedDigitSystemFont(ofSize: 14, weight: .regular)]))
+        let move = liveMove(it) ?? it.chg_1d
+        t.append(NSAttributedString(string: "  \(pc(move))\(live[it.key] != nil ? " ●" : "")",
+                                    attributes: [.font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .regular),
+                                                 .foregroundColor: (move ?? 0) > 0 ? signalColor("BUY") : (move ?? 0) < 0 ? signalColor("SELL") : NSColor.secondaryLabelColor]))
+        row.attributedTitle = t
+        if it.key == Settings.barItem { row.state = .on }
+        row.submenu = detailMenu(it)
+        return row
+    }
+
+    func detailMenu(_ it: Summary.Item) -> NSMenu {
+        let menu = NSMenu()
+        let s = it.signal
         let head = NSMenuItem()
-        let t = NSMutableAttributedString(string: "\(s.label) · \(s.telugu)\n",
+        let t = NSMutableAttributedString(string: "\(it.emoji) \(it.label)\(it.telugu_name.map { " · \($0)" } ?? "") - \(s.label) · \(s.telugu)\n",
                                           attributes: [.font: NSFont.boldSystemFont(ofSize: 15), .foregroundColor: signalColor(s.key)])
-        t.append(NSAttributedString(string: "Score \(signed(s.score)) of ±\(s.max_score) · confidence \(s.confidence) · \(prettyDate(l.asof))",
+        t.append(NSAttributedString(string: "Score \(signed(s.score)) of ±\(s.max_score) · confidence \(s.confidence) · \(prettyDate(it.asof))",
                                     attributes: [.font: NSFont.menuFont(ofSize: 12), .foregroundColor: NSColor.secondaryLabelColor]))
         head.attributedTitle = t
         head.isEnabled = false
         menu.addItem(head)
         menu.addItem(info(wrap("If buying: \(s.buyer)")))
-        menu.addItem(info(wrap("If holding stock: \(s.holder)")))
+        menu.addItem(info(wrap("If holding: \(s.holder)")))
         menu.addItem(.separator())
 
-        let b = l.benchmark
-        menu.addItem(info("Benchmark \(rs(b.price))/qtl · 1d \(pc(b.chg_1d)) · 7d \(pc(b.chg_7d)) · 30d \(pc(b.chg_30d))"))
-        if let f = l.forecast_points["30"] {
+        if let l = live[it.key] {
+            menu.addItem(info("Live \(rs(l.rs))\(it.unit_short) at \(hm(l.at)) · since last close \(pc(liveMove(it)))"))
+            menu.addItem(info("Agent's price \(rs(it.price)) on \(prettyDate(it.asof)) · 7d \(pc(it.chg_7d)) · 30d \(pc(it.chg_30d))"))
+        } else {
+            menu.addItem(info("Price \(rs(it.price))\(it.unit_short) on \(prettyDate(it.asof)) · 1d \(pc(it.chg_1d)) · 7d \(pc(it.chg_7d)) · 30d \(pc(it.chg_30d))"))
+        }
+        if let f = it.forecast30 {
             menu.addItem(info("30-day forecast \(rs(f.price)) (likely \(rs(f.low)) – \(rs(f.high)))"))
         }
-        if let src = l.best_source {
-            menu.addItem(info("Cheapest landed at Srikakulam: \(src.market) \(rs(src.landed))"))
+        for line in it.lines ?? [] { menu.addItem(info(wrap(rupee(line), 70))) }
+        if let cc = it.carrying_cost_30d_pct { menu.addItem(info("Holding cost \(String(format: "%.1f", cc))% per 30 days")) }
+        if pricesOld(it) {
+            menu.addItem(info(wrap("⚠︎ The newest price is from \(prettyDate(it.asof)) (\(priceAgeDays(it)) days ago)." +
+                                   (it.live == nil ? " data.gov.in may not be giving new prices - run scripts/mac-refresh.sh on the Mac." : ""))))
         }
-        var floor = "MSP floor \(rs(l.msp.floor))"
-        if let cc = l.carrying_cost_30d_pct { floor += " · holding cost \(String(format: "%.1f", cc))% per 30 days" }
-        menu.addItem(info(floor))
         menu.addItem(.separator())
 
         // The proof: every rule, its number, the test and the points it gave.
         let proof = NSMenuItem(title: "Why this call - the proof", action: nil, keyEquivalent: "")
         let pm = NSMenu()
-        for e in s.evidence {
-            let it = NSMenuItem()
+        for e in it.evidence {
+            let row = NSMenuItem()
             let a = NSMutableAttributedString(string: "\(signed(e.points))   \(e.rule)\n",
                                               attributes: [.font: NSFont.boldSystemFont(ofSize: 13),
                                                            .foregroundColor: e.points > 0 ? signalColor("BUY") : e.points < 0 ? signalColor("SELL") : NSColor.labelColor])
-            a.append(NSAttributedString(string: wrap(e.value, 70) + "\n",
+            a.append(NSAttributedString(string: wrap(rupee(e.value), 70) + "\n",
                                         attributes: [.font: NSFont.menuFont(ofSize: 12), .foregroundColor: NSColor.labelColor]))
             a.append(NSAttributedString(string: wrap("Test: \(e.test)", 80) + "\n" + wrap("Source: \(e.source)", 80),
                                         attributes: [.font: NSFont.menuFont(ofSize: 11), .foregroundColor: NSColor.secondaryLabelColor]))
-            it.attributedTitle = a
-            it.toolTip = e.why
-            it.isEnabled = false
-            pm.addItem(it)
+            row.attributedTitle = a
+            row.toolTip = e.why
+            row.isEnabled = false
+            pm.addItem(row)
         }
         pm.addItem(.separator())
         pm.addItem(info("Total score \(signed(s.score)) → \(s.label)   (≥+3 strong buy · +1/+2 buy · 0 hold/wait · −1/−2 sell · ≤−3 strong sell)"))
@@ -366,45 +470,52 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
 
         let rec = NSMenuItem(title: "Has this worked before?", action: nil, keyEquivalent: "")
         let rm = NSMenu()
-        let tr = l.track_record.summary
-        func line(_ name: String, _ g: Latest.Group?, rising: Bool) {
-            guard let g = g else { return }
-            let hit = rising ? g.rose_pct : 100 - g.rose_pct
-            rm.addItem(info("\(name) days (\(g.days)): price \(rising ? "higher" : "lower") 30 days later \(String(format: "%.0f", hit))% of the time, avg \(pc(g.avg_move_pct))"))
+        if let g = it.record?.same_call {
+            let word = s.label
+            if s.key == "HOLD", let beat = g.beat_holding_cost_pct {
+                rm.addItem(info("HOLD days (\(g.days), \(g.scope ?? "last year")): keeping beat the holding cost \(String(format: "%.0f", beat))% of the time, avg \(pc(g.avg_move_pct))"))
+            } else {
+                let falling = s.key.contains("SELL")
+                let hit = falling ? 100 - g.rose_pct : g.rose_pct
+                rm.addItem(info("\(word) days (\(g.days), \(g.scope ?? "last year")): price \(falling ? "lower" : "higher") 30 days later \(String(format: "%.0f", hit))% of the time, avg \(pc(g.avg_move_pct))"))
+            }
+        } else {
+            rm.addItem(info("Not enough past days with this call yet."))
         }
-        line("BUY", tr.buy_days, rising: true)
-        if let g = tr.hold_days {
-            rm.addItem(info("HOLD days (\(g.days)): keeping stock beat the holding cost \(String(format: "%.0f", g.beat_holding_cost_pct))% of the time, avg \(pc(g.avg_move_pct))"))
-        }
-        line("WAIT", tr.wait_days, rising: true)
-        line("SELL", tr.sell_days, rising: false)
-        if let all = l.track_record.summary_all, let h = all.hold_days, (tr.hold_days?.days ?? 0) < 10 {
-            rm.addItem(info("HOLD since \(prettyDate(l.track_record.since ?? "")) (\(h.days) days): beat the holding cost \(String(format: "%.0f", h.beat_holding_cost_pct))% of the time, avg \(pc(h.avg_move_pct))"))
-        }
-        if let live = l.track_record.live {
+        if let r = it.record {
             rm.addItem(.separator())
-            rm.addItem(info(live.graded > 0
-                ? "Live calls: \(live.graded) graded, right \(String(format: "%.0f", live.right_pct ?? 0))% of the time"
-                : "Live calls: \(live.calls) logged - each is graded 30 days later"))
+            rm.addItem(info((r.live_graded ?? 0) > 0
+                ? "Live calls: \(r.live_graded!) graded, right \(String(format: "%.0f", r.live_right_pct ?? 0))% of the time"
+                : "Live calls are graded 30 days after each one"))
         }
-        rm.addItem(info("Replayed over the last year using only the data known each day."))
+        rm.addItem(info("Replayed day by day using only the data known each day."))
+        rm.addItem(action("Open the full track record…", #selector(openPage(_:)), represented: "\(it.key)/record"))
         rec.submenu = rm
         menu.addItem(rec)
 
         let br = NSMenuItem(title: "Today's briefing", action: nil, keyEquivalent: "")
         let bm = NSMenu()
-        bm.addItem(info(wrap(l.brief.english, 80)))
+        bm.addItem(info(wrap(rupee(it.briefing.english), 80)))
         bm.addItem(.separator())
-        bm.addItem(info(wrap(l.brief.telugu, 70)))
+        bm.addItem(info(wrap(rupee(it.briefing.telugu), 70)))
         bm.addItem(.separator())
-        bm.addItem(action("Copy English", #selector(copyEnglish)))
-        bm.addItem(action("Copy తెలుగు", #selector(copyTelugu)))
+        bm.addItem(action("Copy English", #selector(copyEnglish(_:)), represented: it.key))
+        bm.addItem(action("Copy తెలుగు", #selector(copyTelugu(_:)), represented: it.key))
         br.submenu = bm
         menu.addItem(br)
 
-        let tm = l.timing
-        menu.addItem(info("Usually cheapest \(tm.cheapest_months.joined(separator: " & ")) · dearest \(tm.dearest_months.joined(separator: " & "))"
-                          + (tm.days_to_buy_window > 0 ? " · buy window in \(tm.days_to_buy_window) days" : " · in the buy window now")))
+        if let tm = it.timing {
+            let days = tm.days_to_buy_window ?? 0
+            menu.addItem(info("Usually cheapest \(tm.cheapest_months.joined(separator: " & ")) · dearest \(tm.dearest_months.joined(separator: " & "))"
+                              + (days > 0 ? " · buy window in \(days) days" : " · in the buy window now")))
+        }
+        menu.addItem(.separator())
+        menu.addItem(action("Open \(it.label) in Dashboard…", #selector(openPage(_:)), represented: "\(it.key)/today"))
+        menu.addItem(action("Timeline - past, now, forecast…", #selector(openPage(_:)), represented: "\(it.key)/timeline"))
+        if it.key != Settings.barItem {
+            menu.addItem(action("Show \(it.label) in the Menu Bar", #selector(pickBar(_:)), represented: it.key))
+        }
+        return menu
     }
 
     func settingsItem() -> NSMenuItem {
@@ -412,12 +523,14 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         let m = NSMenu()
         // Menu bar
         m.addItem(groupHeader("Menu bar"))
+        m.addItem(segmentRow("Show", ["🌾 Wheat", "🥇 Gold", "🥈 Silver", "💠 Plat."], defaultOrder.firstIndex(of: Settings.barItem) ?? 0, #selector(segBar(_:))))
         m.addItem(switchRow("Show price", Settings.showPrice, #selector(switchPrice(_:))))
         // Alerts
         m.addItem(.separator())
         m.addItem(groupHeader("Alerts"))
-        m.addItem(switchRow("Notify on signal change / big moves", Settings.notify, #selector(switchNotify(_:))))
-        m.addItem(segmentRow("Check every", ["15m", "30m", "1h", "2h"], [15, 30, 60, 120].firstIndex(of: Settings.minutes) ?? 1, #selector(segMinutes(_:))))
+        m.addItem(switchRow("Notify on call changes / big moves", Settings.notify, #selector(switchNotify(_:))))
+        m.addItem(segmentRow("Check prices every", Settings.minuteOptions.map { $0 < 60 ? "\($0)m" : "\($0 / 60)h" },
+                             Settings.minuteOptions.firstIndex(of: Settings.minutes) ?? 0, #selector(segMinutes(_:))))
         // General
         m.addItem(.separator())
         m.addItem(groupHeader("General"))
@@ -431,7 +544,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
 
     // MARK: Settings rows (grouped, with switches and segmented controls)
 
-    static let rowWidth: CGFloat = 300
+    static let rowWidth: CGFloat = 320
 
     func groupHeader(_ title: String) -> NSMenuItem {
         let it = NSMenuItem()
@@ -473,6 +586,14 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         return it
     }
 
+    @objc func segBar(_ s: NSSegmentedControl) {
+        guard defaultOrder.indices.contains(s.selectedSegment) else { return }
+        Settings.barItem = defaultOrder[s.selectedSegment]; updateTitle()
+    }
+    @objc func pickBar(_ m: NSMenuItem) {
+        guard let k = m.representedObject as? String else { return }
+        Settings.barItem = k; updateTitle()
+    }
     @objc func switchPrice(_ s: NSSwitch) { Settings.showPrice = s.state == .on; updateTitle() }
     @objc func switchNotify(_ s: NSSwitch) { Settings.notify = s.state == .on }
     @objc func switchLogin(_ s: NSSwitch) {
@@ -480,7 +601,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         s.state = SMAppService.mainApp.status == .enabled ? .on : .off   // snap back if it failed
     }
     @objc func segMinutes(_ s: NSSegmentedControl) {
-        let opts = [15, 30, 60, 120]
+        let opts = Settings.minuteOptions
         guard opts.indices.contains(s.selectedSegment) else { return }
         Settings.minutes = opts[s.selectedSegment]; schedule()
     }
@@ -498,25 +619,27 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         return it
     }
 
-    func action(_ title: String, _ sel: Selector, _ key: String = "") -> NSMenuItem {
+    func action(_ title: String, _ sel: Selector, _ key: String = "", represented: Any? = nil) -> NSMenuItem {
         let it = NSMenuItem(title: title, action: sel, keyEquivalent: key)
         it.target = self
+        it.representedObject = represented
         return it
     }
 
     // MARK: Actions
 
-    @objc func openDashboard() { dashboard.show() }
+    @objc func openDashboard() { dashboard.show("all") }
+    @objc func openPage(_ m: NSMenuItem) { dashboard.show(m.representedObject as? String ?? "all") }
     @objc func openBrowser() { NSWorkspace.shared.open(Settings.siteURL) }
     @objc func openHelp() { NSWorkspace.shared.open(URL(string: repoURL + "/blob/main/guide/MAC_APP.md")!) }
     @objc func quit() { NSApp.terminate(nil) }
 
-    @objc func copyEnglish() { copy(latest?.brief.english) }
-    @objc func copyTelugu() { copy(latest?.brief.telugu) }
-    func copy(_ s: String?) {
-        guard let s = s else { return }
+    @objc func copyEnglish(_ m: NSMenuItem) { copy(m, \.english) }
+    @objc func copyTelugu(_ m: NSMenuItem) { copy(m, \.telugu) }
+    func copy(_ m: NSMenuItem, _ path: KeyPath<Summary.Briefing, String>) {
+        guard let k = m.representedObject as? String, let it = summary?.items[k] else { return }
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(s + "\n" + Settings.siteURL.absoluteString, forType: .string)
+        NSPasteboard.general.setString(rupee(it.briefing[keyPath: path]) + "\n" + Settings.pageURL("\(k)/today").absoluteString, forType: .string)
     }
 
     @objc func toggleLogin() {
@@ -526,7 +649,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         } catch {
             let a = NSAlert()
             a.messageText = "Couldn't change Launch at Login"
-            a.informativeText = "\(error.localizedDescription)\n\nMove WheatWise to the Applications folder and try again, or add it in System Settings → General → Login Items."
+            a.informativeText = "\(error.localizedDescription)\n\nMove Dharalu to the Applications folder and try again, or add it in System Settings → General → Login Items."
             a.runModal()
         }
     }
@@ -534,7 +657,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
     @objc func editSource() {
         let a = NSAlert()
         a.messageText = "Data source"
-        a.informativeText = "The latest.json your WheatWise dashboard publishes. Change it only if you run your own copy (fork) of the repo."
+        a.informativeText = "The summary.json your Dharalu dashboard publishes. Change it only if you run your own copy (fork) of the repo."
         let f = NSTextField(frame: NSRect(x: 0, y: 0, width: 420, height: 24))
         f.stringValue = Settings.dataURL
         a.accessoryView = f
@@ -547,8 +670,9 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         case .alertThirdButtonReturn: Settings.d.removeObject(forKey: "dataURL")
         default: return
         }
-        Settings.lastSignal = nil   // a different source shouldn't count as a signal change
-        latest = nil
+        for k in defaultOrder { Settings.setLastSignal(k, nil) }   // a different source shouldn't count as a call change
+        summary = nil
+        live = [:]
         refresh()
     }
 
@@ -580,7 +704,9 @@ final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDel
     var window: NSWindow?
     var web: WKWebView?
 
-    func show() {
+    /// Opens the dashboard at a page, e.g. "all", "gold/today" or "silver/timeline".
+    func show(_ hash: String) {
+        let target = Settings.pageURL(hash.contains("/") || hash == "all" ? hash : "\(hash)/today")
         if window == nil {
             let cfg = WKWebViewConfiguration()
             cfg.websiteDataStore = .default()   // keeps trades (localStorage) between launches
@@ -592,19 +718,21 @@ final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDel
             w.allowsBackForwardNavigationGestures = true
             let win = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1240, height: 860),
                                styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
-            win.title = "WheatWise"
+            win.title = "Dharalu · ధరలు"
             win.contentView = w
             win.isReleasedWhenClosed = false
             win.delegate = self
-            win.setFrameAutosaveName("WheatWiseDashboard")
-            if !win.setFrameUsingName("WheatWiseDashboard") { win.center() }
+            win.setFrameAutosaveName("DharaluDashboard")
+            if !win.setFrameUsingName("DharaluDashboard") { win.center() }
             window = win
             web = w
-            w.load(URLRequest(url: Settings.siteURL))
+            w.load(URLRequest(url: target))
         } else if web?.url?.host != Settings.siteURL.host {
-            web?.load(URLRequest(url: Settings.siteURL))
+            web?.load(URLRequest(url: target))
         } else {
-            web?.reload()   // pick up the newest run
+            // Same page: switch the hash (the page re-routes and re-polls) instead of a full reload.
+            let h = target.fragment ?? "all"
+            web?.evaluateJavaScript("location.hash='\(h)';", completionHandler: nil)
         }
         NSApp.setActivationPolicy(.regular)   // Dock icon + ⌘-Tab while the window is open
         NSApp.activate(ignoringOtherApps: true)
