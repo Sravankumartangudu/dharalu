@@ -16,6 +16,10 @@
 set -uo pipefail
 export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 cd "$(dirname "$0")/.."
+# Keys for this Mac (DATA_GOV_IN_KEY, TELEGRAM_*, ANTHROPIC_API_KEY): put them in .env
+# (KEY=value lines; git-ignored, never committed). Without DATA_GOV_IN_KEY the shared
+# public sample key is used, which is often busy (429).
+if [ -f .env ]; then set -a; . ./.env; set +a; fi
 
 MODE="${1:---quick}"
 NAME="${DH_GIT_NAME:-Sravankumartangudu}"

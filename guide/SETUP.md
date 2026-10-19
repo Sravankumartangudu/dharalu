@@ -74,6 +74,14 @@ Every 5 minutes the job runs `agent/run.py --quick`:
 - **Publishing** (commit + push to GitHub): within 10 minutes of something that matters (a new day of prices, a call change, new mandi rows), otherwise once an hour. GitHub Pages allows about 10 site builds an hour, and the dashboard and the Mac app fetch live metal prices themselves in between.
 
 Notes:
+- **Your keys on the Mac:** the job doesn't see GitHub's secrets. Put them in `.env` in the repository folder (it is git-ignored, so never committed), one per line:
+  ```bash
+  DATA_GOV_IN_KEY=your-key
+  TELEGRAM_BOT_TOKEN=...      # optional
+  TELEGRAM_CHAT_ID=...        # optional
+  ANTHROPIC_API_KEY=...       # optional
+  ```
+  Without `DATA_GOV_IN_KEY`, wheat uses the shared public sample key, which is often busy (429), so new mandi prices can arrive late.
 - If the Mac is asleep, the job runs when it wakes. If GitHub can't be reached, the run commits locally and a later run pushes it.
 - The push uses your normal git login. Push once by hand first, so macOS keeps the password in the Keychain.
 - To run once without the schedule: `scripts/mac-refresh.sh --full`. To stop: `scripts/mac-schedule.sh uninstall`.
