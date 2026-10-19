@@ -16,7 +16,7 @@
 - Range 1M / 3M / 1Y / 3Y / All years, with Past / Present / Future tiles and tables.
 
 **Every 5 minutes**
-- The Mac job (`scripts/mac-schedule.sh install`) now checks every 5 minutes instead of twice a day. Metals are re-analysed every time; wheat makes a quick check, with a full fetch on new prices or every 6 hours. It publishes within 10 minutes of a change that matters, otherwise hourly. `install` removes the old WheatWise job.
+- The Mac job (`scripts/mac-schedule.sh install`) now checks every 5 minutes instead of twice a day. Metals are re-analysed every time; wheat makes one quick data.gov.in call (pausing 30 minutes after a 429), with a full fetch on new prices or every 6 hours. It publishes within 10 minutes of a change that matters, otherwise hourly. `install` removes the old WheatWise job.
 - The dashboard and the Mac app fetch live metal prices every 5 minutes (● live).
 - GitHub Actions is now a backup, and skips its run when the Mac published in the last 3 hours.
 

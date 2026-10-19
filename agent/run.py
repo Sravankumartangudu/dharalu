@@ -36,6 +36,7 @@ LOG_FIELDS = ["date", "score", "signal", "price", "best_source", "best_landed"]
 METAL_LOG_FIELDS = ["date", "score", "signal", "price"]
 KEEP_OTHER_DAYS = 120  # all-India rows (not watched mandis) kept this long, for the state table
 FULL_EVERY_H = 6       # --quick still does a full wheat fetch this often
+BUSY_WAIT_H = 0.5      # data.gov.in said "too many requests": leave wheat alone this long
 
 
 def now():
@@ -131,16 +132,25 @@ def wheat(cfg, mode, rstate):
         full = mode == "full" or old is None or (
             age_h(rstate.get("wheat_full_at")) >= FULL_EVERY_H and age_h(rstate.get("wheat_try_at")) >= 1)
         bench = [m["name"] for m in cfg["source_markets"] if m.get("long_history")]
+        busy = mode == "quick" and age_h(rstate.get("wheat_busy_at")) < BUSY_WAIT_H
+        if busy and old is not None:
+            print("Wheat: data.gov.in was busy (429) - next check after a %d-minute pause" % (BUSY_WAIT_H * 60))
+            return old, []
         if not full:
-            # Cheap check: the newest 10 rows of each benchmark mandi (1 call each).
+            # Cheap check: the newest 10 rows of one benchmark mandi (1 call), a different
+            # one each time. Mandis report once a day, and the public sample key is shared
+            # and rate-limited, so 3 calls every 5 minutes got "429 Too Many Requests".
+            turn = int(rstate.get("wheat_turn", 0)) % len(bench)
+            rstate["wheat_turn"] = turn + 1
             new = []
-            for name in bench:
-                try:
-                    new += fetch.fetch_market_history(name, max_rows=10, log=lambda _m: None, tries=2)
-                except RuntimeError as e:
-                    print("  ! wheat %s: %s" % (name, e))
+            try:
+                new = fetch.fetch_market_history(bench[turn], max_rows=10, log=lambda _m: None, tries=2)
+            except RuntimeError as e:
+                print("  ! wheat %s: %s" % (bench[turn], e))
+                if "429" in str(e):
+                    rstate["wheat_busy_at"] = stamp()
             added, _ = fetch.merge_prices(new, keep)
-            print("Wheat quick check: +%d new rows" % added)
+            print("Wheat quick check (%s): +%d new rows" % (bench[turn], added))
             full = added > 0
         if full:
             rstate["wheat_try_at"] = stamp()

@@ -2,8 +2,9 @@
 # Dharalu: check prices from this Mac and publish them to GitHub Pages.
 # launchd runs this every 5 minutes (scripts/mac-schedule.sh install). Each run:
 #   * gold, silver, platinum: fetched and re-analysed every time;
-#   * wheat: one quick call per benchmark mandi; the full fetch only when they have new
-#     prices, or every 6 hours (data.gov.in refuses GitHub's servers, so wheat comes from here);
+#   * wheat: one quick call (one benchmark mandi, taking turns; a 429 pauses it 30 min);
+#     the full fetch only when there are new prices, or every 6 hours (data.gov.in
+#     refuses GitHub's servers, so wheat comes from here);
 #   * publishes (commit + push) when something material changed - a new prices day, a
 #     call change, new mandi rows - at most every 10 minutes, else once an hour.
 #     GitHub Pages allows about 10 site builds an hour; the dashboard and the Mac app

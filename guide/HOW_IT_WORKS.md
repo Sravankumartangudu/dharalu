@@ -151,7 +151,7 @@ The score → call table is the same as wheat's, including HOLD.
 
 **On the Mac, every 5 minutes** (`scripts/mac-refresh.sh` via launchd, set up by `scripts/mac-schedule.sh install`). data.gov.in refuses GitHub's servers, which are outside India, so this is where wheat prices come from. Each run is `agent/run.py --quick`:
 1. Metals: top up the closes, fetch the live spot, re-analyse.
-2. Wheat: one quick call per benchmark mandi. The full fetch + analysis runs only when there's a new day of prices, or every 6 hours. Otherwise the published wheat analysis is kept as it is.
+2. Wheat: one quick call (newest 10 rows of one benchmark mandi, a different one each time, so 288 calls a day). After a 429 *too many requests*, wheat pauses for 30 minutes. The full fetch + analysis runs only when there's a new day of prices, or every 6 hours. Otherwise the published wheat analysis is kept as it is.
 3. Compare with the last published `docs/data/summary.json`, and print `MATERIAL: …` when something matters (a new prices day, a call change, new mandi rows).
 4. Publish (commit + push) within 10 minutes of a material change, otherwise once an hour. GitHub Pages allows about 10 site builds an hour.
 

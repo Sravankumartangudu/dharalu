@@ -70,7 +70,7 @@ scripts/mac-schedule.sh status       # installed? last lines of the log
 
 Every 5 minutes the job runs `agent/run.py --quick`:
 - **Gold, silver, platinum:** fetched and re-analysed every time.
-- **Wheat:** one quick call per benchmark mandi. The full fetch runs only when they have new prices, or every 6 hours.
+- **Wheat:** one quick call to data.gov.in, to one benchmark mandi (they take turns). The full fetch runs only when there are new prices, or every 6 hours. If data.gov.in says *too many requests* (429), wheat pauses for 30 minutes. Mandis report once a day, so nothing is missed.
 - **Publishing** (commit + push to GitHub): within 10 minutes of something that matters (a new day of prices, a call change, new mandi rows), otherwise once an hour. GitHub Pages allows about 10 site builds an hour, and the dashboard and the Mac app fetch live metal prices themselves in between.
 
 Notes:
