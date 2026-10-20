@@ -7,18 +7,16 @@
     ]
   },
   "platinum": {
-    "pending": "SELL",
-    "pending_n": 1,
-    "signal": "STRONG_SELL",
+    "signal": "SELL",
     "weekly": [
       2026,
       43
     ]
   },
   "run": {
-    "wheat_busy_at": "2026-10-20T06:54:20+00:00",
+    "wheat_busy_at": "2026-10-20T07:28:24+00:00",
     "wheat_try_at": "2026-10-20T06:42:49+00:00",
-    "wheat_turn": 3
+    "wheat_turn": 1
   },
   "silver": {
     "signal": "SELL",

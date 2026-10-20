@@ -44,7 +44,7 @@ Each commodity's submenu:
 | Score · confidence · date | e.g. *Score −4 of ±8 · confidence High · 19 Oct 2026* |
 | If buying / If holding | The advice for each case |
 | Live … at 18:52 · since last close … | Metals: the live price and how far it has moved today; then the agent's price with its 7- and 30-day changes |
-| Key numbers | 30-day forecast with its likely range; wheat: cheapest landed source and MSP; metals: price with GST and the world price × ₹ rate; holding cost |
+| Key numbers | 30-day forecast with its likely range and **🔮 Why** (e.g. *Expected to fall about 5.7% in 30 days. Biggest reason: recent trend (−4.2%)*); wheat: cheapest landed source and MSP; metals: price with GST and the world price × ₹ rate; holding cost |
 | **Why this call - the proof ▸** | Every rule with its value, test and points, then the total |
 | **Has this worked before? ▸** | How today's call did in the replay, the live record, and *Open the full track record…* |
 | **Today's briefing ▸** | The note in English and Telugu, with *Copy English* / *Copy తెలుగు* for WhatsApp |

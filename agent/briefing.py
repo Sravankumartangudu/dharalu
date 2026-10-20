@@ -34,6 +34,9 @@ def rule_based(a):
     ]
     if f30:
         en.append("30-day outlook: %s (likely range %s - %s)." % (_m(f30["price"]), _m(f30["low"]), _m(f30["high"])))
+        fr = a.get("forecast_reason")
+        if fr:
+            en.append("Why: " + fr["summary"] + " " + "Parts: " + ", ".join("%s %+.1f%%" % (d["name"].lower(), d["pct"]) for d in fr["drivers"]) + ".")
     if best:
         en.append("Cheapest to bring to Srikakulam: %s at %s/qtl landed (mandi %s + freight %s)." % (
             best["market"], _m(best["landed"]), _m(best["mandi_price"]), _m(best["freight"])))
@@ -51,6 +54,8 @@ def rule_based(a):
     ]
     if f30:
         te.append("30 రోజుల అంచనా: %s (%s - %s మధ్య)." % (_m(f30["price"]), _m(f30["low"]), _m(f30["high"])))
+        if a.get("forecast_reason"):
+            te.append(a["forecast_reason"]["telugu"])
     if best:
         te.append("శ్రీకాకుళానికి చౌకగా: %s - రవాణాతో కలిపి %s." % (best["market"], _m(best["landed"])))
     te.append("సాధారణంగా %s లో ధర తక్కువ, %s లో ఎక్కువ." % (
@@ -83,7 +88,7 @@ def with_claude(a, base):
         import anthropic
     except ImportError:
         return None
-    slim = {k: a[k] for k in ("asof", "benchmark", "signal", "forecast_points", "backtest", "timing", "msp",
+    slim = {k: a[k] for k in ("asof", "benchmark", "signal", "forecast_points", "forecast_reason", "backtest", "timing", "msp",
                               "best_source", "selling_reference", "margin_vs_selling_ref",
                               "carrying_cost_30d_pct") if k in a}
     slim["landed_top5"] = (a.get("landed") or [])[:5]

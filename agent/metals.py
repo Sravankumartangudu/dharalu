@@ -349,6 +349,7 @@ def analyse(key, cfg, live):
                    "evidence": evidence, "max_score": sum(e["max"] for e in evidence)},
         "forecast": fc,
         "forecast_points": {str(h): fc[h - 1] for h in (7, 14, 30) if len(fc) >= h},
+        "forecast_reason": az.forecast_reason(cal, idx, bt, fc, evidence, "metal"),
         "backtest": {str(k): v for k, v in bt.items()},
         "seasonality": {"months": az.MONTHS, **idx, "index": [round(x, 4) for x in idx["index"]]},
         "timing": az.timing(idx, cal, series),
@@ -382,6 +383,9 @@ def rule_brief(a):
     ]
     if f30:
         en.append("30-day outlook: %s (likely range %s - %s)." % (inr(f30["price"]), inr(f30["low"]), inr(f30["high"])))
+        fr = a.get("forecast_reason")
+        if fr:
+            en.append("Why: " + fr["summary"] + " " + "Parts: " + ", ".join("%s %+.1f%%" % (d["name"].lower(), d["pct"]) for d in fr["drivers"]) + ".")
     if for_:
         en.append("Reasons to buy: " + "; ".join("%s (%s)" % (e["rule"], e["value"]) for e in for_))
     if against:
@@ -395,4 +399,6 @@ def rule_brief(a):
     ]
     if f30:
         te.append("30 రోజుల అంచనా: %s (%s - %s మధ్య)." % (inr(f30["price"]), inr(f30["low"]), inr(f30["high"])))
+        if a.get("forecast_reason"):
+            te.append(a["forecast_reason"]["telugu"])
     return {"source": "rules", "english": "\n".join(en), "telugu": "\n".join(te)}

@@ -319,7 +319,8 @@ function renderTodayWheat() {
     <div class="tile"><div class="k">Benchmark price (${b.markets.map(x => x.replace(" APMC", "")).join(", ")})</div><div class="v">${rs(b.price)}</div>
       <div class="d">1 day <span class="${cls(b.chg_1d)}">${pc(b.chg_1d)}</span> · 7 days <span class="${cls(b.chg_7d)}">${pc(b.chg_7d)}</span> · 30 days <span class="${cls(b.chg_30d)}">${pc(b.chg_30d)}</span></div></div>
     <div class="tile"><div class="k">30-day forecast</div><div class="v">${f30 ? rs(f30.price) : "–"}</div>
-      <div class="d">${f30 ? `Likely ${rs(f30.low)} – ${rs(f30.high)} (${pc((f30.price / b.price - 1) * 100)})` : ""}</div></div>
+      <div class="d">${f30 ? `Likely ${rs(f30.low)} – ${rs(f30.high)} (${pc((f30.price / b.price - 1) * 100)})` : ""}
+        ${A.forecast_reason ? `<br>🔮 Why: ${esc(A.forecast_reason.biggest)} · <a href="#${C}/timeline">details</a>` : ""}</div></div>
     <div class="tile"><div class="k">Cheapest landed at Srikakulam</div><div class="v">${best ? rs(best.landed) : "–"}</div>
       <div class="d">${best ? `${esc(best.market)}, ${best.km} km · mandi ${rs(best.mandi_price)}` : ""}</div></div>
     <div class="tile"><div class="k">Govt floor (MSP)</div><div class="v">${rs(A.msp.floor)}</div>
@@ -351,7 +352,8 @@ function renderTodayMetal() {
     <div class="tile"><div class="k">With ${gst}% GST (what a coin or bar costs)</div><div class="v">${rs(now * (1 + gst / 100))}</div>
       <div class="d">Plus the shop's making charge or premium - jewellery making is not paid back when you sell</div></div>
     <div class="tile"><div class="k">30-day forecast</div><div class="v">${f30 ? rs(f30.price) : "–"}</div>
-      <div class="d">${f30 ? `Likely ${rs(f30.low)} – ${rs(f30.high)} (${pc((f30.price / A.price - 1) * 100)})` : ""}</div></div>
+      <div class="d">${f30 ? `Likely ${rs(f30.low)} – ${rs(f30.high)} (${pc((f30.price / A.price - 1) * 100)})` : ""}
+        ${A.forecast_reason ? `<br>🔮 Why: ${esc(A.forecast_reason.biggest)} · <a href="#${C}/timeline">details</a>` : ""}</div></div>
     <div class="tile"><div class="k">World price</div><div class="v">US$${(lv ? lv.usd : w.usd_oz).toLocaleString("en-IN", { maximumFractionDigits: 2 })}<span class="u">/oz</span></div>
       <div class="d">× ₹${w.usdinr.toFixed(2)} per US$ (rupee ${pc(w.fx_chg_30d)} in 30 days) + ${A.costs.duty_pct}% import duty</div></div>
     <div class="tile"><div class="k">Last 12 months</div><div class="v">${Math.round(ind.pctile_52w)}%</div>
@@ -397,6 +399,25 @@ function predictionsMap() {
   return out;
 }
 
+/* Why the forecast says what it says: the forecast's move split into its three parts
+   (they add up in log terms), plus how far to trust it and what it can't see. */
+function reasonCard(A) {
+  const r = A.forecast_reason;
+  if (!r) return "";
+  const hz = ["7", "14", "30"].filter(h => r.horizons[h]);
+  const col = (k, h) => { const v = r.horizons[h][k + "_pct"]; return `<td class="num"><span class="${cls(v)}">${pc(v)}</span></td>`; };
+  return `<div class="card reason"><h3>🔮 Why the forecast says this · అంచనాకు కారణం</h3>
+    <p><b>${esc(r.summary)}</b><br><span class="ink2 small">${esc(r.telugu)}</span></p>
+    <div class="tablewrap"><table><tr><th>What moves it</th>${hz.map(h => `<th class="num">${h} days</th>`).join("")}</tr>
+      ${r.drivers.map(d => `<tr><td>${esc(d.name)}</td>${hz.map(h => col(d.key, h)).join("")}</tr>`).join("")}
+      <tr><td><b>= Expected move</b></td>${hz.map(h => `<td class="num"><b class="${cls(r.horizons[h].total_pct)}">${pc(r.horizons[h].total_pct)}</b></td>`).join("")}</tr>
+      <tr><td class="ink2">Likely range (8 in 10)</td>${hz.map(h => `<td class="num ink2">${pc(r.horizons[h].low_pct)} to ${pc(r.horizons[h].high_pct)}</td>`).join("")}</tr></table></div>
+    <ul class="why">${r.drivers.map(d => `<li><b>${esc(d.name)}</b> (${pc(d.pct)} at 30 days): ${esc(d.why)}</li>`).join("")}</ul>
+    ${r.trust ? `<p class="small">🧪 ${esc(r.trust)}</p>` : ""}
+    ${r.in_call ? `<p class="small">⚖️ In today's call, the rule "${esc(r.in_call.rule)}" gives <b>${signed(r.in_call.points)}</b> of ±${r.in_call.max} points.</p>` : ""}
+    <p class="small muted">🙈 ${esc(r.blind)}</p></div>`;
+}
+
 function renderTimeline() {
   const range = store.get("tlRange", "1Y");
   $("#timeline").innerHTML = `
@@ -407,7 +428,8 @@ function renderTimeline() {
   <div class="card"><div class="row" id="tlRanges">${RANGES.map(([n]) => `<button data-tl="${n}" class="${n === range ? "primary" : ""}">${n === "All" ? "All years" : n}</button>`).join("")}
     <span class="legend" style="margin:0 0 0 auto">${Object.entries({ buy: "BUY days", hold: "HOLD", wait: "WAIT", sell: "SELL days" }).map(([k, n]) => `<span class="box" style="--c:${CALL_COLOR[k]}">${n}</span>`).join("")}</span></div>
     <div id="tlChart"></div><div id="tlTables"></div></div>
-  <div class="grid ppf" id="ppf"></div>`;
+  <div class="grid ppf" id="ppf"></div>
+  ${reasonCard(A)}`;
   document.querySelectorAll("[data-tl]").forEach(bt => bt.onclick = () => { store.set("tlRange", bt.dataset.tl); renderTimeline(); });
   drawTimeline(range);
 }
@@ -453,7 +475,8 @@ function drawTimeline(range) {
       <div class="d"><span class="pill ${s.key}">${esc(s.label)}</span> score ${signed(s.score)} of ±${s.max_score} · confidence ${esc(s.confidence)}</div></div>
     <div class="tile"><div class="k">⏩ Future - the agent's forecast</div><div class="v">${A.forecast_points["30"] ? rs(A.forecast_points["30"].price) : "–"} <span class="u">in 30 days</span></div>
       <div class="d">${["7", "14", "30"].filter(h => A.forecast_points[h]).map(h => { const f = A.forecast_points[h]; return `${h} days: <b>${rs(f.price)}</b> (${rs(f.low)} – ${rs(f.high)})`; }).join("<br>")}
-      ${bt.mape_pct != null ? `<br>Tested on past dates: off by ${bt.mape_pct}% at 30 days (no-change guess: ${bt.naive_mape_pct}%)` : ""}</div></div>`;
+      ${bt.mape_pct != null ? `<br>Tested on past dates: off by ${bt.mape_pct}% at 30 days (no-change guess: ${bt.naive_mape_pct}%)` : ""}
+      ${A.forecast_reason ? `<br><b>Why:</b> biggest reason ${esc(A.forecast_reason.biggest)} - see below` : ""}</div></div>`;
 
   const recent = Object.keys(pm).sort().filter(t => t <= A.asof && PX[t]).slice(-30).reverse();
   $("#tlTables").innerHTML =
@@ -476,6 +499,7 @@ function renderForecast() {
   <div class="card"><div class="row" style="margin-bottom:6px">
     ${[90, 365, 1095].map(d => `<button data-range="${d}" class="${d === 365 ? "primary" : ""}">${d === 90 ? "3 months" : d === 365 ? "1 year" : "3 years"}</button>`).join("")}</div>
     <div id="fcChart"></div></div>
+  ${reasonCard(A)}
   <h3>How accurate has the forecast been? (proof)</h3>
   <p class="small ink2">We re-ran the forecast on past dates using only the data available then, and compared it with what really happened.
    "Naive" = assuming the price stays the same. If our error is smaller than naive, the forecast is adding value.</p>
@@ -916,6 +940,7 @@ function renderOverview() {
       <div class="d">1 day <span class="${cls(it.chg_1d)}">${pc(it.chg_1d)}</span> · 7 days <span class="${cls(it.chg_7d)}">${pc(it.chg_7d)}</span> · 30 days <span class="${cls(it.chg_30d)}">${pc(it.chg_30d)}</span></div>
       <div class="spark" id="sp-${k}"></div>
       <div class="d">${f ? `30-day forecast <b>${rs(f.price)}</b> (${pc((f.price / it.price - 1) * 100)})` : ""} · score ${signed(s.score)} of ±${s.max_score}</div>
+      ${it.forecast_why ? `<div class="d">🔮 Why: ${esc(it.forecast_why.biggest)}</div>` : ""}
       <div class="d muted">${esc(s.telugu)} · ${esc(recLine)}</div>
     </a>`;
   };

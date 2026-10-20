@@ -272,6 +272,8 @@ def entry(key, a):
         "signal": {k: s[k] for k in ("key", "label", "telugu", "score", "max_score", "confidence", "buyer", "holder")},
         "evidence": [{k: x[k] for k in ("rule", "value", "test", "points", "max", "source")} for x in s["evidence"]],
         "forecast30": f30,
+        "forecast_why": {k: (a.get("forecast_reason") or {}).get(k) for k in ("summary", "biggest")}
+                        if a.get("forecast_reason") else None,
         "record": {"same_call": _same_call(tr, s["key"]), "live_right_pct": live.get("right_pct"),
                    "live_graded": live.get("graded", 0)},
         "briefing": (a.get("briefing") or {}).get("ai") or (a.get("briefing") or {}).get("rules"),

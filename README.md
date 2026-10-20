@@ -23,6 +23,7 @@ For each one it tells you **when to buy, when to hold and when to sell**, and sh
 | **Overview** | All four on one page: today's call, live price, 1-year sparkline with the 30-day forecast, and a "100 = a year ago" chart to compare them |
 | **Timeline** | Past prices → today → forecast with its likely range, the call on every day (a coloured strip), and what each past 30-day forecast said vs what happened |
 | **Prediction** | A 45-day forecast with a likely range, tested against past data so you can see how accurate it really is |
+| **Why the forecast** | 🔮 The expected move split into recent trend + season + last few days' average at 7/14/30 days, how far to trust it, and what it can't see |
 | **Pre-analysis** (before a trade) | Wheat: landed cost, money needed, holding cost, break-even. Metals: GST + making charge, the bank interest you give up, the buy-back cut, break-even. Both: bad / likely / good cases and a go/no-go checklist |
 | **Post-analysis** (after trades) | Your profit and loss (first-in-first-out, after holding costs), a timing score for each trade, whether you followed the agent's call that day, and lessons - per commodity |
 | **Monitoring** | A job on the Mac every 5 minutes; Telegram + Mac notifications on call changes and big moves |

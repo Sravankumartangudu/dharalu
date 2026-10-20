@@ -205,3 +205,8 @@ header h1 .te { font-weight: 500; color: var(--ink-2); font-size: 16px; }
   table.proof tr:last-child { display: flex; justify-content: space-between; gap: 10px; }
   table.proof tr:last-child td { width: auto; }
 }
+
+/* Why the forecast says this */
+.reason h3 { margin-top: 0; }
+.reason ul.why { margin: 10px 0 6px; padding-left: 18px; }
+.reason ul.why li { margin: 3px 0; }

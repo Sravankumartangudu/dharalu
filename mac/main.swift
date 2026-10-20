@@ -90,6 +90,7 @@ struct Summary: Decodable {
     struct Timing: Decodable { let cheapest_months: [String]; let dearest_months: [String]; let days_to_buy_window: Int? }
     /// Metals only: the agent's world price and the factor that turns US$/oz into ₹ for the unit shown.
     struct Live: Decodable { let symbol: String; let usd: Double; let factor: Double; let prev_close: Double?; let updated: String? }
+    struct ForecastWhy: Decodable { let summary: String?; let biggest: String? }
     struct Item: Decodable {
         let key: String
         let asof: String
@@ -97,6 +98,8 @@ struct Summary: Decodable {
         let signal: Signal
         let evidence: [Evidence]
         let forecast30: Point?
+        /// Why the forecast says what it says (summary + its biggest part).
+        let forecast_why: ForecastWhy?
         let record: Record?
         let briefing: Briefing
         let timing: Timing?
@@ -437,6 +440,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         }
         if let f = it.forecast30 {
             menu.addItem(info("30-day forecast \(rs(f.price)) (likely \(rs(f.low)) – \(rs(f.high)))"))
+            if let why = it.forecast_why?.summary { menu.addItem(info(wrap("🔮 Why: \(why)", 70))) }
         }
         for line in it.lines ?? [] { menu.addItem(info(wrap(rupee(line), 70))) }
         if let cc = it.carrying_cost_30d_pct { menu.addItem(info("Holding cost \(String(format: "%.1f", cc))% per 30 days")) }

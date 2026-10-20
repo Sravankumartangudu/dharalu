@@ -252,8 +252,9 @@ class SeasonAsOf:
 PHI = 0.97  # trend damping per day
 
 
-def _forecast_from(cal, idx, horizon):
-    """Damped-trend on de-seasonalised log price + seasonal shape."""
+def _fit(cal, idx):
+    """The forecast's two inputs, on the de-seasonalised log price: the starting level
+    (half today, half the last-5-day average) and the per-day slope of the last 30 points."""
     tail = cal[-60:]
     pts = [(i, math.log(p) - math.log(seasonal_factor(idx, dy))) for i, (dy, p) in enumerate(tail) if p]
     if len(pts) < 20:
@@ -264,13 +265,117 @@ def _forecast_from(cal, idx, horizon):
     sxx = sum((x - mx) ** 2 for x in xs)
     slope = sum((x - mx) * (y - my) for x, y in recent) / sxx if sxx else 0.0
     level = 0.5 * ys[-1] + 0.5 * st.mean(ys[-5:])
+    return {"level": level, "slope": slope, "last": ys[-1], "span": xs[-1] - xs[0]}
+
+
+def _damp(h):
+    """Days of trend the forecast carries to day h (the trend fades by PHI each day)."""
+    return sum(PHI ** k for k in range(1, h + 1))
+
+
+def _forecast_from(cal, idx, horizon):
+    """Damped-trend on de-seasonalised log price + seasonal shape."""
+    f = _fit(cal, idx)
+    if not f:
+        return None
     last_day = cal[-1][0]
     out, damp = [], 0.0
     for h in range(1, horizon + 1):
         damp += PHI ** h
         dy = last_day + timedelta(days=h)
-        out.append((dy, math.exp(level + slope * damp + math.log(seasonal_factor(idx, dy)))))
+        out.append((dy, math.exp(f["level"] + f["slope"] * damp + math.log(seasonal_factor(idx, dy)))))
     return out
+
+
+BLIND = {  # what the forecast can't see, by commodity
+    "wheat": "a new MSP, government wheat sales (OMSS), the size of the next harvest, or export/stock-limit rules",
+    "metal": "US interest-rate moves, war or crisis news, central-bank buying, or an import-duty change in the Budget",
+}
+
+
+def forecast_reason(cal, se, bt, fc, evidence=(), kind="wheat"):
+    """Why the forecast says what it says. The forecast is
+         log(price on day h) = level + slope x damp(h) + log(season on day h),
+    so the move from today's price splits exactly into three parts (in log terms):
+      trend  = slope x damp(h)                  - the last 30 days' direction, fading out
+      season = log(season day h / season today) - the usual month-to-month pattern
+      level  = level - today's adjusted price   - today's price smoothed with the last 5 days."""
+    idx = se["index"]
+    f = _fit(cal, idx)
+    if not f or not fc:
+        return None
+    last_day, p0 = cal[-1][0], cal[-1][1]
+    s0 = seasonal_factor(idx, last_day)
+    pc_ = lambda x: round((math.exp(x) - 1) * 100, 2)
+    hz = {}
+    for h in (7, 14, 30):
+        if len(fc) < h:
+            continue
+        p = fc[h - 1]
+        hz[str(h)] = {
+            "total_pct": round(pct(p["price"], p0), 2),
+            "trend_pct": pc_(f["slope"] * _damp(h)),
+            "season_pct": pc_(math.log(seasonal_factor(idx, last_day + timedelta(days=h)) / s0)),
+            "level_pct": pc_(f["level"] - f["last"]),
+            "low_pct": round(pct(p["low"], p0), 1), "high_pct": round(pct(p["high"], p0), 1),
+        }
+    if "30" not in hz:
+        return None
+    r = hz["30"]
+    past = pc_(f["slope"] * f["span"])  # the season-adjusted move over the last 30 points
+    kept = round(100 * _damp(30) / 30)
+    m_now = MONTHS[last_day.month - 1]
+    m_then = MONTHS[(last_day + timedelta(days=30)).month - 1]
+    word = lambda v: "rise" if v >= 1 else "fall" if v <= -1 else "stay about the same"
+    drivers = [
+        {"key": "trend", "name": "Recent trend", "pct": r["trend_pct"],
+         "why": "Over the last 30 days the price %s %s once the usual seasonal effect is taken out. "
+                "The forecast carries that direction forward but lets it fade each day, so about %d%% of "
+                "it is kept over the next 30 days." % (
+                    "rose" if past > 0 else "fell" if past < 0 else "moved", "%.1f%%" % abs(past), kept)},
+        {"key": "season", "name": "Season", "pct": r["season_pct"],
+         "why": ("In the seasonal pattern (from %d years of prices) the price is usually %.1f%% %s in 30 days' time (%s) than now (%s)." % (
+                    se.get("years_used", 0), abs(r["season_pct"]), "higher" if r["season_pct"] > 0 else "lower", m_then, m_now))
+                if abs(r["season_pct"]) >= 0.1 else "No real seasonal pull between %s and %s." % (m_now, m_then)},
+        {"key": "level", "name": "Last few days' average", "pct": r["level_pct"],
+         "why": ("Today's price is %s the last 5 days' average, and the forecast counts a one-day %s only half, "
+                 "so it starts %.1f%% %s than today." % (
+                     "below" if r["level_pct"] > 0 else "above", "dip" if r["level_pct"] > 0 else "jump",
+                     abs(r["level_pct"]), "higher" if r["level_pct"] > 0 else "lower"))
+                if abs(r["level_pct"]) >= 0.1 else "Today's price is in line with the last 5 days - no effect."},
+    ]
+    main = max(drivers, key=lambda d: abs(d["pct"]))
+    summary = "Expected to %s%s in 30 days. Biggest reason: %s (%s)." % (
+        word(r["total_pct"]), (" about %.1f%%" % abs(r["total_pct"])) if abs(r["total_pct"]) >= 1 else "",
+        main["name"].lower(), pct_str(main["pct"]))
+    b = (bt or {}).get(30)
+    trust = None
+    if b:
+        better = b["mape_pct"] < b["naive_mape_pct"]
+        trust = "Tested on %d past dates: off by %.1f%% on average at 30 days, vs %.1f%% for \"price stays the same\" - %s.%s" % (
+            b["tests"], b["mape_pct"], b["naive_mape_pct"],
+            "it adds a little value" if better else "it is NOT better than no-change here, so read it as a range, not a number",
+            (" Direction right %.0f%% of the time." % b["direction_hit_pct"]) if b.get("direction_hit_pct") is not None else "")
+    in_call = next(({"rule": e["rule"], "points": e["points"], "max": e["max"]}
+                    for e in evidence if e["rule"].startswith("30-day forecast")), None)
+    te = "30 రోజుల్లో సుమారు %.1f%% %s. ప్రధాన కారణం: %s (%s)." % (
+        abs(r["total_pct"]),
+        "పెరగవచ్చు" if r["total_pct"] >= 1 else "తగ్గవచ్చు" if r["total_pct"] <= -1 else "దాదాపు అలాగే ఉండవచ్చు",
+        {"Recent trend": "ఇటీవలి ధోరణి", "Season": "సీజన్", "Last few days' average": "గత కొన్ని రోజుల సగటు"}[main["name"]],
+        pct_str(main["pct"]))
+    return {
+        "summary": summary, "telugu": te, "main": main["name"],
+        "biggest": "%s %s" % (main["name"].lower(), pct_str(main["pct"])), "drivers": drivers, "horizons": hz,
+        "past_30d_adjusted_pct": past, "trend_kept_pct": kept,
+        "range": "80%% of past misses fell inside %s to %s at 30 days, so that is the likely range." % (
+            pct_str(r["low_pct"]), pct_str(r["high_pct"])),
+        "trust": trust, "in_call": in_call,
+        "blind": "It reads only the price's own trend and season. It can't see %s - news like that can move the price outside the range." % BLIND[kind],
+    }
+
+
+def pct_str(v):
+    return "%+.1f%%" % v
 
 
 def backtest(cal, season_asof, horizons=(7, 14, 30), step=3, lookback_days=730):
@@ -665,6 +770,7 @@ def run(rows, cfg, current_rows=None):
                    "max_score": sum(e["max"] for e in evidence)},
         "forecast": fc,
         "forecast_points": {str(h): fc[h - 1] for h in (7, 14, 30) if len(fc) >= h},
+        "forecast_reason": forecast_reason(cal, idx, bt, fc, evidence, "wheat"),
         "backtest": {str(k): v for k, v in bt.items()},
         "seasonality": {"months": MONTHS, **idx, "index": [round(x, 4) for x in idx["index"]]},
         "timing": timing(idx, cal, bench),

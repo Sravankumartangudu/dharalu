@@ -39,7 +39,7 @@ Each call gives two pieces of advice, because the right move depends on your pos
 
 ## All - the overview
 
-- One card per commodity: the call, the price (live for metals), the 1-day change, and a sparkline of the last year with the 30-day forecast. Click a card to open it.
+- One card per commodity: the call, the price (live for metals), the 1-day change, and a sparkline of the last year with the 30-day forecast and **🔮 Why** (its biggest reason). Click a card to open it.
 - **Compared - 100 = a year ago:** all four on one chart, each scaled to 100 a year ago, so you can see which rose most.
 
 ## Tabs
@@ -68,9 +68,11 @@ Everything on one time axis:
 - **Predicted 30 days earlier** (dotted line): what the agent forecast for each day, 30 days before, using only what it knew then. Where it hugs the real line, the forecasts were good. Hover any point for the date, price, call and forecast.
 - **Past / Present / Future** tiles: the change over the range, today's price (live for metals), and the 30-day forecast.
 - **Tables** (click to open): the forecast day by day, and each recent day's 30-days-earlier prediction next to the real price and the miss.
+- **🔮 Why the forecast says this:** the expected move at 7, 14 and 30 days split into its parts (recent trend, season, last few days' average), a sentence on each, how far to trust it, what it adds to today's call and what it can't see (news, policy).
 
 ### Forecast · అంచనా
 - The 45-day forecast with its likely range (the band widens the further ahead it goes).
+- **🔮 Why the forecast says this** - the same card as on the Timeline.
 - **How accurate has it been?** The average error at 7, 14 and 30 days (and how often it called the direction right), next to the "price stays the same" guess. If the forecast doesn't beat that guess at 30 days, its vote is cut to 1 point.
 - **Seasonal pattern:** which months are usually cheap or dear, learned from the price history.
 

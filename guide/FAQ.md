@@ -24,6 +24,9 @@ HOLD needs a specific mix of rules, so it's rarer than the others. That's why th
 **Why no Srikakulam mandi price?**
 Andhra Pradesh hasn't reported wheat mandi prices since 2017; it buys wheat from other states. So Dharalu works out the landed cost from 16 source mandis. Enter your local selling rate in *Mandis* to see your margin.
 
+**Why does the forecast say the price will rise (or fall)?**
+Open 🔮 *Why the forecast says this* on the Timeline or Forecast tab. The move is split into the recent trend, the season and the last few days' average, with the biggest named as the main reason. The forecast reads only the price's own history, so news and policy changes (MSP, duty, US rates…) are not in it. When the card says it is NOT better than "price stays the same", trust the range more than the single number.
+
 ## Gold, silver, platinum
 
 **My jeweller's rate is different.**

@@ -49,6 +49,16 @@ The forecast works on the price with the season taken out:
 
 That percentile range becomes the **likely range** on the dashboard, widened for longer horizons. If the 30-day forecast doesn't beat the "no change" guess, the forecast rule is capped at ±1 point.
 
+**Why the forecast says this** (`forecast_reason` in the data). In log terms the forecast is *starting level + trend × fade + season*, so its move from today's price splits exactly into three parts, shown for 7, 14 and 30 days:
+
+| Part | What it is |
+|---|---|
+| **Recent trend** | The last 30 days' direction with the season taken out, carried forward but fading every day (about 65% of a month's trend is kept over the next 30 days) |
+| **Season** | How much dearer or cheaper the seasonal pattern usually makes the target day than today |
+| **Last few days' average** | The forecast starts from today's price averaged with the last 5 days, so a one-day jump or dip counts only half |
+
+The parts add up to the expected move (in log terms, so the % may differ by a rounding hair). The biggest part is named as the main reason. Next to it the agent shows how far to trust the forecast (backtest error vs "no change", direction hit-rate), how many points it gives in today's call, and what it can't see: for wheat a new MSP, OMSS sales, the harvest size or export/stock rules; for metals US rates, war or crisis news, central-bank buying or a Budget duty change.
+
 **Confidence** starts from the size of the score: ±0-1 is Low, ±2-3 Medium, ±4 or more High. It drops one level when there's less than 120 days of history, or when the 30-day direction hit-rate is below 55%.
 
 ## 6. The score

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0 - 20 Oct 2026
+
+**🔮 Why the forecast says this.** Every forecast now comes with its reason.
+- The expected move at 7, 14 and 30 days is split into its three parts: **recent trend** (the last 30 days' direction, season taken out, fading), **season** (the usual month-to-month pattern) and **last few days' average** (a one-day jump or dip counts half). They add up to the forecast; the biggest one is named as the main reason.
+- With it: how far to trust the forecast (tested error vs "price stays the same", direction right %), the points it gives in today's call, and what it can't see (wheat: MSP, OMSS, harvest, export/stock rules; metals: US rates, crises, central-bank buying, Budget duty).
+- Shown on the Timeline and Forecast tabs (card + a *Why* line on the Future tile), the Today tab, each overview card, the Mac menu (Mac app 2.1.0) and the English/తెలుగు briefing. Data: `forecast_reason` in each commodity's JSON, `forecast_why` in summary.json.
+
 ## 2.0.0 - 19 Oct 2026
 
 **WheatWise is now Dharalu (ధరలు, "prices"), and it watches gold, silver and platinum as well as wheat.** The new address is https://sravankumartangudu.github.io/dharalu/. The old `/wheatwise/` address no longer updates.
