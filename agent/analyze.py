@@ -106,6 +106,35 @@ def benchmark_series(mdaily, index_markets, min_overlap=15):
     return out
 
 
+TE_PLACE = {"Jabalpur": "జబల్‌పూర్", "Indore": "ఇండోర్", "Kota": "కోటా", "Madhya Pradesh": "మధ్యప్రదేశ్",
+            "Rajasthan": "రాజస్థాన్", "Maharashtra": "మహారాష్ట్ర"}
+
+
+def where_wheat(cfg, index_markets, best):
+    """Which place the wheat price is from - shown beside every price."""
+    state = {m["name"]: m.get("state") for m in cfg["source_markets"]}
+    towns = [m.replace(" APMC", "").replace("APMC ", "") for m in index_markets]
+    states = sorted({state.get(m) for m in index_markets if state.get(m)}, key=[state.get(m) for m in index_markets].index)
+    home = cfg["business"]["location"]
+    join = lambda xs: ", ".join(xs[:-1]) + " & " + xs[-1] if len(xs) > 1 else "".join(xs)
+    w = {
+        "short": "Wholesale mandi price · %s (%s)" % (join(towns), ", ".join(states)),
+        "short_te": "మండీ టోకు ధర · %s (%s)" % (", ".join(TE_PLACE.get(t, t) for t in towns),
+                                               ", ".join(TE_PLACE.get(s, s) for s in states)),
+        "detail": "The middle of the day's modal (most-traded) wholesale prices at %s APMC mandis (%s), from "
+                  "data.gov.in Agmarknet. Andhra Pradesh publishes no wheat mandi prices, so this is not a %s "
+                  "rate." % (join(towns), ", ".join(states), home.split(",")[0]),
+        "home": home,
+    }
+    if best:
+        w["landed"] = "At %s: cheapest landed %s/qtl from %s, %s (%s km) = mandi %s + fee + freight + handling." % (
+            home.split(",")[0], money(best["landed"]), best["market"], best["state"], best["km"], money(best["mandi_price"]))
+        w["landed_te"] = "%s వద్ద: %s, %s (%s కి.మీ) నుండి తెచ్చిన ధర %s/క్వింటాల్ (మండీ ధర + ఫీజు + రవాణా)." % (
+            "శ్రీకాకుళం" if home.startswith("Srikakulam") else home.split(",")[0],
+            best["market"], best["state"], best["km"], money(best["landed"]))
+    return w
+
+
 def to_calendar(series, max_gap=10):
     """Forward-fill an irregular {date: price} into a daily list [(date, price|None)]."""
     if not series:
@@ -1172,6 +1201,7 @@ def run(rows, cfg, current_rows=None):
                 "floor": msp_floor(cfg, cal[-1][0])[0], "season": msp_floor(cfg, cal[-1][0])[1]},
         "landed": lt,
         "best_source": lt[0] if lt else None,
+        "where": where_wheat(cfg, index_markets, lt[0] if lt else None),
         "states": states,
         "selling_reference": sell_ref,
         "margin_vs_selling_ref": (sell_ref - lt[0]["landed"]) if (sell_ref and lt) else None,

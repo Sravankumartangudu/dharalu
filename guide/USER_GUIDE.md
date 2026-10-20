@@ -54,6 +54,9 @@ Each call gives two pieces of advice, because the right move depends on your pos
 
 ### Today · ఈరోజు
 - **The call**, with the score gauge (the middle is 0; the ticks are the ±1 and ±3 call bands), confidence, and date of the latest prices.
+- **📍 Prices from**: which place the price is for, also in the header of every tab and on each overview card.
+  - **Wheat**: the middle of the day's modal (most-traded) wholesale prices at the **Jabalpur, Indore & Kota APMC mandis** (Madhya Pradesh, Rajasthan), from data.gov.in Agmarknet. Andhra Pradesh publishes no wheat mandi prices, so it also shows the cheapest **landed at Srikakulam** cost (mandi price + fee + freight + handling).
+  - **Gold, silver, platinum**: the **all-India import price**: world spot (US$ per ounce) × the ₹ rate + import duty, before GST. The same anywhere in India, so it is not a Srikakulam jeweller's rate; shops add their own premium, making charges and GST.
 - **The plain line, what would change it, its record, why this confidence**: see *Reading a call in 30 seconds* above.
 - **🔄 What changed since <date>**: shown on a new prices day. Which rules moved (counted points then → now) and whether the call changed.
 - **Saving for years** (metals): ADD / STEADY / GO SLOW for money you'll keep a year or more, its reason, its 1-year record, and the 5- and 10-year growth. Open *The long-term rules and their record* for each rule and whether it counts.

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.3.0 - 20 Oct 2026
+
+**📍 Every price now says where it is from.**
+- **Wheat**: *Wholesale mandi price · Jabalpur, Indore & Kota (Madhya Pradesh, Rajasthan)*, with the cheapest *landed at Srikakulam* cost under it. Andhra Pradesh publishes no wheat mandi prices, so it says that this is not a Srikakulam rate.
+- **Gold, silver, platinum**: *All-India import price · world spot + 6% duty, before GST* (6.4% for platinum). It says that this is not a Srikakulam jeweller's rate.
+- **Where it shows:**
+  - the dashboard header on every tab;
+  - the Today card, with the full detail;
+  - the key-number tiles;
+  - each overview card, and a short note on the All page;
+  - the Mac app menu (hover for the detail).
+- The agent writes it as `where` in each commodity's data and in `summary.json`.
+
 ## 2.2.0 - 20 Oct 2026
 
 **Easier to read, and the rules now earn their say.** All ten suggestions from the review.

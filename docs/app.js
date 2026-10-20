@@ -270,6 +270,8 @@ function signalCard(s, brief) {
       ${s.pending ? `<div class="pending">⏳ ${esc(s.pending.note)}</div>` : ""}
       <div class="advice"><div><b>If you are buying</b>${esc(s.buyer)}</div><div><b>If you are holding ${C === "wheat" ? "stock" : esc(A.label.toLowerCase())}</b>${esc(s.holder)}</div></div>
       <div class="facts">
+        ${A.where ? `<div><span>📍 Prices from</span><span title="${esc(A.where.detail)}"><span data-en="${esc(A.where.short)}" data-te="${esc(A.where.short_te || A.where.short)}">${esc(te ? A.where.short_te || A.where.short : A.where.short)}</span>
+          <br><span class="muted">${esc(A.where.detail)}</span>${A.where.landed ? `<br><span data-en="${esc(A.where.landed)}" data-te="${esc(A.where.landed_te || A.where.landed)}">${esc(te ? A.where.landed_te || A.where.landed : A.where.landed)}</span>` : ""}</span></div>` : ""}
         ${s.change_line ? `<div><span>🎯 What would change it</span><span data-en="${esc(s.change_line)}" data-te="${esc(s.change_line_te || s.change_line)}">${esc(te ? s.change_line_te || s.change_line : s.change_line)}</span></div>` : ""}
         ${s.record_line ? `<div><span>📊 Its record</span><span>${esc(s.record_line)}</span></div>` : ""}
         ${s.confidence_why ? `<div><span>🤔 Why ${esc(s.confidence)} confidence</span><span>${s.confidence_why.map(esc).join(" · ")}</span></div>` : ""}
@@ -375,7 +377,7 @@ function renderTodayWheat() {
   $("#today").innerHTML = `${signalCard(s, brief)}${proofTable(s)}${workedBefore(s)}
   <h2>Key numbers</h2>
   <div class="grid kn">
-    <div class="tile"><div class="k">Benchmark price (${b.markets.map(x => x.replace(" APMC", "")).join(", ")})</div><div class="v">${rs(b.price)}</div>
+    <div class="tile"><div class="k">Benchmark wholesale price (${b.markets.map(x => x.replace(" APMC", "")).join(", ")} mandis)</div><div class="v">${rs(b.price)}</div>
       <div class="d">1 day <span class="${cls(b.chg_1d)}">${pc(b.chg_1d)}</span> · 7 days <span class="${cls(b.chg_7d)}">${pc(b.chg_7d)}</span> · 30 days <span class="${cls(b.chg_30d)}">${pc(b.chg_30d)}</span></div></div>
     <div class="tile"><div class="k">30-day forecast</div><div class="v">${f30 ? rs(f30.price) : "–"}</div>
       <div class="d">${f30 ? `Likely ${rs(f30.low)} – ${rs(f30.high)} (${pc((f30.price / b.price - 1) * 100)})` : ""}
@@ -405,7 +407,7 @@ function renderTodayMetal() {
   $("#today").innerHTML = `${signalCard(s, brief)}${proofTable(s)}${workedBefore(s)}
   <h2>Key numbers</h2>
   <div class="grid kn">
-    <div class="tile"><div class="k">${esc(A.label)} in India now (${esc(A.purity)}, ${esc(unitTxt())}) ${liveNote(C)}</div><div class="v">${rs(now)}</div>
+    <div class="tile"><div class="k">${esc(A.label)} all-India import price now (${esc(A.purity)}, ${esc(unitTxt())}) ${liveNote(C)}</div><div class="v">${rs(now)}</div>
       <div class="d">1 day <span class="${cls(ind.chg_1d)}">${pc(ind.chg_1d)}</span> · 7 days <span class="${cls(ind.chg_7d)}">${pc(ind.chg_7d)}</span> · 30 days <span class="${cls(ind.chg_30d)}">${pc(ind.chg_30d)}</span>
       ${sinceCall != null ? `<br>The call used ${rs(A.price)} (${hm(A.generated_at)}) - <span class="${cls(sinceCall)}">${pc(sinceCall, 2)}</span> since` : ""}</div></div>
     <div class="tile"><div class="k">With ${gst}% GST (what a coin or bar costs)</div><div class="v">${rs(now * (1 + gst / 100))}</div>
@@ -1023,6 +1025,7 @@ function renderOverview() {
       <div class="spark" id="sp-${k}"></div>
       <div class="d">${f ? `30-day forecast <b>${rs(f.price)}</b> (${pc((f.price / it.price - 1) * 100)})` : ""} · score ${scoreTxt(s.score)} of ±${absTxt(s.max_score)} · ${esc(s.confidence)} confidence</div>
       ${s.plain ? `<div class="d"><b>${esc(s.plain)}</b></div>` : ""}
+      ${it.where ? `<div class="d where" title="${esc(it.where.detail)}">📍 ${esc(it.where.short)}</div>` : ""}
       ${s.change_line ? `<div class="d">🎯 ${esc(s.change_line)}</div>` : ""}
       ${s.pending ? `<div class="d">⏳ ${esc(s.pending)}</div>` : ""}
       ${it.long_term ? `<div class="d">📅 Saving for years: <b>${esc(it.long_term.label)}</b></div>` : ""}
@@ -1034,6 +1037,8 @@ function renderOverview() {
   <h2>Today's prices and calls · ఈరోజు ధరలు</h2>
   <p class="ink2 small">One card per commodity: the agent's call, its price and the 30-day forecast (dashed, shaded side of each little chart). Click a card for the proof, the timeline and your trades.
     Gold, silver and platinum refresh live every 5 minutes; wheat when the mandis report.</p>
+  <p class="ink2 small">📍 <b>Where the prices are from:</b> wheat is the wholesale mandi price at ${esc(S.items.wheat?.where?.short.split("· ")[1] || "Jabalpur, Indore & Kota")} - Andhra Pradesh publishes no wheat mandi prices, so the Srikakulam figure is that price plus fee, freight and handling.
+    Gold, silver and platinum are the all-India import price (world spot × ₹ rate + import duty), before GST - a Srikakulam jeweller adds their own premium, making charges and GST.</p>
   <div class="cards">${order.map(card).join("")}</div>
   <h2>Last 12 months side by side</h2>
   <p class="ink2 small">Each line starts at 100 a year ago, so you can compare how much each has risen or fallen (110 = up 10%).</p>
@@ -1110,12 +1115,12 @@ function header() {
   const stale = age >= 3 ? ` · ⚠︎ agent last ran ${Math.round(age)} h ago` : "";
   let t;
   if (C === "all") {
-    t = `Srikakulam, AP · prices checked every 5 minutes · agent ran ${hm(g)}${stale}`;
+    t = `For Srikakulam, AP · 📍 wheat: MP & Rajasthan mandis · metals: all-India import price · checked every 5 minutes · agent ran ${hm(g)}${stale}`;
   } else if (C === "wheat") {
     const oldDays = Math.floor((Date.now() - new Date(A.asof + "T00:00:00+05:30")) / 864e5), best = A.best_source;
-    t = `Wheat · ${fmtDate(A.asof)}${oldDays >= 3 ? ` ⚠︎ ${oldDays} days old` : ""} · benchmark ${rs(A.benchmark.price)}/qtl` + (best ? ` · landed ${rs(best.landed)}/qtl` : "") + stale;
+    t = `Wheat · ${fmtDate(A.asof)}${oldDays >= 3 ? ` ⚠︎ ${oldDays} days old` : ""} · 📍 ${A.benchmark.markets.map(x => x.replace(" APMC", "")).join(", ")} mandis ${rs(A.benchmark.price)}/qtl` + (best ? ` · landed at Srikakulam ${rs(best.landed)}/qtl` : "") + stale;
   } else {
-    t = `${A.label} ${rs(nowPrice(C))}${A.unit_short}${LIVE[C] ? ` · live ${hm(LIVE[C].updated)}` : ""} · call ${A.signal.label} (${fmtDate(A.asof)})${stale}`;
+    t = `${A.label} ${rs(nowPrice(C))}${A.unit_short} · 📍 all-India import price, before GST${LIVE[C] ? ` · live ${hm(LIVE[C].updated)}` : ""} · call ${A.signal.label} (${fmtDate(A.asof)})${stale}`;
   }
   $("#asof").textContent = t;
   document.querySelectorAll("#commodities button").forEach(b => b.setAttribute("aria-selected", b.dataset.c === C));

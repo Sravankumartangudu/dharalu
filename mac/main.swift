@@ -101,6 +101,8 @@ struct Summary: Decodable {
     /// Metals only: the agent's world price and the factor that turns US$/oz into ₹ for the unit shown.
     struct Live: Decodable { let symbol: String; let usd: Double; let factor: Double; let prev_close: Double?; let updated: String? }
     struct ForecastWhy: Decodable { let summary: String?; let biggest: String? }
+    /// Which place the price is from (wheat: the benchmark mandis; metals: the all-India import price).
+    struct Where: Decodable { let short: String; let detail: String?; let landed: String? }
     struct Item: Decodable {
         let key: String
         let asof: String
@@ -128,6 +130,7 @@ struct Summary: Decodable {
         let move_alert_pct: Double?
         let live: Live?
         let lines: [String]?
+        let `where`: Where?
     }
 
     let generated_at: String
@@ -465,6 +468,11 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
             menu.addItem(info("Agent's price \(rs(it.price)) on \(prettyDate(it.asof)) · 7d \(pc(it.chg_7d)) · 30d \(pc(it.chg_30d))"))
         } else {
             menu.addItem(info("Price \(rs(it.price))\(it.unit_short) on \(prettyDate(it.asof)) · 1d \(pc(it.chg_1d)) · 7d \(pc(it.chg_7d)) · 30d \(pc(it.chg_30d))"))
+        }
+        if let w = it.where {
+            let row = info(wrap("📍 \(w.short)", 70))
+            row.toolTip = w.detail
+            menu.addItem(row)
         }
         if let f = it.forecast30 {
             menu.addItem(info("30-day forecast \(rs(f.price)) (likely \(rs(f.low)) – \(rs(f.high)))"))

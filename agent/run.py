@@ -334,6 +334,7 @@ def entry(key, a):
         "briefing": (a.get("briefing") or {}).get("ai") or (a.get("briefing") or {}).get("rules"),
         "timing": {k: a["timing"][k] for k in ("cheapest_months", "dearest_months", "next_buy_window", "days_to_buy_window")},
         "carrying_cost_30d_pct": a.get("carrying_cost_30d_pct"),
+        "where": a.get("where"),
     }
     if key == "wheat":
         b, best = a["benchmark"], a.get("best_source") or {}

@@ -55,6 +55,11 @@ The live price updates every 5 minutes, but the call only changes when the agent
 
 ## Data
 
+**Which place are the prices for?**
+- **Wheat**: the wholesale mandi price at **Jabalpur, Indore & Kota** (Madhya Pradesh, Rajasthan). These three have the longest daily records on data.gov.in Agmarknet. Andhra Pradesh publishes no wheat mandi prices, so there is no "Srikakulam wheat price" to show. Instead the agent works out what wheat costs **landed at Srikakulam** from each source mandi: mandi price + mandi fee + freight + handling (Mandis & landed cost tab).
+- **Gold, silver, platinum**: the **all-India import price**: the world spot price × the ₹ rate + import duty, before GST. It is the same for all of India. A Srikakulam jeweller's rate is usually a little higher (their premium), and jewellery adds making charges and GST.
+- Every price shows a 📍 line saying this.
+
 **The dashboard shows an old date (⚠︎ N days old).**
 - Mandis don't report on Sundays and holidays, and data.gov.in is sometimes late or down. The agent then analyses the data it already has, and tries again at the next run. Metal markets close at weekends.
 - data.gov.in refuses GitHub's servers, so the GitHub runs show ✅ but bring no new wheat prices. Fresh prices come from your Mac: `scripts/mac-schedule.sh status` to check it's installed, `scripts/mac-schedule.sh run` to fetch now ([SETUP.md](SETUP.md#8-run-the-agent-from-your-mac-important)).

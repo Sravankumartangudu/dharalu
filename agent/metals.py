@@ -431,6 +431,20 @@ def long_view(cal, trading):
                      "not proof." % span_y)}
 
 
+def where(m, home):
+    """Which place the metal price is for - shown beside every price."""
+    town = home.split(",")[0]
+    return {
+        "short": "All-India import price · world spot + %g%% duty, before GST" % m["duty_pct"],
+        "short_te": "అఖిల భారత దిగుమతి ధర · ప్రపంచ ధర + %g%% సుంకం, GST లేకుండా" % m["duty_pct"],
+        "detail": "World spot %s in US$ per troy ounce (gold-api.com; history COMEX %s, Yahoo Finance) x the US$/Rs "
+                  "rate (Yahoo INR=X) + %g%% import duty, for %s. The same for all of India - not a %s jeweller's "
+                  "rate: shops add their own premium, making charges and %g%% GST on top." % (
+                      m["spot"], m["futures"], m["duty_pct"], m["purity"], town, m["gst_pct"]),
+        "home": home,
+    }
+
+
 # --------------------------------------------------------------------------- one metal
 def analyse(key, cfg, live):
     m = cfg["metals"][key]
@@ -495,6 +509,7 @@ def analyse(key, cfg, live):
         "ratio_gold_silver": round(ratio_at(cal[-1][0]), 1) if ratio_at else None,
         "costs": {k: m[k] for k in ("duty_pct", "gst_pct", "sell_discount_pct", "interest_pct_per_month")},
         "convert": {"oz_g": OZ_G, "grams": m["grams"], "duty_pct": m["duty_pct"]},
+        "where": where(m, cfg["business"]["location"]),
     }
 
 

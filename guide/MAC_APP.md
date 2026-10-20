@@ -46,6 +46,7 @@ Each commodity's submenu:
 | If buying / If holding | The advice for each case |
 | 🎯 · 📊 · 🤔 | What would change the call, its past record vs any day, why this confidence |
 | 🔄 · 📅 | The call on the previous prices day (when it changed); metals: *Saving for years* (ADD / STEADY / GO SLOW) |
+| 📍 Prices from … | Which place the price is for: wheat *Wholesale mandi price · Jabalpur, Indore & Kota*; metals *All-India import price · world spot + duty, before GST*. Hover it for the full detail |
 | Live … at 18:52 · since last close … | Metals: the live price and how far it has moved today; then the agent's price with its 7- and 30-day changes |
 | Key numbers | 30-day forecast with its likely range and **🔮 Why** (e.g. *Expected to fall about 5.7% in 30 days. Biggest reason: recent trend (−4.2%)*); wheat: cheapest landed source and MSP; metals: price with GST and the world price × ₹ rate; holding cost |
 | **Why this call - the proof ▸** | Every rule with its value, test and points × weight = counted (e.g. *−1 ×0.5 = −0.5*), the trend cap note, then the total and the equal-weights call when it differs |

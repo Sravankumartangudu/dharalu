@@ -45,6 +45,9 @@ For each one it tells you **when to buy, when to hold and when to sell**, and sh
 Since 2.2 the score can be fractional (e.g. +1.5), because each rule's points are multiplied by a weight it earned (below).
 
 **Every call comes with:**
+- **📍 Where the price is from**, next to every price:
+  - wheat is the **wholesale mandi price at Jabalpur, Indore & Kota** (Madhya Pradesh, Rajasthan), plus the cheapest *landed at Srikakulam* cost;
+  - gold, silver and platinum are the **all-India import price** (world spot × ₹ rate + import duty, before GST), not a Srikakulam jeweller's rate.
 - **One plain line**: why, in English and తెలుగు, e.g. *"Mainly because the 30-day forecast doesn't beat the holding cost and prices have been falling for weeks."*
 - **What would change it**: the prices at which the call would turn, e.g. *"Turns WAIT if the price falls to ₹1,17,670 (−11.8%)."*
 - **Its record**: how often past days with this call were right, next to how often *any* day was, e.g. *"Past SELL days (1047 since 2017): lower 30 days later on 44% vs 38% of all days → edge +5 points."*
