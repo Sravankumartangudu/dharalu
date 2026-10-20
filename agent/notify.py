@@ -54,9 +54,9 @@ def send(text):
 def message(a, brief, reasons, site, title):
     s = a["signal"]
     lines = ["%s - %s" % (title, " / ".join(reasons)), "", brief["english"], "", brief["telugu"], "",
-             "Proof (rule -> points):"]
+             "Proof (rule -> points x weight = counted):"]
     for e in s["evidence"]:
-        lines.append("%+d  %s: %s" % (e["points"], e["rule"], e["value"]))
+        lines.append("%+d x%g = %+g  %s: %s" % (e["points"], e.get("weight", 1), e.get("counted", e["points"]), e["rule"], e["value"]))
     if site:
         lines += ["", site]
     text = "\n".join(lines)

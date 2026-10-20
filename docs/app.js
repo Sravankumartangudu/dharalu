@@ -231,9 +231,13 @@ function forecastAt(days) {
 }
 function verdictWord(score, key) {
   if (key) return key.replace("_", " ");
-  return score >= 3 ? "STRONG BUY" : score >= 1 ? "BUY" : score >= 0 ? "WAIT" : score >= -2 ? "SELL" : "STRONG SELL";
+  return score >= 3 ? "STRONG BUY" : score >= 1 ? "BUY" : score > -1 ? "WAIT" : score > -3 ? "SELL" : "STRONG SELL";
 }
-const callGroup = (score, key) => score > 0 ? "buy" : score < 0 ? "sell" : key === "HOLD" ? "hold" : "wait";
+// Since 2.2 rules are weighted, so scores can be fractional: the call's key decides the group.
+const GROUP_OF = { STRONG_BUY: "buy", BUY: "buy", HOLD: "hold", WAIT: "wait", SELL: "sell", STRONG_SELL: "sell" };
+const callGroup = (score, key) => GROUP_OF[key] || (score >= 1 ? "buy" : score <= -1 ? "sell" : "wait");
+const absTxt = n => Math.abs(Math.round(+n * 10) / 10);
+const scoreTxt = n => n == null || n === "" ? "–" : (+n > 0 ? "+" : +n < 0 ? "−" : "") + Math.abs(Math.round(+n * 10) / 10);
 function tableToggle(id, head, rows, title = "Show as table") {
   return `<details><summary>${title}</summary><div class="tablewrap"><table id="${id}"><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</table></div></details>`;
 }
@@ -243,24 +247,70 @@ function liveNote(k) {
 }
 
 /* ------------------------------------------------------------------ shared Today pieces */
+function scoreGauge(s) {
+  // A fractional score on a −max..+max line: the fill runs from the middle to the score.
+  const m = s.max_score || 1, w = Math.min(50, Math.abs(s.score) / m * 50);
+  const band = v => `<i style="left:${50 + v / m * 50}%"></i>`;
+  return `<div class="gauge" title="Score ${scoreTxt(s.score)} of ±${absTxt(m)}">
+    <b class="${cls(s.score)}" style="${s.score >= 0 ? "left" : "right"}:50%;width:${w}%"></b>${[-3, -1, 1, 3].filter(v => Math.abs(v) < m).map(band).join("")}</div>`;
+}
 function signalCard(s, brief) {
-  const bars = Array.from({ length: s.max_score * 2 + 1 }, (_, i) => i - s.max_score)
-    .map(v => `<i class="${(s.score > 0 && v > 0 && v <= s.score) || (s.score < 0 && v < 0 && v >= s.score) || (v === 0 && s.score === 0) ? "on" : ""}"></i>`).join("");
+  const te = LANG === "te";
   return `
   <div class="card signal">
     <div class="badge ${s.key}">
       <div class="kind">${A.emoji} ${esc(A.label)} · ${esc(A.telugu_name)}</div>
       <div class="big">${esc(s.label)}</div><div class="te">${esc(s.telugu)}</div>
-      <div class="scorebar" title="Score ${s.score} of ±${s.max_score}">${bars}</div>
-      <div class="meta">Score ${signed(s.score)} of ±${s.max_score} · Confidence ${esc(s.confidence)}</div>
+      ${scoreGauge(s)}
+      <div class="meta">Score ${scoreTxt(s.score)} of ±${absTxt(s.max_score)} · Confidence ${esc(s.confidence)}</div>
       <div class="meta">${fmtDate(A.asof)}</div>
     </div>
     <div>
+      ${s.plain ? `<p class="plain" data-en="${esc(s.plain)}" data-te="${esc(s.plain_te || s.plain)}">${esc(te ? s.plain_te || s.plain : s.plain)}</p>` : ""}
+      ${s.pending ? `<div class="pending">⏳ ${esc(s.pending.note)}</div>` : ""}
       <div class="advice"><div><b>If you are buying</b>${esc(s.buyer)}</div><div><b>If you are holding ${C === "wheat" ? "stock" : esc(A.label.toLowerCase())}</b>${esc(s.holder)}</div></div>
+      <div class="facts">
+        ${s.change_line ? `<div><span>🎯 What would change it</span><span data-en="${esc(s.change_line)}" data-te="${esc(s.change_line_te || s.change_line)}">${esc(te ? s.change_line_te || s.change_line : s.change_line)}</span></div>` : ""}
+        ${s.record_line ? `<div><span>📊 Its record</span><span>${esc(s.record_line)}</span></div>` : ""}
+        ${s.confidence_why ? `<div><span>🤔 Why ${esc(s.confidence)} confidence</span><span>${s.confidence_why.map(esc).join(" · ")}</span></div>` : ""}
+        ${s.equal && s.equal.key !== s.key ? `<div><span>⚖️ Without learned weights</span><span>every rule counting the same would say <b>${esc(s.equal.label)}</b> (${scoreTxt(s.equal.score)}) - <a href="#${C}/record">which way did better?</a></span></div>` : ""}
+      </div>
       <div class="tabs2"><button data-lang="en" class="${LANG === "en" ? "primary" : ""}">English</button><button data-lang="te" class="${LANG === "te" ? "primary" : ""}">తెలుగు</button>
         <span class="muted small" style="align-self:center">Briefing by ${esc(brief.source)}</span></div>
-      <div class="pre" id="brief">${esc(LANG === "te" ? brief.telugu : brief.english)}</div>
+      <div class="pre" id="brief">${esc(te ? brief.telugu : brief.english)}</div>
     </div>
+  </div>${changesCard(s)}${longTermCard()}`;
+}
+function changesCard(s) {
+  const c = s.changes;
+  if (!c) return "";
+  const head = c.call_changed
+    ? `The call changed from <b>${esc(c.label_was)}</b> (${scoreTxt(c.score_was)}) to <b>${esc(s.label)}</b> (${scoreTxt(s.score)}).`
+    : `The call stayed <b>${esc(s.label)}</b> (score ${scoreTxt(c.score_was)} → ${scoreTxt(s.score)}).`;
+  const rows = c.rules.map(r => `<tr><td><b>${esc(r.rule)}</b></td><td class="small">${esc(r.value_was || "–")}</td><td class="small">${esc(r.value_now || "–")}</td>
+    <td class="num pts ${cls(r.was)}">${scoreTxt(r.was)}</td><td class="num pts ${cls(r.now)}">${scoreTxt(r.now)}</td></tr>`).join("");
+  return `<div class="card changes"><b>🔄 What changed since ${fmtDate(c.since)}</b> ${head}
+    ${c.rules.length ? `<div class="tablewrap"><table><tr><th>Rule</th><th>Then</th><th>Now</th><th class="num">Counted then</th><th class="num">Now</th></tr>${rows}</table></div>`
+      : `<div class="small muted">No rule moved - only the prices did.</div>`}</div>`;
+}
+function longTermCard() {
+  const L = A.long_term;
+  if (!L) return "";
+  const te = LANG === "te";
+  const g = L.groups || {}, all = L.all_days || {};
+  const rows = (L.evidence || []).map(e => `<tr><td><b>${esc(e.rule)}</b><div class="why">${esc(e.test)}</div></td><td class="small">${esc(e.value)}</td>
+    <td class="small ${e.counts ? "" : "muted"}">${esc(e.why)}</td><td class="num pts ${cls(e.counted)}">${scoreTxt(e.counted)}</td></tr>`).join("");
+  return `<div class="card longterm">
+    <div class="lt-head"><span class="pill lt ${L.key}">${esc(L.label)}</span> <b>Saving for years (1 year or more)</b> <span class="te small">${esc(L.telugu)}</span></div>
+    <p data-en="${esc(L.advice)}" data-te="${esc(L.advice_te || L.advice)}">${esc(te ? L.advice_te || L.advice : L.advice)}</p>
+    <p class="small" data-en="${esc(L.why)}" data-te="${esc(L.why_te || L.why)}">${esc(te ? L.why_te || L.why : L.why)}</p>
+    <p class="small">📊 ${esc(L.record_line)}${L.cagr_pct ? ` · ${A.label} grew ${L.cagr_pct["5"] != null ? `${pc(L.cagr_pct["5"])} a year over 5 years` : ""}${L.cagr_pct["10"] != null ? `, ${pc(L.cagr_pct["10"])} a year over 10` : ""}.` : ""}</p>
+    <details><summary>The long-term rules and their record</summary><div class="tablewrap"><table>
+      <tr><th>Rule</th><th>Today</th><th>Its record (price 1 year later)</th><th class="num">Counted</th></tr>${rows}</table></div>
+      <table class="small"><tr><th>Past days that said</th><th class="num">Days</th><th class="num">Avg 1 year later</th><th class="num">Higher on</th></tr>
+      ${["ADD", "STEADY", "GO_SLOW"].filter(k => g[k]).map(k => `<tr><td>${k.replace("_", " ")}</td><td class="num">${g[k].days}</td><td class="num ${cls(g[k].avg_1y_pct)}">${pc(g[k].avg_1y_pct)}</td><td class="num">${g[k].rose_pct}%</td></tr>`).join("")}
+      <tr><td><i>Any day</i></td><td class="num">${all.days || "–"}</td><td class="num ${cls(all.avg_1y_pct)}">${pc(all.avg_1y_pct)}</td><td class="num">${all.rose_pct}%</td></tr></table>
+      <p class="small muted">${esc(L.note)}</p></details>
   </div>`;
 }
 function wireBrief(brief) {
@@ -268,36 +318,45 @@ function wireBrief(brief) {
     LANG = bt.dataset.lang;
     document.querySelectorAll("[data-lang]").forEach(x => x.classList.toggle("primary", x === bt));
     $("#brief").textContent = LANG === "te" ? brief.telugu : brief.english;
+    document.querySelectorAll("[data-en]").forEach(x => x.textContent = LANG === "te" ? x.dataset.te : x.dataset.en);
   });
 }
 function proofTable(s) {
+  const rec = e => e.rule_record && e.rule_record.votes
+    ? `${e.rule_record.votes} past votes, right ${e.rule_record.right_pct}% vs ${e.rule_record.usual_pct}% usual (edge ${signed(e.rule_record.edge_pts)})` : "";
   return `
   <h2>Why this call - the proof</h2>
-  <p class="ink2 small">Each rule below looks at real data and adds or removes points. Total score ≥ +3 = strong buy, +1 to +2 = buy, 0 = hold (if the forecast + season rules still point up) or wait, −1 to −2 = sell, ≤ −3 = strong sell.</p>
+  <p class="ink2 small">Each rule below looks at real data and gives points. Each rule's points are then multiplied by a <b>weight</b> it earned from its own past record
+    (only days whose result was already known at the time - no peeking): 2× if it beat the usual rate by 10+ points, 1× if by 3+, ½ if barely, 0 if it was worse than guessing.
+    The forecast and trend rules all read the recent direction, so together they count at most ±2.
+    Total ≥ +3 = strong buy, +1 to +3 = buy, between −1 and +1 = hold (if the forward-looking rules still point up) or wait, −1 to −3 = sell, ≤ −3 = strong sell.</p>
   <div class="card tablewrap"><table class="proof">
-    <tr><th>Rule</th><th>What the data shows today</th><th>Test used</th><th class="num">Points</th></tr>
+    <tr><th>Rule</th><th>What the data shows today</th><th>Test used</th><th class="num">Points</th><th class="num">Weight</th><th class="num">Counted</th></tr>
     ${s.evidence.map(e => `<tr><td data-label="Rule"><b>${esc(e.rule)}</b><div class="why">${esc(e.why)}</div></td>
       <td data-label="What the data shows today">${esc(e.value)}<div class="why">Source: ${esc(e.source)}</div></td><td data-label="Test used" class="small ink2">${esc(e.test)}</td>
-      <td data-label="Points" class="num pts ${cls(e.points)}">${signed(e.points)}</td></tr>`).join("")}
-    <tr><td colspan="3" class="total"><b>Total score</b></td><td class="num pts total ${cls(s.score)}">${signed(s.score)}</td></tr>
-  </table></div>`;
+      <td data-label="Points" class="num pts ${cls(e.points)}">${signed(e.points)}</td>
+      <td data-label="Weight" class="num" title="${esc(rec(e))}">${e.weight != null ? `×${e.weight}` : "×1"}<div class="why">${esc(e.weight_why || "")}</div></td>
+      <td data-label="Counted" class="num pts ${cls(e.counted ?? e.points)}">${scoreTxt(e.counted ?? e.points)}${e.capped && Math.abs((e.counted ?? 0) - e.points * (e.weight ?? 1)) > 0.01 ? `<div class="why">trend cap</div>` : ""}</td></tr>`).join("")}
+    <tr><td colspan="5" class="total"><b>Total score</b></td><td class="num pts total ${cls(s.score)}">${scoreTxt(s.score)}</td></tr>
+  </table></div>
+  ${s.trend_cap ? `<p class="small ink2">🧢 ${esc(s.trend_cap)}</p>` : ""}`;
 }
 function workedBefore(s) {
   const tr = A.track_record.summary, live = A.track_record.live || {};
-  const gkey = s.score >= 1 ? "buy_days" : s.score <= -1 ? "sell_days" : s.key === "HOLD" ? "hold_days" : "wait_days";
+  const g = callGroup(s.score, s.key), gkey = g + "_days";
   // Under 10 days in the last year proves little - quote the whole-history replay instead.
   const thin = !(tr[gkey] && tr[gkey].days >= 10) && A.track_record.summary_all && A.track_record.summary_all[gkey];
   const grp = thin ? A.track_record.summary_all[gkey] : tr[gkey];
   const span = thin ? `since ${fmtDate(A.track_record.since)}` : "in the last year";
-  const grpName = s.score >= 1 ? "BUY" : s.score <= -1 ? "SELL" : s.key;
+  const grpName = { buy: "BUY", sell: "SELL", hold: "HOLD", wait: "WAIT" }[g];
   const cost = C === "wheat" ? "the holding cost" : "bank interest";
   let line = "";
   if (grp) {
-    line = s.score >= 1
+    line = g === "buy"
       ? `On the <b>${grp.days}</b> past days ${span} when these same rules said <b>${grpName}</b>, the price 30 days later was higher <b>${grp.rose_pct}%</b> of the time (average move <b class="${cls(grp.avg_move_pct)}">${pc(grp.avg_move_pct)}</b>; beat ${cost} ${grp.beat_holding_cost_pct}% of the time).`
-      : s.score <= -1
+      : g === "sell"
         ? `On the <b>${grp.days}</b> past days ${span} when these rules said <b>${grpName}</b>, the price 30 days later was lower <b>${(100 - grp.rose_pct).toFixed(1)}%</b> of the time (average move <b class="${cls(grp.avg_move_pct)}">${pc(grp.avg_move_pct)}</b>).`
-        : s.key === "HOLD"
+        : g === "hold"
           ? `On the <b>${grp.days}</b> past HOLD days ${span}, keeping it beat ${cost} <b>${grp.beat_holding_cost_pct}%</b> of the time (price rose ${grp.rose_pct}% of the time, average move <b class="${cls(grp.avg_move_pct)}">${pc(grp.avg_move_pct)}</b>).`
           : `On the <b>${grp.days}</b> past WAIT days ${span}, the average 30-day move was <b class="${cls(grp.avg_move_pct)}">${pc(grp.avg_move_pct)}</b> - not enough to beat ${cost}.`;
   }
@@ -414,7 +473,7 @@ function reasonCard(A) {
       <tr><td class="ink2">Likely range (8 in 10)</td>${hz.map(h => `<td class="num ink2">${pc(r.horizons[h].low_pct)} to ${pc(r.horizons[h].high_pct)}</td>`).join("")}</tr></table></div>
     <ul class="why">${r.drivers.map(d => `<li><b>${esc(d.name)}</b> (${pc(d.pct)} at 30 days): ${esc(d.why)}</li>`).join("")}</ul>
     ${r.trust ? `<p class="small">🧪 ${esc(r.trust)}</p>` : ""}
-    ${r.in_call ? `<p class="small">⚖️ In today's call, the rule "${esc(r.in_call.rule)}" gives <b>${signed(r.in_call.points)}</b> of ±${r.in_call.max} points.</p>` : ""}
+    ${r.in_call ? `<p class="small">⚖️ In today's call, the rule "${esc(r.in_call.rule)}" gives <b>${signed(r.in_call.points)}</b> of ±${r.in_call.max} points${r.in_call.counted != null && r.in_call.counted !== r.in_call.points ? ` - counted as <b>${scoreTxt(r.in_call.counted)}</b> after its weight (×${r.in_call.weight}) and the trend cap` : ""}.</p>` : ""}
     <p class="small muted">🙈 ${esc(r.blind)}</p></div>`;
 }
 
@@ -455,7 +514,7 @@ function drawTimeline(range) {
         band: A.forecast.map(p => ({ x: p.date, lo: p.low, hi: p.high })) },
     ],
     dots: [{ x: A.asof, y: now, color, label: (isMetal(C) && LIVE[C] ? "Live " : "Today ") + rs(now) }],
-    tipExtra: x => { const s = SIG[x]; return s ? `<div class="muted">Agent said: <b>${verdictWord(s.score, s.key)}</b> (${signed(s.score)})</div>` : ""; },
+    tipExtra: x => { const s = SIG[x]; return s ? `<div class="muted">Agent said: <b>${verdictWord(s.score, s.key)}</b> (${scoreTxt(s.score)})</div>` : ""; },
   });
 
   // Past / present / future, in numbers
@@ -472,7 +531,7 @@ function drawTimeline(range) {
       <div class="d">${first ? `${rs(first.y)} → ${rs(last.y)} · low ${rs(loP.y)} (${fmtDate(loP.x)}) · high ${rs(hiP.y)} (${fmtDate(hiP.x)})` : ""}
       ${err != null ? `<br>Agent's 30-day predictions here: off by <b>${err.toFixed(1)}%</b> on average, direction right <b>${Math.round(dirOk / graded.length * 100)}%</b> (${graded.length} checked)` : ""}</div></div>
     <div class="tile"><div class="k">⏺ Present - ${isMetal(C) && LIVE[C] ? "live " + hm(LIVE[C].updated) : fmtDate(A.asof)}</div><div class="v">${rs(now)}<span class="u">${esc(A.unit_short)}</span></div>
-      <div class="d"><span class="pill ${s.key}">${esc(s.label)}</span> score ${signed(s.score)} of ±${s.max_score} · confidence ${esc(s.confidence)}</div></div>
+      <div class="d"><span class="pill ${s.key}">${esc(s.label)}</span> score ${scoreTxt(s.score)} of ±${absTxt(s.max_score)} · confidence ${esc(s.confidence)}</div></div>
     <div class="tile"><div class="k">⏩ Future - the agent's forecast</div><div class="v">${A.forecast_points["30"] ? rs(A.forecast_points["30"].price) : "–"} <span class="u">in 30 days</span></div>
       <div class="d">${["7", "14", "30"].filter(h => A.forecast_points[h]).map(h => { const f = A.forecast_points[h]; return `${h} days: <b>${rs(f.price)}</b> (${rs(f.low)} – ${rs(f.high)})`; }).join("<br>")}
       ${bt.mape_pct != null ? `<br>Tested on past dates: off by ${bt.mape_pct}% at 30 days (no-change guess: ${bt.naive_mape_pct}%)` : ""}
@@ -567,7 +626,7 @@ function renderPreWheat() {
     });
     const s = A.signal, edge = (fc.price / b.price - 1) * 100 - (carry / landed * 100);
     const checks = [
-      [s.score >= 1, `Agent signal is ${s.label} (score ${signed(s.score)})`, "Agent signal supports buying", "Agent signal does not support buying now"],
+      [callGroup(s.score, s.key) === "buy", `Agent signal is ${s.label} (score ${scoreTxt(s.score)})`, "Agent signal supports buying", "Agent signal does not support buying now"],
       [edge > 0, `Forecast move ${pc((fc.price / b.price - 1) * 100)} vs holding cost ${pc(carry / landed * 100)} over ${days} days`, "Expected rise beats holding cost", "Expected rise does NOT beat holding cost"],
       [lt.length ? landed <= lt[0].landed * 1.02 : null, `This source lands at ${rs(landed)} vs cheapest ${rs(lt.length ? lt[0].landed : landed)}`, "Among the cheapest sources", "A cheaper source exists"],
       [b.price <= A.msp.floor * 1.08, `Benchmark ${rs(b.price)} vs MSP ${rs(A.msp.floor)}`, "Close to the MSP floor (limited downside)", "Well above MSP (more downside if prices fall)"],
@@ -616,7 +675,7 @@ function renderPreMetal() {
     });
     const s = A.signal, move = (fc.price / A.price - 1) * 100, intPct = c.interest_pct_per_month * days / 30;
     const checks = [
-      [s.score >= 1, `Agent signal is ${s.label} (score ${signed(s.score)})`, "Agent signal supports buying", "Agent signal does not support buying now"],
+      [callGroup(s.score, s.key) === "buy", `Agent signal is ${s.label} (score ${scoreTxt(s.score)})`, "Agent signal supports buying", "Agent signal does not support buying now"],
       [days ? move - intPct > 0 : null, `Forecast move ${pc(move)} vs bank interest ${pc(intPct)} over ${days} days`, "Expected rise beats bank interest", "Expected rise does NOT beat bank interest"],
       [ind.pctile_52w <= 50, `Today is above ${Math.round(ind.pctile_52w)}% of the last 12 months' prices`, "In the cheaper half of the year's range", "In the dearer half of the year's range"],
       [mk + g <= 6, `Making/premium ${mk}% + GST ${g}% = ${(mk + g).toFixed(1)}% lost on day one`, "Low entry cost (coin / bar level)", "High entry cost - the price must rise a lot just to break even"],
@@ -701,9 +760,10 @@ function renderTrades() {
     let ag = "–";
     if (sig != null) {
       judged++;
-      const ok = t.type === "buy" ? sig >= 0 : sig <= 0 && sg.key !== "HOLD";   // HOLD = keep it, so selling went against it
+      const g = callGroup(sig, sg.key);
+      const ok = t.type === "buy" ? g !== "sell" : g === "sell" || g === "wait";   // HOLD = keep it, so selling went against it
       if (ok) agree++;
-      ag = `<span class="status ${ok ? "good" : "serious"}">${verdictWord(sig, sg.key)} (${signed(sig)})</span>`;
+      ag = `<span class="status ${ok ? "good" : "serious"}">${verdictWord(sig, sg.key)} (${scoreTxt(sig)})</span>`;
     }
     const s = sells.find(x => x.id === t.id);
     return `<tr><td>${fmtDate(t.date)}</td><td>${t.type === "buy" ? "Buy" : "Sell"}</td><td class="num">${t.qty}</td><td class="num">${rs(t.price)}</td>
@@ -772,6 +832,26 @@ function lessons(sells, list) {
 }
 
 /* ------------------------------------------------------------------ TRACK RECORD */
+function compareTable(tr) {
+  const cm = tr.compare, rules = tr.rules;
+  if (!cm) return "";
+  const nm = { buy: "BUY / STRONG BUY", hold: "HOLD", wait: "WAIT", sell: "SELL / STRONG SELL" };
+  const cell = x => x && x.days ? `<td class="num">${x.days}</td><td class="num">${x.right_pct}%</td><td class="num pts ${cls(x.edge_pts)}">${signed(x.edge_pts)}</td>` : `<td class="num muted" colspan="3">no days</td>`;
+  const rows = ["buy", "hold", "wait", "sell"].map(k => { const w = cm.weighted[k] || {}, e = cm.equal[k] || {}, ref = w.days ? w : e;
+    return `<tr><td><b>${nm[k]}</b><div class="why">right = ${esc(ref.what || "")} 30 days later; any day: ${ref.base_pct ?? "–"}%</div></td>${cell(w)}${cell(e)}</tr>`; }).join("");
+  const ev = Object.fromEntries((A.signal.evidence || []).map(e => [e.rule, e]));
+  const rr = rules ? Object.entries(rules).map(([r, x]) => { const e = ev[r] || {};
+    return `<tr><td><b>${esc(r)}</b></td><td class="num">${x.votes}</td><td class="num">${x.up} / ${x.down}</td><td class="num">${x.votes ? x.right_pct + "%" : "–"}</td><td class="num">${x.votes ? x.usual_pct + "%" : "–"}</td>
+      <td class="num pts ${cls(x.edge_pts)}">${x.votes ? signed(x.edge_pts) : "–"}</td><td class="num">${e.weight != null ? "×" + e.weight : "–"}</td></tr>`; }).join("") : "";
+  return `<h3>Learned weights vs every rule counting the same</h3>
+  <p class="ink2 small">The same replay, done twice. <b>Weighted</b> (what Dharalu uses since 2.2): each day uses rule weights learned only from days whose result was already known.
+    <b>Equal</b>: every rule counts the same (how it worked before 2.2). <b>Edge</b> = how many points more often the call was right than for any day - above 0 means the call adds something.</p>
+  <div class="card tablewrap"><table><tr><th rowspan="2">Call</th><th colspan="3" class="c">Weighted (now)</th><th colspan="3" class="c">Equal (before 2.2)</th></tr>
+    <tr><th class="num">Days</th><th class="num">Right</th><th class="num">Edge</th><th class="num">Days</th><th class="num">Right</th><th class="num">Edge</th></tr>${rows}</table></div>
+  ${rr ? `<h3>Each rule's own record</h3>
+  <p class="ink2 small">Every past day a rule said "up" or "down", graded on the price 30 days later (${tr.graded_days || "all"} graded days). Today's weight comes from this record: fewer than 60 votes = ×1 (too few to judge), edge 10+ with 120+ votes = ×2, 3+ = ×1, 0 to 3 = ×½, below 0 = ×0 (ignored).</p>
+  <div class="card tablewrap"><table><tr><th>Rule</th><th class="num">Votes</th><th class="num">Up / down</th><th class="num">Right</th><th class="num">Usual</th><th class="num">Edge</th><th class="num">Weight today</th></tr>${rr}</table></div>` : ""}`;
+}
 function renderRecord() {
   const tr = A.track_record, s = tr.summary, live = tr.live || {};
   const cost = C === "wheat" ? "holding cost" : "bank interest";
@@ -781,18 +861,20 @@ function renderRecord() {
   $("#record").innerHTML = `
   <h2>${A.emoji} ${esc(A.label)} - agent track record: proof that the signal works (or doesn't)</h2>
   <p class="ink2 small">For every ${C === "wheat" ? "day" : "trading day"} in the last year we re-ran the same rules using only data available on that day, then checked the price 30 days later.
-   A good BUY should be followed by rises, a good HOLD by rises that beat the ${cost}, and a good SELL by falls. Each day only sees the data known on that day (the seasonal pattern too), so this is a fair test - the live record below is graded on real calls.</p>
+   A good BUY should be followed by rises, a good HOLD by rises that beat the ${cost}, and a good SELL by falls. Each day only sees the data known on that day (the seasonal pattern too), so this is a fair test - the live record below is graded on real calls.
+   The rule weights are learned the same way: each day only uses past days whose 30-day result was already known.</p>
   <div class="card tablewrap"><table>${head}${rec(s)}</table></div>
   ${tr.summary_all ? `<h3>Whole history - since ${fmtDate(tr.since)}</h3>
   <p class="ink2 small">The same replay over every day we have data for. More days = stronger proof, but older years were a different market.</p>
   <div class="card tablewrap"><table>${head}${rec(tr.summary_all)}</table></div>` : ""}
+  ${compareTable(tr)}
   <div class="card"><div id="recChart"></div></div>
   <h3>Live calls (graded 30 days later)</h3>
   <div class="card tablewrap">${live.graded ? `<p>Right <b>${live.right_pct}%</b> of ${live.graded} graded calls.</p>` : ""}
     <table><tr><th>Date</th><th>Call</th><th class="num">Price then</th><th class="num">30 days later</th><th class="num">Move</th><th>Right?</th></tr>
-    ${(live.rows || []).slice().reverse().map(r => `<tr><td>${fmtDate(r.date)}</td><td>${verdictWord(+r.score, r.signal)} (${r.score})</td><td class="num">${rs(+r.price)}</td><td class="num">${rs(r.after30)}</td><td class="num ${cls(r.move_pct)}">${pc(r.move_pct)}</td><td>${r.right ? '<span class="status good">Yes</span>' : '<span class="status critical">No</span>'}</td></tr>`).join("")}
+    ${(live.rows || []).slice().reverse().map(r => `<tr><td>${fmtDate(r.date)}</td><td>${verdictWord(+r.score, r.signal)} (${scoreTxt(r.score)})</td><td class="num">${rs(+r.price)}</td><td class="num">${rs(r.after30)}</td><td class="num ${cls(r.move_pct)}">${pc(r.move_pct)}</td><td>${r.right ? '<span class="status good">Yes</span>' : '<span class="status critical">No</span>'}</td></tr>`).join("")}
     ${!(live.rows || []).length && !(live.pending || []).length ? '<tr><td colspan="6" class="muted">No live calls yet - one is logged every prices day.</td></tr>' : ""}
-    ${(live.pending || []).slice().reverse().slice(0, 10).map(r => `<tr><td>${fmtDate(r.date)}</td><td>${verdictWord(+r.score, r.signal)} (${r.score})</td><td class="num">${rs(+r.price)}</td><td colspan="3" class="muted">waiting - graded on ${fmtDate(addDays(r.date, 30))}</td></tr>`).join("")}
+    ${(live.pending || []).slice().reverse().slice(0, 10).map(r => `<tr><td>${fmtDate(r.date)}</td><td>${verdictWord(+r.score, r.signal)} (${scoreTxt(r.score)})</td><td class="num">${rs(+r.price)}</td><td colspan="3" class="muted">waiting - graded on ${fmtDate(addDays(r.date, 30))}</td></tr>`).join("")}
     </table></div>`;
   const cut = addDays(A.asof, -400);
   const rows = (tr.rows || []).filter(r => r.date >= cut);
@@ -801,7 +883,7 @@ function renderRecord() {
     series: [{ name: `${A.label} price`, short: "Price", color: css(COLOR[C]), pts: rows.map(r => ({ x: r.date, y: r.price })) },
       { name: "Price 30 days later", short: "+30d", color: css("--ink-2"), dash: true, pts: rows.map(r => ({ x: r.date, y: r.after30 })) }],
     strip: rows.map(r => ({ x: r.date, color: CALL_COLOR[callGroup(r.score, r.signal)] })),
-    tipExtra: x => { const r = rows.find(z => z.date === x); return r ? `<div class="muted">Agent said: <b>${verdictWord(r.score, r.signal)}</b> (${signed(r.score)})</div>` : ""; },
+    tipExtra: x => { const r = rows.find(z => z.date === x); return r ? `<div class="muted">Agent said: <b>${verdictWord(r.score, r.signal)}</b> (${scoreTxt(r.score)})</div>` : ""; },
   });
   $("#recChart .legend").insertAdjacentHTML("beforeend", Object.entries({ buy: "BUY days", hold: "HOLD", wait: "WAIT", sell: "SELL days" }).map(([k, n]) => `<span class="box" style="--c:${CALL_COLOR[k]}">${n}</span>`).join(""));
 }
@@ -930,16 +1012,20 @@ function renderOverview() {
   const order = S.order;
   const card = k => {
     const it = S.items[k], s = it.signal, now = nowPrice(k), f = it.forecast30, rec = it.record.same_call || {};
-    const grp = s.score > 0 ? "BUY" : s.score < 0 ? "SELL" : s.key;
-    const recLine = rec.days ? (s.score < 0
+    const grp = { buy: "BUY", sell: "SELL", hold: "HOLD", wait: "WAIT" }[callGroup(s.score, s.key)];
+    const recLine = s.record_line || !rec.days ? s.record_line || "" : (grp === "SELL"
       ? `Past ${grp} days (${rec.scope}): lower 30 days later ${(100 - rec.rose_pct).toFixed(0)}% of ${rec.days}`
-      : `Past ${grp} days (${rec.scope}): higher 30 days later ${rec.rose_pct.toFixed(0)}% of ${rec.days}`) : "";
+      : `Past ${grp} days (${rec.scope}): higher 30 days later ${rec.rose_pct.toFixed(0)}% of ${rec.days}`);
     return `<a class="ccard" href="#${k}/today" style="--c:${css(COLOR[k])}">
       <div class="top"><span class="em">${it.emoji}</span><b>${esc(it.label)}</b><span class="te">${esc(it.telugu_name)}</span><span class="pill ${s.key}">${esc(s.label)}</span></div>
       <div class="v">${rs(now)}<span class="u">${esc(it.unit_short)}</span> ${liveNote(k)}</div>
       <div class="d">1 day <span class="${cls(it.chg_1d)}">${pc(it.chg_1d)}</span> · 7 days <span class="${cls(it.chg_7d)}">${pc(it.chg_7d)}</span> · 30 days <span class="${cls(it.chg_30d)}">${pc(it.chg_30d)}</span></div>
       <div class="spark" id="sp-${k}"></div>
-      <div class="d">${f ? `30-day forecast <b>${rs(f.price)}</b> (${pc((f.price / it.price - 1) * 100)})` : ""} · score ${signed(s.score)} of ±${s.max_score}</div>
+      <div class="d">${f ? `30-day forecast <b>${rs(f.price)}</b> (${pc((f.price / it.price - 1) * 100)})` : ""} · score ${scoreTxt(s.score)} of ±${absTxt(s.max_score)} · ${esc(s.confidence)} confidence</div>
+      ${s.plain ? `<div class="d"><b>${esc(s.plain)}</b></div>` : ""}
+      ${s.change_line ? `<div class="d">🎯 ${esc(s.change_line)}</div>` : ""}
+      ${s.pending ? `<div class="d">⏳ ${esc(s.pending)}</div>` : ""}
+      ${it.long_term ? `<div class="d">📅 Saving for years: <b>${esc(it.long_term.label)}</b></div>` : ""}
       ${it.forecast_why ? `<div class="d">🔮 Why: ${esc(it.forecast_why.biggest)}</div>` : ""}
       <div class="d muted">${esc(s.telugu)} · ${esc(recLine)}</div>
     </a>`;
@@ -952,7 +1038,7 @@ function renderOverview() {
   <h2>Last 12 months side by side</h2>
   <p class="ink2 small">Each line starts at 100 a year ago, so you can compare how much each has risen or fallen (110 = up 10%).</p>
   <div class="card"><div id="idxChart"></div>
-    ${tableToggle("allTbl", ["", "Price", "Call", "Score", "30-day forecast", "Past record of this call"], order.map(k => { const it = S.items[k], r = it.record.same_call || {}; return [`${it.emoji} ${esc(it.label)}`, rs(nowPrice(k)) + esc(it.unit_short), esc(it.signal.label), signed(it.signal.score), it.forecast30 ? rs(it.forecast30.price) : "–", r.days ? `${r.days} days, rose ${r.rose_pct}% of the time (${esc(r.scope)})` : "–"]; }))}</div>`;
+    ${tableToggle("allTbl", ["", "Price", "Call", "Score", "30-day forecast", "Past record of this call"], order.map(k => { const it = S.items[k], r = it.record.same_call || {}; return [`${it.emoji} ${esc(it.label)}`, rs(nowPrice(k)) + esc(it.unit_short), esc(it.signal.label), scoreTxt(it.signal.score), it.forecast30 ? rs(it.forecast30.price) : "–", r.days ? `${r.days} days, rose ${r.rose_pct}% of the time (${esc(r.scope)})` : "–"]; }))}</div>`;
   const ser = [];
   for (const k of order) {
     const a = D[k];
@@ -1037,7 +1123,7 @@ function header() {
     const k = el.dataset.k, it = S.items[k];
     el.textContent = it ? `${rs(nowPrice(k))}` : "";
     el.className = "px " + (it ? it.signal.key : "");
-    el.title = it ? `${it.signal.label} · score ${signed(it.signal.score)}` : "";
+    el.title = it ? `${it.signal.label} · score ${scoreTxt(it.signal.score)}` : "";
   });
 }
 
@@ -1104,7 +1190,7 @@ async function boot() {
     const url = location.href;
     const text = C === "all"
       ? "Dharalu today: " + S.order.map(k => `${S.items[k].emoji} ${S.items[k].label} ${S.items[k].signal.label} ${rs(nowPrice(k))}${S.items[k].unit_short}`).join(" · ")
-      : `Dharalu ${A.emoji} ${A.label} ${A.asof}: ${A.signal.label} (${A.signal.telugu}) - score ${A.signal.score}. ${rs(C === "wheat" ? A.benchmark.price : nowPrice(C))}${A.unit_short}.`;
+      : `Dharalu ${A.emoji} ${A.label} ${A.asof}: ${A.signal.label} (${A.signal.telugu}) - score ${scoreTxt(A.signal.score)}. ${A.signal.plain ? A.signal.plain + " " : ""}${rs(C === "wheat" ? A.benchmark.price : nowPrice(C))}${A.unit_short}.`;
     if (navigator.share) { try { await navigator.share({ title: "Dharalu", text, url }); } catch { } }
     else { await navigator.clipboard.writeText(text + " " + url); alert("Copied - paste it in WhatsApp."); }
   };

@@ -34,19 +34,30 @@ For each one it tells you **when to buy, when to hold and when to sell**, and sh
 | Call | Score | If you are buying | If you are holding |
 |---|---|---|---|
 | 🟢 **STRONG BUY** | +3 or more | Good time to buy - in 2-3 parts | Hold - prices likely to rise |
-| 🟢 **BUY** | +1 / +2 | Buy gradually, in parts | Hold - don't rush to sell |
-| 🟠 **HOLD** | 0, outlook up | Don't add at today's price | **Keep it** - the outlook beats your holding cost |
-| ⚪ **WAIT** | 0 | Buy only what you need now | No clear edge - sell only if you need cash |
-| 🔴 **SELL** | −1 / −2 | Avoid stocking - wait for a dip | Sell gradually / book part profit |
+| 🟢 **BUY** | +1 up to +3 | Buy gradually, in parts | Hold - don't rush to sell |
+| 🟠 **HOLD** | between −1 and +1, outlook up | Don't add at today's price | **Keep it** - the outlook beats your holding cost |
+| ⚪ **WAIT** | between −1 and +1 | Buy only what you need now | No clear edge - sell only if you need cash |
+| 🔴 **SELL** | −1 down to −3 | Avoid stocking - wait for a dip | Sell gradually / book part profit |
 | 🔴 **STRONG SELL** | −3 or less | Do not buy now | Sell / book profit now |
 
-**HOLD vs WAIT:** both have a total score of 0. It is HOLD when the two forward-looking rules (the 30-day forecast and the season) still point up: today's price is no bargain, but it should rise from here, so keep what you have.
+**HOLD vs WAIT:** both have a score between −1 and +1. It is HOLD when the two forward-looking rules (the 30-day forecast and the season) still point up: today's price is no bargain, but it should rise from here, so keep what you have.
+
+Since 2.2 the score can be fractional (e.g. +1.5), because each rule's points are multiplied by a weight it earned (below).
+
+**Every call comes with:**
+- **One plain line**: why, in English and తెలుగు, e.g. *"Mainly because the 30-day forecast doesn't beat the holding cost and prices have been falling for weeks."*
+- **What would change it**: the prices at which the call would turn, e.g. *"Turns WAIT if the price falls to ₹1,17,670 (−11.8%)."*
+- **Its record**: how often past days with this call were right, next to how often *any* day was, e.g. *"Past SELL days (1047 since 2017): lower 30 days later on 44% vs 38% of all days → edge +5 points."*
+- **Confidence** that this record can cap: a call whose past days barely beat any day can't be High.
+- **What changed** since the previous prices day: which rules moved, and whether the call changed.
+- For gold, silver and platinum, a **Saving for years** view (ADD / STEADY / GO SLOW) for money you'll keep for a year or more.
+- A four-line **briefing**: the call and advice, why, what would change it, how sure.
 
 **Holding cost** is what holding costs you for 30 days. For wheat that's interest, godown rent and losses. For metals it's the bank interest the money would have earned.
 
 ## How a call is made - and proved
 
-Each rule adds or removes points. The dashboard shows each rule's **actual number, source and threshold**, so you can check it yourself.
+Each rule gives points. The dashboard shows each rule's **actual number, source and threshold**, so you can check it yourself.
 
 | Rule | Wheat | Gold / silver / platinum |
 |---|---|---|
@@ -61,9 +72,21 @@ Each rule adds or removes points. The dashboard shows each rule's **actual numbe
 | **MSP floor**: price within 4% of MSP | +1 | - |
 | **FCI OMSS ceiling**: price at or above the reserve price | −1 | - |
 
+**Weights (since 2.2).** A rule's points are multiplied by a weight from its own record: on every past day it said "up" or "down", was it right more often than the usual rate?
+- Edge of 10+ points over the usual rate (with 120+ votes) counts double (×2).
+- Edge of 3+ points counts ×1, 0 to 3 points counts ×½, and a rule that did worse than guessing counts ×0.
+- Fewer than 60 votes: ×1, since that's too few to judge.
+
+The weights are learned walk-forward: each day only uses past days whose 30-day result was already known. So the replay below is still a fair test.
+
+**Trend cap.** The forecast, the trend and the long trend all read the same recent direction, so together they count at most ±2. Without the cap, one trend got counted two or three times.
+
+**Hold for two checks.** Live metal prices move every few minutes. A new metal call is shown only once it has held for two checks in a row; until then the old call stays, with a ⏳ note.
+
 **Proof it works:**
 
 - **Replay.** Every past day is re-run using only the data known on that day. The track record shows what the price did 30 days after each kind of call: last year, and the whole history (wheat since 2016, metals about 10 years).
+- **Weighted vs equal.** The *Agent track record* tab replays the history twice, with learned weights and with every rule counting the same, so you can see which did better for each commodity.
 - **Live record.** Every real call is saved in `data/signals_log.csv` (wheat) or `data/signals_<metal>.csv`, and graded automatically 30 days later.
 
 How it all works in detail: [guide/HOW_IT_WORKS.md](guide/HOW_IT_WORKS.md).

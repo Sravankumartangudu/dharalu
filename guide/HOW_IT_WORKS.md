@@ -59,7 +59,15 @@ That percentile range becomes the **likely range** on the dashboard, widened for
 
 The parts add up to the expected move (in log terms, so the % may differ by a rounding hair). The biggest part is named as the main reason. Next to it the agent shows how far to trust the forecast (backtest error vs "no change", direction hit-rate), how many points it gives in today's call, and what it can't see: for wheat a new MSP, OMSS sales, the harvest size or export/stock rules; for metals US rates, war or crisis news, central-bank buying or a Budget duty change.
 
-**Confidence** starts from the size of the score: ±0-1 is Low, ±2-3 Medium, ±4 or more High. It drops one level when there's less than 120 days of history, or when the 30-day direction hit-rate is below 55%.
+**Confidence** is set in three steps:
+1. **Size of the score:** below ±1.5 is Low, below ±3.5 Medium, otherwise High.
+2. **One level down** when there's less than 120 days of history, or when the forecast's 30-day direction hit-rate is below 55%.
+3. **Capped by the call's own record:** past days with this call (buy, hold, wait or sell) must have been right clearly more often than any day.
+   - An edge of 10+ points allows High.
+   - 3 to 10 points allows at most Medium.
+   - Under 3 points, or fewer than 30 such days, means Low.
+
+The dashboard lists the reasons under *Why … confidence*.
 
 ## 6. The score
 
@@ -75,19 +83,43 @@ The parts add up to the expected move (in log terms, so the % may differ by a ro
 
 **Holding cost** for 30 days = interest + godown rent + storage loss (from `config.json`), as a % of the price.
 
+**Weights (since 2.2).** The points above are multiplied by a weight from each rule's own record. Counted points = points × weight, and the score is the sum of the counted points.
+- **The record:** on every past day the rule said "up" or "down", was the price higher or lower 30 days later?
+- **The usual rate:** how often a blind guess in that direction would have been right on all known days.
+- **The weight**, from the edge (right % minus the usual rate):
+
+| Rule's record | Weight |
+|---|---|
+| fewer than 60 votes | ×1 (too few to judge) |
+| edge ≥ 10 points, with ≥ 120 votes | ×2 |
+| edge ≥ 3 points | ×1 |
+| edge 0 to 3 points | ×½ |
+| edge below 0 (worse than guessing) | ×0, not counted |
+
+The weights are **walk-forward**: on each replayed day only the past days whose 30-day result was already known are used (`RuleBook` in `analyze.py`). Each commodity learns its own weights.
+
+**Trend cap.** "30-day forecast vs holding cost", "Trend", "Trend (weeks)" and "Long trend (months)" all read the recent direction. Together they count at most ±2 (`TREND_CAP`), scaled down evenly. Without the cap, one trend was counted two or three times.
+
 **Score → call:**
 | Score | Call |
 |---|---|
 | ≥ +3 | STRONG BUY |
-| +1 / +2 | BUY |
-| 0, and the forecast + season rules add up to more than 0 | **HOLD** |
-| 0, otherwise | WAIT |
-| −1 / −2 | SELL |
+| +1 up to +3 | BUY |
+| between −1 and +1, and the forecast + season rules add up to more than 0 | **HOLD** |
+| between −1 and +1, otherwise | WAIT |
+| −1 down to −3 | SELL |
 | ≤ −3 | STRONG SELL |
 
-**Why HOLD is split from WAIT:** a 0 can mean "nothing is happening". It can also mean "the price is high today (the price-level and trend rules are negative) but the outlook is still up (forecast and season are positive)". For someone holding stock those are different situations.
+**Why HOLD is split from WAIT:** a score near 0 can mean "nothing is happening". It can also mean "the price is high today (the price-level and trend rules are negative) but the outlook is still up (forecast and season are positive)". For someone holding stock those are different situations.
 
-In the replay since 2016, HOLD days (38 of them) averaged a +1.0% move in 30 days and beat the holding cost 42% of the time. WAIT days averaged +0.4% (36%) and SELL days −0.5% (33%).
+**With each call** (`decide()` in `analyze.py`):
+- **Plain reason:** the one or two rules that counted most for the call, plus the strongest one against it, in English and తెలుగు.
+- **What would change it:** the agent re-scores the day with the price moved up and down in 0.25% steps (up to 15%), re-making the forecast each time. The first price where the call changes is the trigger. "Stays SELL even if it rises 15%" means no trigger was found.
+- **Its record:** past days with this call, right % vs the usual rate for any day (the edge), and the average move.
+- **What changed:** the rules whose counted points moved since the previous prices day's final call, and whether the call changed.
+- **Equal-weights call:** what the call would be if every rule counted the same, for comparison.
+
+**Hold for two checks (metals).** The live price wiggles every 5 minutes, so near a boundary the call could flip back and forth. A new call is shown only when it has held for 2 checks in a row (`HOLD_CHECKS` in `run.py`). Until then the old call stays, with a ⏳ note saying what the score says now.
 
 ## 7. Track record - no peeking
 
@@ -98,6 +130,17 @@ The replay re-runs the rules on every past day using **only what was known on th
 - OMSS only after it started.
 
 It then checks the price 30 days later. Results are shown for the last year and for the whole history.
+
+The replay runs twice, with learned weights and with every rule counting the same, and the *Agent track record* tab shows both side by side. Results since the start of each history (edge = points better than any day):
+
+| | Weighted BUY | Equal BUY | Weighted HOLD | Equal HOLD | Weighted SELL | Equal SELL |
+|---|---|---|---|---|---|---|
+| Wheat | +8.1 (1412 days) | +5.5 | +10.9 (192) | −1.7 (37) | +11.2 (985) | +7.3 |
+| Gold | **−3.3** (438) | +2.4 | +17.3 (323) | +11.4 (33) | +5.3 (1047) | +3.6 |
+| Silver | +11.3 (935) | +0.3 | −31.8 (13) | −18.9 (50) | +14.2 (761) | +0.7 |
+| Platinum | +16.7 (540) | −2.5 | −16.3 (71) | +8.6 (83) | +7.4 (850) | 0 |
+
+Weights helped most calls. They made two things worse: **gold BUY** (gold rose on most days anyway, so a BUY call barely beat any day) and **platinum HOLD**. Silver HOLD is rare and has always been weak. Read the tab, not just the call.
 
 The same replay also records each day's 30-day forecast. The *Timeline* tab draws it as the "predicted 30 days earlier" line next to the real price, up to today.
 
@@ -145,7 +188,23 @@ Gold per 10 g, silver per kg, platinum per 10 g. GST is shown separately ("with 
 | Rupee: US$/₹ change over 30 days | +1 at ≥ +1% (rupee weaker), −1 at ≤ −1% |
 | Silver only: gold/silver ratio | +1 at ≥ 85 (silver cheap vs gold), −1 at ≤ 65 |
 
-The score → call table is the same as wheat's, including HOLD.
+The weights, the trend cap and the score → call table are the same as wheat's, including HOLD.
+
+**Saving for years (1 year or more).** Gold, silver and platinum also get a long-term view (`long_view()` in `metals.py`), graded on the price **1 year later**:
+
+| Rule | Points |
+|---|---|
+| Price vs its 3-year average | +1 at or below the average, −1 at 30%+ above |
+| Change over 12 months | +1 after a 10%+ fall, −1 after a 30%+ rise |
+| Long trend (200 days) | +1 above, −1 below |
+
+A rule only counts if its own record agrees: on days it said +1 (or −1), the next year must have been better (or worse) than for any day, with at least 100 such days. Otherwise it shows as "Not counted (its record disagrees)".
+
+For gold, for example, "far above the 3-year average" was followed by +32% a year later, against +24% on any day. So that rule is shown but not counted.
+
+The total gives **ADD** (≥ +1: a good time to add to long-term savings), **STEADY** (keep the regular buys) or **GO SLOW** (≤ −1: keep the small regular buys, avoid one big purchase). It also shows the past record of each view and the 5- and 10-year growth per year.
+
+This record covers only about 6 years of 1-year results, which overlap, and the rules were switched on or off using the same years. Treat it as a guide, not proof.
 
 **Live prices between runs:** the dashboard and the Mac app fetch gold-api.com themselves every 5 minutes, and convert with the agent's own factor (₹ rate × duty ÷ ounce). A live price more than 15% away from the agent's price is ignored as a bad tick. Only the agent changes the call.
 
@@ -153,7 +212,7 @@ The score → call table is the same as wheat's, including HOLD.
 
 
 - **Briefing** (`briefing.py`), one per commodity:
-  - A rule-based English + Telugu note is always made.
+  - A rule-based English + Telugu note is always made. It opens with four lines: the call and advice, *Why*, *What would change it*, *How sure*. Then come the price, the cheapest source (wheat) or *Saving for years* (metals), and the season.
   - With `ANTHROPIC_API_KEY`, Claude (`claude-opus-5-5`) also writes a trader's note from the same JSON. It is told to use only those numbers. If it fails, the rule-based note is used.
 - **Alerts** (`notify.py`), per commodity: Telegram is sent on a call change, a big daily move (wheat 2.5%, gold 2%, silver and platinum 3%), the weekly summary, and the first run. A metal's new call must hold for two checks in a row before it alerts. The alert state is only saved once a message is really sent, so a failed send is retried on the next run.
 

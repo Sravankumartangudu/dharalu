@@ -78,11 +78,21 @@ enum Settings {
 // MARK: - The agent's output (docs/data/summary.json)
 
 struct Summary: Decodable {
-    struct Evidence: Decodable { let rule: String; let value: String; let test: String; let points: Int; let source: String; let why: String? }
-    struct Signal: Decodable {
-        let score: Int; let max_score: Int; let confidence: String; let key: String
-        let label: String; let telugu: String; let buyer: String; let holder: String
+    /// Since 2.2 each rule's points are multiplied by a weight learned from its own record,
+    /// so the counted points and the score can be fractional.
+    struct Evidence: Decodable {
+        let rule: String; let value: String; let test: String; let points: Double; let source: String; let why: String?
+        let weight: Double?; let counted: Double?
     }
+    struct Equal: Decodable { let score: Double; let key: String; let label: String }
+    struct Signal: Decodable {
+        let score: Double; let max_score: Double; let confidence: String; let key: String
+        let label: String; let telugu: String; let buyer: String; let holder: String
+        let plain: String?; let record_line: String?; let change_line: String?; let confidence_why: [String]?
+        let trend_cap: String?; let pending: String?; let equal: Equal?
+    }
+    struct Changes: Decodable { let since: String; let label_was: String?; let call_changed: Bool? }
+    struct LongTerm: Decodable { let key: String; let label: String; let telugu: String?; let advice: String; let why: String?; let record_line: String? }
     struct Point: Decodable { let date: String; let price: Double; let low: Double; let high: Double }
     struct Group: Decodable { let scope: String?; let days: Int; let avg_move_pct: Double; let rose_pct: Double; let beat_holding_cost_pct: Double? }
     struct Record: Decodable { let same_call: Group?; let live_right_pct: Double?; let live_graded: Int? }
@@ -101,6 +111,8 @@ struct Summary: Decodable {
         /// Why the forecast says what it says (summary + its biggest part).
         let forecast_why: ForecastWhy?
         let record: Record?
+        let changes: Changes?
+        let long_term: LongTerm?
         let briefing: Briefing
         let timing: Timing?
         let carrying_cost_30d_pct: Double?
@@ -151,7 +163,12 @@ func pc(_ v: Double?) -> String {
     return String(format: "%@%.1f%%", v > 0 ? "+" : "", v)
 }
 
-func signed(_ n: Int) -> String { n > 0 ? "+\(n)" : n < 0 ? "−\(-n)" : "0" }
+func signed(_ n: Double) -> String {
+    let r = (n * 10).rounded() / 10
+    let t = r == r.rounded() ? String(Int(abs(r))) : String(format: "%.1f", abs(r))
+    return r > 0 ? "+" + t : r < 0 ? "−" + t : "0"
+}
+func plainNum(_ n: Double) -> String { signed(n).replacingOccurrences(of: "+", with: "") }
 
 func prettyDate(_ iso: String) -> String {
     let p = DateFormatter(); p.dateFormat = "yyyy-MM-dd"
@@ -334,7 +351,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
             if let prev = Settings.lastSignal(k), prev != sig.key {
                 post(id: "signal-\(k)-\(it.asof)-\(sig.key)", key: k,
                      title: "Dharalu: \(it.emoji) \(it.label) now \(sig.label) · \(sig.telugu)",
-                     body: "Was \(prev.replacingOccurrences(of: "_", with: " ")). Score \(signed(sig.score)) of ±\(sig.max_score), confidence \(sig.confidence). If buying: \(sig.buyer) If holding: \(sig.holder)")
+                     body: "Was \(prev.replacingOccurrences(of: "_", with: " ")). Score \(signed(sig.score)) of ±\(plainNum(sig.max_score)), confidence \(sig.confidence). \(sig.plain.map { $0 + " " } ?? "")If buying: \(sig.buyer) If holding: \(sig.holder)")
             }
             let limit = it.move_alert_pct ?? 2.5
             let move = liveMove(it) ?? it.chg_1d
@@ -423,13 +440,24 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         let head = NSMenuItem()
         let t = NSMutableAttributedString(string: "\(it.emoji) \(it.label)\(it.telugu_name.map { " · \($0)" } ?? "") - \(s.label) · \(s.telugu)\n",
                                           attributes: [.font: NSFont.boldSystemFont(ofSize: 15), .foregroundColor: signalColor(s.key)])
-        t.append(NSAttributedString(string: "Score \(signed(s.score)) of ±\(s.max_score) · confidence \(s.confidence) · \(prettyDate(it.asof))",
+        t.append(NSAttributedString(string: "Score \(signed(s.score)) of ±\(plainNum(s.max_score)) · confidence \(s.confidence) · \(prettyDate(it.asof))",
                                     attributes: [.font: NSFont.menuFont(ofSize: 12), .foregroundColor: NSColor.secondaryLabelColor]))
         head.attributedTitle = t
         head.isEnabled = false
         menu.addItem(head)
+        if let p = s.plain { menu.addItem(info(wrap(p, 70))) }
+        if let p = s.pending { menu.addItem(info(wrap("⏳ " + p, 70))) }
         menu.addItem(info(wrap("If buying: \(s.buyer)")))
         menu.addItem(info(wrap("If holding: \(s.holder)")))
+        if let c = s.change_line { menu.addItem(info(wrap("🎯 " + rupee(c), 70))) }
+        if let r = s.record_line { menu.addItem(info(wrap("📊 " + r, 70))) }
+        if let w = s.confidence_why, !w.isEmpty { menu.addItem(info(wrap("🤔 \(s.confidence) confidence: " + w.joined(separator: " · "), 70))) }
+        if let c = it.changes, c.call_changed == true, let was = c.label_was {
+            menu.addItem(info("🔄 Was \(was) on \(prettyDate(c.since))"))
+        }
+        if let l = it.long_term {
+            menu.addItem(info(wrap("📅 Saving for years: \(l.label) - \(l.advice)", 70)))
+        }
         menu.addItem(.separator())
 
         if let l = live[it.key] {
@@ -455,9 +483,11 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         let pm = NSMenu()
         for e in it.evidence {
             let row = NSMenuItem()
-            let a = NSMutableAttributedString(string: "\(signed(e.points))   \(e.rule)\n",
+            let c = e.counted ?? e.points
+            let w = e.weight.map { " ×\(plainNum($0)) = \(signed(c))" } ?? ""
+            let a = NSMutableAttributedString(string: "\(signed(e.points))\(w)   \(e.rule)\n",
                                               attributes: [.font: NSFont.boldSystemFont(ofSize: 13),
-                                                           .foregroundColor: e.points > 0 ? signalColor("BUY") : e.points < 0 ? signalColor("SELL") : NSColor.labelColor])
+                                                           .foregroundColor: c > 0 ? signalColor("BUY") : c < 0 ? signalColor("SELL") : NSColor.labelColor])
             a.append(NSAttributedString(string: wrap(rupee(e.value), 70) + "\n",
                                         attributes: [.font: NSFont.menuFont(ofSize: 12), .foregroundColor: NSColor.labelColor]))
             a.append(NSAttributedString(string: wrap("Test: \(e.test)", 80) + "\n" + wrap("Source: \(e.source)", 80),
@@ -468,7 +498,10 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
             pm.addItem(row)
         }
         pm.addItem(.separator())
-        pm.addItem(info("Total score \(signed(s.score)) → \(s.label)   (≥+3 strong buy · +1/+2 buy · 0 hold/wait · −1/−2 sell · ≤−3 strong sell)"))
+        if let cap = s.trend_cap { pm.addItem(info(wrap("🧢 " + cap, 80))) }
+        pm.addItem(info("Total score \(signed(s.score)) → \(s.label)   (≥+3 strong buy · +1 to +3 buy · between −1 and +1 hold/wait · −1 to −3 sell · ≤−3 strong sell)"))
+        pm.addItem(info("Points × weight (learned from each rule's own record) = counted"))
+        if let q = s.equal, q.key != s.key { pm.addItem(info("Every rule counting the same would say \(q.label) (\(signed(q.score)))")) }
         proof.submenu = pm
         menu.addItem(proof)
 

@@ -1,5 +1,40 @@
 # Changelog
 
+## 2.2.0 - 20 Oct 2026
+
+**Easier to read, and the rules now earn their say.** All ten suggestions from the review.
+
+**Reading a call**
+- **One plain line** under the call, in English and తెలుగు: why, mainly, plus the strongest reason against it.
+- **🎯 What would change it:** the prices where the call would turn. The agent re-scores the day with the price moved in 0.25% steps up to 15%, re-making the forecast each time. Example: *Turns WAIT if the price falls to ₹1,17,670 (−11.8%)*.
+- **📊 Its record:** past days with this call vs any day. Example: *Past SELL days (1047 since 2017): lower 30 days later on 44% vs 38% of all days → edge +5 points*.
+- **🔄 What changed since <date>:** on a new prices day, the rules that moved and whether the call changed.
+- **Four-line briefing:** the call and advice, *Why*, *What would change it*, *How sure*. Then the details. The Claude briefing is asked for the same four lines, and never to give a ×0 rule as a reason.
+- **📅 Saving for years** (gold, silver, platinum): ADD / STEADY / GO SLOW for money kept 1 year or more. It uses three long-run rules graded on the price 1 year later; a rule only counts if its own record agrees. It shows its record and the 5- and 10-year growth. Today all three metals say GO SLOW. Gold's "far above the 3-year average" rule is shown but not counted, because a year later such days were *higher* than usual (+32% vs +24%). About 6 overlapping years of results, so a guide, not proof.
+
+**How the call is made**
+- **Learned weights per commodity.** Each rule's points × a weight from its own record: ×2, ×1, ×½, or ×0 for a rule worse than guessing. They are learned walk-forward, so the replay still never peeks. Scores can now be fractional, and the calls are bands (+1 up to +3 = BUY, between −1 and +1 = HOLD/WAIT…).
+- **Trend cap:** the forecast, trend and long-trend rules together count at most ±2. They read the same direction and were being counted two or three times.
+- **Confidence** is now also capped by the call's own record. An edge of 10+ points allows High, 3–10 allows Medium, less than that means Low.
+- **Hold for two checks** (metals): a new call is shown only after 2 checks in a row (5 minutes apart). Until then a ⏳ note says what the score says now.
+
+**Before → after** (whole-history replay; edge = points better than any day):
+
+| | BUY | HOLD | SELL |
+|---|---|---|---|
+| Wheat | +5.5 → **+8.1** | −1.7 → **+10.9** | +7.3 → **+11.2** |
+| Gold | +2.4 → **−3.3** (worse) | +11.4 → **+17.3** | +3.6 → **+5.3** |
+| Silver | +0.3 → **+11.3** | −18.9 → −31.8 (13 days) | +0.7 → **+14.2** |
+| Platinum | −2.5 → **+16.7** | +8.6 → **−16.3** (worse) | 0 → **+7.4** |
+
+Weights helped most calls. Gold BUY and platinum HOLD got worse, and silver HOLD is rare and weak. The *Agent track record* tab shows both ways side by side, plus each rule's own record.
+
+Today's calls under 2.2 vs the old equal weights: gold SELL (was STRONG SELL), silver BUY (was SELL), platinum BUY (was SELL), wheat BUY.
+
+**Dashboard:** a score gauge in place of the integer bar. The proof table gains *Weight* and *Counted* columns and a trend-cap note. Also new: the changes card, the *Saving for years* box, the weighted-vs-equal and rule-record tables, and the plain line / trigger on each overview card.
+
+**Mac app 2.2.0:** fractional scores. The menu adds the plain line, 🎯 trigger, 📊 record, 🤔 confidence reasons, 🔄 previous call and 📅 *Saving for years*. The proof shows *points ×weight = counted*.
+
 ## 2.1.0 - 20 Oct 2026
 
 **🔮 Why the forecast says this.** Every forecast now comes with its reason.

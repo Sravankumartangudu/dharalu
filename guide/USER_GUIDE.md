@@ -33,7 +33,15 @@ The top row picks the commodity: **All**, 🌾 **Wheat**, 🥇 **Gold**, 🥈 **
 | **WAIT** | No clear edge either way. Buy only what you need; sell only if you need cash |
 | **SELL / STRONG SELL** | Prices look set to soften. Sell in parts / book profit; don't stock up |
 
-Each call gives two pieces of advice, because the right move depends on your position: **if you are buying** and **if you are holding**. Confidence (Low / Medium / High) depends on how strong the score is. It drops a level when there's less than 4 months of history, or when the forecast's 30-day direction has been right less than 55% of the time.
+Each call gives two pieces of advice, because the right move depends on your position: **if you are buying** and **if you are holding**. Confidence (Low / Medium / High) depends on how strong the score is. It drops a level when there's less than 4 months of history, or when the forecast's 30-day direction has been right less than 55% of the time. Since 2.2 it is also capped by the call's own record: if past days with this call were barely more right than any day, confidence stays Low.
+
+**Reading a call in 30 seconds** (Today tab, top right):
+1. **The plain line**: why, in one sentence.
+2. **🎯 What would change it**: e.g. *Turns WAIT if the price falls to ₹1,17,670 (−11.8%)*. A trigger that is far away means a settled call; a trigger 1–2% away means it could flip soon.
+3. **📊 Its record**: past days with this call vs any day. *Edge +5 points* means a SELL was right 5 points more often than guessing "lower" on any day. Near 0 means the call adds little.
+4. **🤔 Why … confidence**: the reasons for Low / Medium / High.
+5. **⚖️ Without learned weights** (shown when it differs): the call if every rule counted the same.
+6. **⏳** (metals, sometimes): the score has just crossed into a new call. It switches only if the next check agrees.
 
 **Holding cost** - wheat: interest + godown rent + losses. Metals: the bank interest (fixed deposit) the money would have earned.
 
@@ -45,14 +53,19 @@ Each call gives two pieces of advice, because the right move depends on your pos
 ## Tabs
 
 ### Today · ఈరోజు
-- **The call**, with the score bar, confidence, and date of the latest prices.
+- **The call**, with the score gauge (the middle is 0; the ticks are the ±1 and ±3 call bands), confidence, and date of the latest prices.
+- **The plain line, what would change it, its record, why this confidence**: see *Reading a call in 30 seconds* above.
+- **🔄 What changed since <date>**: shown on a new prices day. Which rules moved (counted points then → now) and whether the call changed.
+- **Saving for years** (metals): ADD / STEADY / GO SLOW for money you'll keep a year or more, its reason, its 1-year record, and the 5- and 10-year growth. Open *The long-term rules and their record* for each rule and whether it counts.
 - **Briefing** in English / తెలుగు. "Briefing by claude" means the AI wrote it; "by rules" means the built-in template did.
 - **Why this call - the proof.** One row per rule:
   - *What the data shows today*: the real number and its source.
   - *Test used*: the threshold.
   - *Points*: what the rule added or took away.
+  - *Weight*: earned from the rule's own past record (×2, ×1, ×½, or ×0 when it did worse than guessing). Hover it to see the record.
+  - *Counted*: points × weight. *trend cap* means the forecast and trend rules together hit the ±2 limit.
 
-  Add up the points and you get the score.
+  Add up the counted points and you get the score.
 - **Has this worked before?** How often the same call was right in the replay. If the last year had fewer than 10 such days, it quotes the whole history.
 - **Key numbers** -
   - wheat: benchmark price and changes, 30-day forecast, cheapest landed source, MSP, your margin, holding cost;
@@ -105,6 +118,8 @@ Each commodity has its own list.
 ### Agent track record
 - **Last year:** every day re-run with only the data known that day. The table shows the average price move 30 days later after each call, how often the price rose, and how often the rise beat the holding cost.
 - **Whole history:** the same replay over every day there's data for.
+- **Learned weights vs every rule counting the same:** the replay done both ways, with days, right % and **edge** (points better than any day) for each kind of call. Above 0 = the call adds something.
+- **Each rule's own record:** every rule's votes, how often it was right vs the usual rate, and today's weight.
 - **Chart:** the price with the call strip underneath.
 - **Live calls:** the agent's real calls, graded 30 days later.
   - BUY and HOLD are right if the price rose.

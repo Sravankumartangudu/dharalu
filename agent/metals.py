@@ -300,6 +300,137 @@ def weekly(series):
     return [{"date": k, "price": round(v)} for k, v in sorted(out.values())]
 
 
+# --------------------------------------------------------------------------- the long run (1 year +)
+LONG_CALLS = {  # key: (label, Telugu label, advice, Telugu advice)
+    "ADD": ("ADD FOR THE LONG RUN", "దీర్ఘకాలానికి కొనండి",
+            "A good time to add for the long run - still buy in 2-3 parts.",
+            "దీర్ఘకాలానికి కొనడానికి మంచి సమయం - అయినా 2-3 భాగాలుగా కొనండి."),
+    "STEADY": ("BUY STEADILY", "క్రమంగా కొనండి",
+               "Keep buying a small fixed amount regularly (say every month); don't try to time it.",
+               "ప్రతి నెలా కొద్ది మొత్తం క్రమంగా కొంటూ ఉండండి; సరైన సమయం కోసం ఎదురుచూడకండి."),
+    "GO_SLOW": ("GO SLOW", "నెమ్మదిగా కొనండి",
+                "The long-run signs are weak right now: keep the small regular buys, but avoid one big purchase now.",
+                "దీర్ఘకాల సంకేతాలు ఇప్పుడు బలహీనంగా ఉన్నాయి: చిన్న క్రమమైన కొనుగోళ్లు కొనసాగించండి, ఇప్పుడు ఒకేసారి పెద్ద మొత్తం కొనకండి."),
+}
+LONG_PLAIN = {  # rule -> (+1 phrase, -1 phrase), each (English, Telugu)
+    "Price vs 3-year average": (("it is at or below its 3-year average", "ధర 3 ఏళ్ల సగటు కంటే తక్కువగా ఉంది"),
+                                ("it is far above its 3-year average", "ధర 3 ఏళ్ల సగటు కంటే చాలా ఎక్కువగా ఉంది")),
+    "Change over 12 months": (("it fell a lot in the past year", "గత ఏడాదిలో బాగా పడిపోయింది"),
+                              ("it rose very fast in the past year", "గత ఏడాదిలో చాలా వేగంగా పెరిగింది")),
+    "Long trend (200 days)": (("the long wave is up (above the 200-day average)", "దీర్ఘకాల ధోరణి పైకి ఉంది (200 రోజుల సగటు పైన)"),
+                              ("the long wave is down (below the 200-day average)", "దీర్ఘకాల ధోరణి కిందికి ఉంది (200 రోజుల సగటు కింద)")),
+}
+Y3 = 3 * 365
+LONG_MIN = 100  # days on one side of a long-term rule before its record can switch it off
+
+
+def long_key(score):
+    return "ADD" if score >= 1 else "GO_SLOW" if score <= -1 else "STEADY"
+
+
+def long_view(cal, trading):
+    """For someone saving for years (a daughter's wedding, a pension), not trading a month:
+    three simple, fixed rules, checked against what the price did ONE YEAR later.
+    The thresholds were set by hand, not fitted, and years overlap, so the record is
+    a guide (about one independent result per year), not proof."""
+    n = len(cal)
+    vals = [p for _, p in cal]
+    pre = [0.0]
+    for v in vals:
+        pre.append(pre[-1] + (v or 0))
+    avg = lambda a, b: (pre[b] - pre[a]) / (b - a)
+
+    def rules(t):
+        if t < Y3 or not vals[t] or not vals[t - 365]:
+            return None
+        price, a3, a200 = vals[t], avg(t - Y3 + 1, t + 1), avg(t - 279, t + 1)
+        g3, ch = az.pct(price, a3), az.pct(price, vals[t - 365])
+        return [
+            {"rule": "Price vs 3-year average", "value": "%s vs 3-year average %s (%+.0f%%)" % (inr(price), inr(a3), g3),
+             "test": "at or below the average: +1 (cheap for the long run) | 30%+ above: -1 (far above)",
+             "points": 1 if g3 <= 0 else -1 if g3 >= 30 else 0},
+            {"rule": "Change over 12 months", "value": "%+.0f%% in a year (from %s)" % (ch, inr(vals[t - 365])),
+             "test": "fell 10%+: +1 | rose 30%+: -1 (a fast run-up often cools)",
+             "points": 1 if ch <= -10 else -1 if ch >= 30 else 0},
+            {"rule": "Long trend (200 days)", "value": "%s vs 200-day average %s" % (inr(price), inr(a200)),
+             "test": "above: +1 (the long wave is up) | below: -1",
+             "points": 1 if price > a200 else -1},
+        ]
+
+    graded = []
+    for t in range(Y3, n - 365):
+        if cal[t][0].isoformat() not in trading or not vals[t + 365]:
+            continue
+        ev = rules(t)
+        if ev:
+            graded.append(({e["rule"]: e["points"] for e in ev}, az.pct(vals[t + 365], vals[t])))
+    ev = rules(n - 1)
+    if not ev or len(graded) < 200:
+        return None
+    all_avg = st.mean(mv for _v, mv in graded)
+    # A rule only counts when its own record agrees with it: on its +1 days the next year
+    # beat the usual year, on its -1 days it fell short. With under LONG_MIN days on a side
+    # there is no record yet and the rule counts as set.
+    for e in ev:
+        side = [mv for v, mv in graded if v[e["rule"]] == e["points"]] if e["points"] else []
+        up = [mv for v, mv in graded if v[e["rule"]] > 0]
+        dn = [mv for v, mv in graded if v[e["rule"]] < 0]
+        e["record"] = {"up_days": len(up), "up_avg_1y_pct": round(st.mean(up), 1) if up else None,
+                       "down_days": len(dn), "down_avg_1y_pct": round(st.mean(dn), 1) if dn else None}
+        if not e["points"]:
+            e["counts"], e["why"] = True, "not pointing either way today"
+        elif len(side) < LONG_MIN:
+            e["counts"], e["why"] = True, "only %d such days so far - counts as set" % len(side)
+        else:
+            gap = st.mean(side) - all_avg
+            e["counts"] = gap * e["points"] > 0
+            e["why"] = "on such days the next year was %+.0f%% vs %+.0f%% usually - %s" % (
+                st.mean(side), all_avg, "agrees, counts" if e["counts"] else "the record disagrees, NOT counted")
+        e["counted"] = e["points"] if e["counts"] else 0
+    side_ok = {}
+    for e in ev:
+        for p in (1, -1):
+            side = [mv for w, mv in graded if w[e["rule"]] == p]
+            side_ok[(e["rule"], p)] = len(side) < LONG_MIN or (st.mean(side) - all_avg) * p > 0
+    scored = [(sum(p for r, p in v.items() if p and side_ok[(r, p)]), mv) for v, mv in graded]
+    score = sum(e["counted"] for e in ev)
+    key = long_key(score)
+
+    def rec(sel):
+        g = [mv for sc, mv in scored if sel(sc)]
+        if not g:
+            return None
+        return {"days": len(g), "avg_1y_pct": round(st.mean(g), 1), "rose_pct": round(100.0 * sum(x > 0 for x in g) / len(g), 1)}
+    groups = {k: rec(lambda sc, k=k: long_key(sc) == k) for k in LONG_CALLS}
+    alld = rec(lambda sc: True)
+    cagr = {}
+    for yrs in (5, 10):
+        t0 = n - 1 - yrs * 365
+        if t0 >= 0 and vals[t0]:
+            cagr[str(yrs)] = round(((vals[-1] / vals[t0]) ** (1.0 / yrs) - 1) * 100, 1)
+    lab, te, adv, adv_te = LONG_CALLS[key]
+    g = groups.get(key)
+    line = None
+    if g and alld:
+        line = "Past %s days: 1 year later %+.0f%% on average (higher on %.0f%%) vs %+.0f%% for any day (higher on %.0f%%)." % (
+            lab, g["avg_1y_pct"], g["rose_pct"], alld["avg_1y_pct"], alld["rose_pct"])
+    span_y = round((n - 365 - Y3) / 365.0, 1)
+    live = [e for e in ev if e["counted"]]
+    say = lambda lang: (" and " if lang == 0 else " మరియు ").join(
+        LONG_PLAIN[e["rule"]][0 if e["counted"] > 0 else 1][lang] for e in live)
+    why = ("Because %s." % say(0)) if live else "No long-run rule points either way today."
+    why_te = ("కారణం: %s." % say(1)) if live else "ఈరోజు దీర్ఘకాల నియమాలేవీ ఏ వైపూ చూపడం లేదు."
+    off = [e["rule"] for e in ev if e["points"] and not e["counts"]]
+    if off:
+        why += " Not counted (its record disagrees): %s." % ", ".join(off)
+    return {"key": key, "label": lab, "telugu": te, "advice": adv, "advice_te": adv_te, "score": score,
+            "why": why, "why_te": why_te, "evidence": ev, "groups": groups, "all_days": alld, "record_line": line, "cagr_pct": cagr,
+            "years_graded": span_y,
+            "note": ("Graded on the price 1 year later over about %.0f years. Those years overlap (about one independent "
+                     "result per year), and the rules were switched on/off using the same years, so read it as a guide, "
+                     "not proof." % span_y)}
+
+
 # --------------------------------------------------------------------------- one metal
 def analyse(key, cfg, live):
     m = cfg["metals"][key]
@@ -334,9 +465,8 @@ def analyse(key, cfg, live):
     season_asof = az.SeasonAsOf(series, FLAT, detrend=True)
     bt = az.backtest(cal, season_asof)
     fc = az.forecast(cal, idx["index"], bt)
-    score, evidence, ind = scorer(cal, idx, m, fc, bt)
-    act = az.action_for(score, evidence, METAL_ACTIONS)
-    tr = az.track_record(cal, season_asof, m, bt, scorer=scorer, carry=carry, actions=METAL_ACTIONS, days=trading)
+    sig, tr, ind = az.decide(cal, idx, m, fc, bt, season_asof, scorer=scorer, carry=carry,
+                             actions=METAL_ACTIONS, days=trading, fmt=inr)
     price = ind["price"]
     gst = m["gst_pct"]
     return {
@@ -345,11 +475,11 @@ def analyse(key, cfg, live):
         "asof": cal[-1][0].isoformat(),
         "price": round(price), "price_with_gst": round(price * (1 + gst / 100.0)),
         "indicators": ind,
-        "signal": {"score": score, "confidence": az.confidence(score, bt, ind), **act,
-                   "evidence": evidence, "max_score": sum(e["max"] for e in evidence)},
+        "signal": sig,
+        "long_term": long_view(cal, trading),
         "forecast": fc,
         "forecast_points": {str(h): fc[h - 1] for h in (7, 14, 30) if len(fc) >= h},
-        "forecast_reason": az.forecast_reason(cal, idx, bt, fc, evidence, "metal"),
+        "forecast_reason": az.forecast_reason(cal, idx, bt, fc, sig["evidence"], "metal"),
         "backtest": {str(k): v for k, v in bt.items()},
         "seasonality": {"months": az.MONTHS, **idx, "index": [round(x, 4) for x in idx["index"]]},
         "timing": az.timing(idx, cal, series),
@@ -369,36 +499,28 @@ def analyse(key, cfg, live):
 
 
 def rule_brief(a):
+    """Four lines first - the call, why, what would change it, how sure - then the price."""
     s, ind = a["signal"], a["indicators"]
     f30 = (a.get("forecast_points") or {}).get("30")
-    for_ = [e for e in s["evidence"] if e["points"] > 0]
-    against = [e for e in s["evidence"] if e["points"] < 0]
     p = lambda v: "%+.1f%%" % v if v is not None else "n/a"
-    en = [
-        "%s %s - %s (score %+d of %d, confidence %s)" % (a["asof"], a["label"], s["label"], s["score"], s["max_score"], s["confidence"]),
-        "If buying: %s  If holding: %s" % (s["buyer"], s["holder"]),
-        "Price in India: %s %s (%s with %g%% GST); 7 days %s, 30 days %s. World price US$%s/oz, Rs %.2f per US$." % (
-            inr(a["price"]), a["unit"].replace("Rs ", ""), inr(a["price_with_gst"]), a["costs"]["gst_pct"],
-            p(ind["chg_7d"]), p(ind["chg_30d"]), format(a["world"]["usd_oz"], ",.2f"), a["world"]["usdinr"]),
-    ]
+    four, four_te = az.brief_lines(s)
+    en = ["%s %s - %s" % (a["asof"], a["label"], four[0])] + four[1:]
+    price = "Price: %s %s (%s with %g%% GST); 7 days %s, 30 days %s." % (
+        inr(a["price"]), a["unit"].replace("Rs ", ""), inr(a["price_with_gst"]), a["costs"]["gst_pct"],
+        p(ind["chg_7d"]), p(ind["chg_30d"]))
     if f30:
-        en.append("30-day outlook: %s (likely range %s - %s)." % (inr(f30["price"]), inr(f30["low"]), inr(f30["high"])))
-        fr = a.get("forecast_reason")
-        if fr:
-            en.append("Why: " + fr["summary"] + " " + "Parts: " + ", ".join("%s %+.1f%%" % (d["name"].lower(), d["pct"]) for d in fr["drivers"]) + ".")
-    if for_:
-        en.append("Reasons to buy: " + "; ".join("%s (%s)" % (e["rule"], e["value"]) for e in for_))
-    if against:
-        en.append("Reasons for caution: " + "; ".join("%s (%s)" % (e["rule"], e["value"]) for e in against))
-    conf = {"High": "ఎక్కువ", "Medium": "మధ్యస్థం", "Low": "తక్కువ"}[s["confidence"]]
+        price += " 30-day outlook %s (likely %s - %s)." % (inr(f30["price"]), inr(f30["low"]), inr(f30["high"]))
+    en.append(price)
+    lt = a.get("long_term")
+    if lt:
+        en.append("Saving for years: %s - %s %s" % (lt["label"], lt["advice"], lt["why"]))
     unit_te = "10 గ్రాములకు" if a["grams"] == 10 else "కిలోకు"
-    te = [
-        "%s %s - %s (స్కోరు %+d / %d, నమ్మకం %s)" % (a["asof"], a["telugu_name"], s["telugu"], s["score"], s["max_score"], conf),
-        "భారత ధర: %s %s (GST తో %s); 7 రోజుల్లో %s, 30 రోజుల్లో %s." % (
-            unit_te, inr(a["price"]), inr(a["price_with_gst"]), p(ind["chg_7d"]), p(ind["chg_30d"])),
-    ]
+    te = ["%s %s - %s" % (a["asof"], a["telugu_name"], four_te[0])] + four_te[1:]
+    tp = "ధర: %s %s (GST తో %s); 7 రోజుల్లో %s, 30 రోజుల్లో %s." % (
+        unit_te, inr(a["price"]), inr(a["price_with_gst"]), p(ind["chg_7d"]), p(ind["chg_30d"]))
     if f30:
-        te.append("30 రోజుల అంచనా: %s (%s - %s మధ్య)." % (inr(f30["price"]), inr(f30["low"]), inr(f30["high"])))
-        if a.get("forecast_reason"):
-            te.append(a["forecast_reason"]["telugu"])
+        tp += " 30 రోజుల అంచనా %s (%s - %s)." % (inr(f30["price"]), inr(f30["low"]), inr(f30["high"]))
+    te.append(tp)
+    if lt:
+        te.append("ఏళ్ల తరబడి దాచుకునేవారికి: %s - %s %s" % (lt["telugu"], lt["advice_te"], lt["why_te"]))
     return {"source": "rules", "english": "\n".join(en), "telugu": "\n".join(te)}

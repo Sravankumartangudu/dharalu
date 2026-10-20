@@ -356,7 +356,8 @@ def forecast_reason(cal, se, bt, fc, evidence=(), kind="wheat"):
             b["tests"], b["mape_pct"], b["naive_mape_pct"],
             "it adds a little value" if better else "it is NOT better than no-change here, so read it as a range, not a number",
             (" Direction right %.0f%% of the time." % b["direction_hit_pct"]) if b.get("direction_hit_pct") is not None else "")
-    in_call = next(({"rule": e["rule"], "points": e["points"], "max": e["max"]}
+    in_call = next(({"rule": e["rule"], "points": e["points"], "max": e["max"], "counted": counted(e),
+                     "weight": e.get("weight", 1.0)}
                     for e in evidence if e["rule"].startswith("30-day forecast")), None)
     te = "30 రోజుల్లో సుమారు %.1f%% %s. ప్రధాన కారణం: %s (%s)." % (
         abs(r["total_pct"]),
@@ -551,27 +552,374 @@ def score_signal(cal, idx, cfg, fc=None, bt=None):
     return score, ev, ind
 
 
+def counted(e):
+    """The points a rule really adds to the score (after its weight and the trend cap)."""
+    return e.get("counted", e["points"])
+
+
 def outlook_points(evidence):
     """Points from the forward-looking rules only (30-day forecast + season)."""
-    return sum(e["points"] for e in evidence if e.get("forward"))
+    return sum(counted(e) for e in evidence if e.get("forward"))
 
 
-def action_for(score, evidence=(), actions=ACTIONS):
-    hold = score == 0 and outlook_points(evidence) > 0
-    for mn, key, en, te, buy, hold_adv in actions:
-        if key == "HOLD" and not hold:
-            continue
-        if score >= mn:
-            return {"key": key, "label": en, "telugu": te, "buyer": buy, "holder": hold_adv}
+def action_key(score, evidence=()):
+    """Score -> call. Scores can be fractions now (rules are weighted), so the calls are bands:
+    >= 3 STRONG BUY | >= 1 BUY | between -1 and +1 HOLD or WAIT | > -3 SELL | else STRONG SELL."""
+    if score >= 3:
+        return "STRONG_BUY"
+    if score >= 1:
+        return "BUY"
+    if score > -1:
+        return "HOLD" if outlook_points(evidence) > 0 else "WAIT"
+    return "SELL" if score > -3 else "STRONG_SELL"
+
+
+def action_info(key, actions=ACTIONS):
+    for _mn, k, en, te, buy, hold_adv in actions:
+        if k == key:
+            return {"key": k, "label": en, "telugu": te, "buyer": buy, "holder": hold_adv}
     return None
 
 
-def confidence(score, bt, ind):
-    c = 1 if abs(score) <= 1 else 2 if abs(score) <= 3 else 3
+def action_for(score, evidence=(), actions=ACTIONS):
+    return action_info(action_key(score, evidence), actions)
+
+
+# --------------------------------------------------------------------------- weighing the rules
+# The rules don't all deserve the same vote. Each rule's weight comes from its OWN past
+# record - but only outcomes that were already known on the day (walk-forward), so a
+# rule can't look good by being graded on the days it was tuned on.
+TREND_FAMILY = ("30-day forecast vs holding cost", "Trend", "Trend (weeks)", "Long trend (months)")
+TREND_CAP = 2       # the forecast and the trend rules all read the same thing - the recent direction
+MIN_VOTES = 60      # fewer graded votes than this: the rule keeps weight 1 (not enough proof yet)
+BOLD_VOTES = 120    # weight 2 needs at least this many graded votes
+CALL_GROUP = {"STRONG_BUY": "buy", "BUY": "buy", "HOLD": "hold", "WAIT": "wait", "SELL": "sell", "STRONG_SELL": "sell"}
+GROUP_WORD = {"buy": "BUY", "hold": "HOLD", "wait": "WAIT", "sell": "SELL"}
+WAIT_BAND = 3.0     # a WAIT was right if the price moved less than this (%) in 30 days
+
+
+class RuleBook:
+    """Each rule's record so far: when it voted up (down), how often the price really
+    rose (fell) over the next 30 days - against how often it did on ANY day (the usual
+    rate). A rule is only useful if it beats the usual rate."""
+
+    def __init__(self):
+        self.r = {}
+        self.days = self.rose = self.fell = 0
+
+    def add(self, votes, move):
+        self.days += 1
+        self.rose += move > 0
+        self.fell += move < 0
+        for rule, p in votes:
+            s = self.r.setdefault(rule, [0, 0, 0, 0])  # up votes, up right, down votes, down right
+            if p > 0:
+                s[0] += 1
+                s[1] += move > 0
+            elif p < 0:
+                s[2] += 1
+                s[3] += move < 0
+
+    def stat(self, rule):
+        nu, ru, nd, rd = self.r.get(rule, (0, 0, 0, 0))
+        n = nu + nd
+        if not n or not self.days:
+            return {"votes": n}
+        right = 100.0 * (ru + rd) / n
+        usual = 100.0 * (nu * self.rose + nd * self.fell) / (n * self.days)
+        return {"votes": n, "up": nu, "down": nd, "right_pct": round(right, 1),
+                "usual_pct": round(usual, 1), "edge_pts": round(right - usual, 1)}
+
+    def weight(self, rule):
+        s = self.stat(rule)
+        if s["votes"] < MIN_VOTES:
+            return 1.0, s, "only %d graded votes so far - full weight until it has %d" % (s["votes"], MIN_VOTES)
+        e = s["edge_pts"]
+        if e >= 10 and s["votes"] >= BOLD_VOTES:
+            return 2.0, s, "beat the usual rate by %.0f points - counts double" % e
+        if e >= 3:
+            return 1.0, s, "beat the usual rate by %.0f points - full weight" % e
+        if e >= 0:
+            return 0.5, s, "only %.1f points better than the usual rate - half weight" % e
+        return 0.0, s, "did worse than the usual rate (%+.1f points) - not counted" % e
+
+
+def weigh(evidence, book):
+    """Fill each evidence row's weight + counted points; return (score, max score, note).
+    The forecast and the trend rules count at most TREND_CAP together, because they all
+    measure the same recent direction (without the cap a trend is counted 2-3 times)."""
+    for e in evidence:
+        w, s, why = book.weight(e["rule"]) if book else (1.0, {"votes": 0}, "")
+        e.update({"weight": w, "weight_why": why, "rule_record": s, "counted": round(e["points"] * w, 2) + 0.0})
+    fam = [e for e in evidence if e["rule"] in TREND_FAMILY]
+    tot = sum(e["counted"] for e in fam)
+    note = None
+    if abs(tot) > TREND_CAP:
+        k = TREND_CAP / abs(tot)
+        for e in fam:
+            e["counted"] = round(e["counted"] * k, 2) + 0.0
+            e["capped"] = True
+        note = "The forecast and trend rules together said %+g; they all read the recent direction, so together they count at most %+d." % (
+            tot, TREND_CAP if tot > 0 else -TREND_CAP)
+    score = round(sum(e["counted"] for e in evidence), 2)
+    fam_max = min(TREND_CAP, sum(e["max"] * e["weight"] for e in fam))
+    most = fam_max + sum(e["max"] * e["weight"] for e in evidence if e["rule"] not in TREND_FAMILY)
+    return score, round(most, 2), note
+
+
+def score_str(v):
+    """+1.5, -2, 0 - scores are halves/fractions now."""
+    v = round(v, 1)
+    return "0" if v == 0 else ("%+.1f" % v).replace(".0", "")
+
+
+def group_right(group, move):
+    if group in ("buy", "hold"):
+        return move > 0
+    if group == "sell":
+        return move < 0
+    return abs(move) < WAIT_BAND
+
+
+def call_record(rows, key, field="signal"):
+    """How this kind of call did in the walk-forward replay, against any day.
+    BUY/HOLD: price higher 30 days later | SELL: lower | WAIT: moved less than 3%."""
+    group = CALL_GROUP[key]
+    done = [r for r in rows if r.get("move_pct") is not None]
+    g = [r for r in done if CALL_GROUP.get(r[field]) == group]
+    if not done:
+        return None
+    base = 100.0 * sum(group_right(group, r["move_pct"]) for r in done) / len(done)
+    what = {"buy": "higher", "hold": "higher", "sell": "lower", "wait": "within 3%"}[group]
+    out = {"group": group, "call": GROUP_WORD[group], "what": what, "days": len(g),
+           "base_pct": round(base, 1), "all_days": len(done), "since": done[0]["date"]}
+    if g:
+        right = 100.0 * sum(group_right(group, r["move_pct"]) for r in g) / len(g)
+        out.update({"right_pct": round(right, 1), "edge_pts": round(right - base, 1),
+                    "avg_move_pct": round(st.mean(r["move_pct"] for r in g), 2)})
+    return out
+
+
+def record_line(rec):
+    """'Past SELL days: lower 30 days later on 49% vs 43% of all days -> edge +6 points'."""
+    if not rec or rec.get("right_pct") is None:
+        return "No past %s days to judge yet." % (rec or {}).get("call", "such")
+    return "Past %s days (%d since %s): %s 30 days later on %.0f%% vs %.0f%% of all days -> edge %+.0f points" % (
+        rec["call"], rec["days"], rec["since"][:4], rec["what"], rec["right_pct"], rec["base_pct"], rec["edge_pts"])
+
+
+def record_line_te(rec):
+    if not rec or rec.get("right_pct") is None:
+        return "ఇలాంటి సూచనకు గత రికార్డు ఇంకా లేదు."
+    what = {"higher": "ధర పెరిగింది", "lower": "ధర తగ్గింది", "within 3%": "ధర 3% లోపే మారింది"}[rec["what"]]
+    return "గతంలో %s రోజుల్లో (%d రోజులు) 30 రోజుల తర్వాత %.0f%% సార్లు %s; ఏ రోజైనా %.0f%% (తేడా %+.0f)." % (
+        rec["call"], rec["days"], rec["right_pct"], what, rec["base_pct"], rec["edge_pts"])
+
+
+CONF_TE = {"High": "ఎక్కువ", "Medium": "మధ్యస్థం", "Low": "తక్కువ"}
+
+
+def brief_lines(sig):
+    """The four lines every briefing starts with: the call, why, what would change it,
+    how sure. (English, Telugu) - each a list of 4 strings."""
+    en = ["%s (score %s of %g): If buying: %s  If holding: %s" % (
+              sig["label"], score_str(sig["score"]), sig["max_score"], sig["buyer"], sig["holder"]),
+          "Why: " + sig["plain"],
+          "What would change it: " + sig["change_line"],
+          "How sure: %s. %s." % (sig["confidence"], sig["record_line"])]
+    te = ["%s (స్కోరు %s / %g)" % (sig["telugu"], score_str(sig["score"]), sig["max_score"]),
+          "ఎందుకు: " + sig["plain_te"],
+          "ఏది మారిస్తే మారుతుంది: " + sig["change_line_te"],
+          "నమ్మకం: %s. %s" % (CONF_TE[sig["confidence"]], record_line_te(sig.get("record")))]
+    if sig.get("pending"):
+        en.append("Note: " + sig["pending"]["note"])
+    return en, te
+
+
+def confidence(score, bt, ind, rec=None):
+    """How sure: starts from the size of the score, then can't be higher than the call's
+    own walk-forward record allows. Returns (Low | Medium | High, reasons)."""
+    why = []
+    c = 1 if abs(score) < 1.5 else 2 if abs(score) < 3.5 else 3
+    why.append("score %s -> %s" % (score_str(score), ["", "Low", "Medium", "High"][c]))
     hit = ((bt or {}).get(30) or {}).get("direction_hit_pct")
-    if ind["days_of_history"] < 120 or (hit is not None and hit < 55):
+    if ind["days_of_history"] < 120:
         c -= 1
-    return ["Low", "Low", "Medium", "High"][max(0, c)]
+        why.append("less than 120 days of prices - one step lower")
+    elif hit is not None and hit < 55:
+        c -= 1
+        why.append("the forecast got the 30-day direction right only %.0f%% of the time - one step lower" % hit)
+    if rec is not None:
+        edge, days = rec.get("edge_pts"), rec.get("days", 0)
+        if edge is None or days < 30:
+            cap, txt = 1, "only %d past %s days to judge - at most Low" % (days, rec["call"])
+        elif edge >= 10:
+            cap, txt = 3, "past %s days beat any day by %.0f points - High allowed" % (rec["call"], edge)
+        elif edge >= 3:
+            cap, txt = 2, "past %s days beat any day by only %.0f points - at most Medium" % (rec["call"], edge)
+        else:
+            cap, txt = 1, "past %s days were no better than any day (%+.0f points) - at most Low" % (rec["call"], edge)
+        if c > cap:
+            c = cap
+            why.append(txt)
+        else:
+            why.append(txt.split(" - ")[0])
+    return ["Low", "Low", "Medium", "High"][max(0, c)], why
+
+
+# --------------------------------------------------------------------------- the call in plain words
+PLAIN = {  # rule -> (when it points up, when it points down), each (English, Telugu)
+    "30-day forecast vs holding cost": (
+        ("the 30-day forecast expects a rise bigger than the holding cost", "30 రోజుల అంచనా నిల్వ ఖర్చు కంటే ఎక్కువ పెరుగుదల చూపుతోంది"),
+        ("the 30-day forecast doesn't beat the holding cost", "30 రోజుల అంచనా నిల్వ ఖర్చును కూడా దాటడం లేదు")),
+    "Season (next 60 days)": (
+        ("prices usually rise in the next two months", "రాబోయే రెండు నెలల్లో ధరలు సాధారణంగా పెరుగుతాయి"),
+        ("prices usually ease in the next two months", "రాబోయే రెండు నెలల్లో ధరలు సాధారణంగా తగ్గుతాయి")),
+    "Trend": (
+        ("prices have been rising for weeks", "కొన్ని వారాలుగా ధరలు పెరుగుతున్నాయి"),
+        ("prices have been falling for weeks", "కొన్ని వారాలుగా ధరలు తగ్గుతున్నాయి")),
+    "Trend (weeks)": (
+        ("prices have been rising for weeks", "కొన్ని వారాలుగా ధరలు పెరుగుతున్నాయి"),
+        ("prices have been falling for weeks", "కొన్ని వారాలుగా ధరలు తగ్గుతున్నాయి")),
+    "Long trend (months)": (
+        ("the months-long trend is up", "నెలల తరబడి ధోరణి పైకి ఉంది"),
+        ("the months-long trend is down", "నెలల తరబడి ధోరణి కిందికి ఉంది")),
+    "Price level vs last 12 months": (
+        ("the price is in the cheap part of the year's range", "ధర ఈ ఏడాది పరిధిలో తక్కువ భాగంలో ఉంది"),
+        ("the price is near the top of the year's range", "ధర ఈ ఏడాది గరిష్ఠ స్థాయి దగ్గర ఉంది")),
+    "Momentum (RSI-14)": (
+        ("it fell very fast, and such falls often bounce back", "చాలా వేగంగా పడిపోయింది, ఇలాంటప్పుడు తరచుగా మళ్ళీ పెరుగుతుంది"),
+        ("it rose very fast, and such rises often pause", "చాలా వేగంగా పెరిగింది, ఇలాంటప్పుడు తరచుగా ఆగుతుంది")),
+    "Govt floor (MSP)": (
+        ("it is close to the government floor (MSP)", "ప్రభుత్వ కనీస మద్దతు ధర (MSP) దగ్గర ఉంది"), None),
+    "Govt ceiling (FCI OMSS sales)": (
+        None, ("FCI's open-market sales keep prices from rising", "FCI బహిరంగ మార్కెట్ అమ్మకాలు ధర పెరగకుండా ఆపుతాయి")),
+    "Rupee (US$/Rs, 30 days)": (
+        ("a weaker rupee makes it dearer in India", "రూపాయి బలహీనపడటం వల్ల భారత్‌లో ధర పెరుగుతుంది"),
+        ("a stronger rupee makes it cheaper in India", "రూపాయి బలపడటం వల్ల భారత్‌లో ధర తగ్గుతుంది")),
+    "Gold / silver ratio": (
+        ("silver is cheap compared with gold", "బంగారంతో పోలిస్తే వెండి చౌకగా ఉంది"),
+        ("silver is dear compared with gold", "బంగారంతో పోలిస్తే వెండి ఖరీదుగా ఉంది")),
+}
+
+
+def _phrase(e, lang):
+    pair = PLAIN.get(e["rule"])
+    p = pair and pair[0 if counted(e) > 0 else 1]
+    return p[lang] if p else e["rule"].lower()
+
+
+def plain_reason(key, evidence):
+    """The call in one line: the biggest counted reasons for it and the biggest against."""
+    live = [e for e in evidence if counted(e)]
+    up = sorted((e for e in live if counted(e) > 0), key=lambda e: -counted(e))
+    dn = sorted((e for e in live if counted(e) < 0), key=lambda e: counted(e))
+    g = CALL_GROUP[key]
+    pro, con = (up, dn) if g in ("buy", "hold") else (dn, up) if g == "sell" else (up, dn)
+    j = lambda xs, lang, word: (" %s " % word).join(_phrase(e, lang) for e in xs)
+    if g == "wait":
+        if not live:
+            return ("No rule gives a clear signal today.", "ఈరోజు ఏ నియమమూ స్పష్టమైన సంకేతం ఇవ్వడం లేదు.")
+        if pro and con:
+            return ("The reasons cancel out: %s, but %s." % (j(pro[:1], 0, "and"), j(con[:1], 0, "and")),
+                    "కారణాలు ఒకదానికొకటి సరిపోతున్నాయి: %s, కానీ %s." % (j(pro[:1], 1, "మరియు"), j(con[:1], 1, "మరియు")))
+        one = (pro or con)[:1]
+        return ("Only a weak signal: %s." % j(one, 0, "and"), "బలహీన సంకేతం మాత్రమే: %s." % j(one, 1, "మరియు"))
+    en = "Mainly because %s." % j(pro[:2], 0, "and") if pro else "No single strong reason."
+    te = "ముఖ్య కారణం: %s." % j(pro[:2], 1, "మరియు") if pro else "బలమైన ఒక్క కారణమూ లేదు."
+    if con:
+        en += " Against it: %s." % j(con[:1], 0, "and")
+        te += " వ్యతిరేకంగా: %s." % j(con[:1], 1, "మరియు")
+    return en, te
+
+
+# --------------------------------------------------------------------------- what would change the call
+def triggers(cal, idx, cfg, bt, scorer, book, key_now, step=0.25, most=15.0):
+    """Re-score today with only today's price changed (forecast re-made too), stepping
+    0.25% at a time up and down: the nearest prices where the call would change."""
+    price = cal[-1][1]
+
+    def call_at(f):
+        c = cal[:-1] + [(cal[-1][0], price * f)]
+        fc = forecast(c, idx["index"], bt)
+        _s, ev, _i = scorer(c, idx, cfg, fc, bt)
+        sc = weigh(ev, book)[0]
+        return action_key(sc, ev), sc
+
+    out = {"price": round(price), "step_pct": step, "most_pct": most}
+    for name, sign in (("up", 1), ("down", -1)):
+        out[name] = None
+        k = 1
+        while k * step <= most + 1e-9:
+            f = 1 + sign * k * step / 100.0
+            key, sc = call_at(f)
+            if key != key_now:
+                out[name] = {"price": round(price * f), "pct": round(sign * k * step, 2), "key": key,
+                             "label": key.replace("_", " "), "score": sc}
+                break
+            k += 1
+    return out
+
+
+def trigger_line(tr, fmt, key_now):
+    if not tr:
+        return ""
+    bits = []
+    for name, word in (("up", "rises"), ("down", "falls")):
+        t = tr.get(name)
+        if t:
+            bits.append("%s if the price %s to %s (%+.1f%%)" % (t["label"], word, fmt(t["price"]), t["pct"]))
+    if not bits:
+        return "%s holds even if the price moves %.0f%% either way." % (key_now.replace("_", " "), tr["most_pct"])
+    line = "Turns " + "; turns ".join(bits) + "."
+    for name, word in (("up", "rises"), ("down", "falls")):
+        if not tr.get(name):
+            line += " Stays %s even if it %s %.0f%%." % (key_now.replace("_", " "), word, tr["most_pct"])
+    return line
+
+
+def trigger_line_te(tr, fmt, actions):
+    if not tr:
+        return ""
+    te = {k: t for _m, k, _e, t, _b, _h in actions}
+    bits = []
+    for name, word in (("up", "పెరిగితే"), ("down", "తగ్గితే")):
+        t = tr.get(name)
+        if t:
+            bits.append("ధర %s (%+.1f%%) కి %s %s" % (fmt(t["price"]), t["pct"], word, te.get(t["key"], t["label"])))
+    if not bits:
+        return "ధర %.0f%% అటూ ఇటూ మారినా ఇదే సూచన." % tr["most_pct"]
+    line = "; ".join(bits) + "."
+    for name, word in (("up", "పెరిగినా"), ("down", "తగ్గినా")):
+        if not tr.get(name):
+            line += " ధర %.0f%% %s ఇదే సూచన." % (tr["most_pct"], word)
+    return line
+
+
+# --------------------------------------------------------------------------- what changed since the last prices day
+def snapshot(asof, sig):
+    return {"asof": asof, "key": sig["key"], "label": sig["label"], "score": sig["score"],
+            "rules": [{"rule": e["rule"], "points": e["points"], "counted": counted(e), "value": e["value"]}
+                      for e in sig["evidence"]]}
+
+
+def changes(prev, asof, sig):
+    """Which rules moved since the previous prices day's final call."""
+    if not prev or prev.get("asof") == asof:
+        return None
+    before = {r["rule"]: r for r in prev.get("rules") or []}
+    moved = []
+    for e in sig["evidence"]:
+        b = before.pop(e["rule"], None)
+        was = b.get("counted", b["points"]) if b else 0
+        if round(was, 2) != round(counted(e), 2):
+            moved.append({"rule": e["rule"], "was": was, "now": counted(e),
+                          "value_was": b["value"] if b else None, "value_now": e["value"]})
+    for r, b in before.items():
+        if b.get("counted", b["points"]):
+            moved.append({"rule": r, "was": b.get("counted", b["points"]), "now": 0, "value_was": b["value"], "value_now": None})
+    return {"since": prev["asof"], "key_was": prev["key"], "label_was": prev["label"], "score_was": prev["score"],
+            "call_changed": prev["key"] != sig["key"], "rules": moved}
 
 
 # --------------------------------------------------------------------------- timing
@@ -676,9 +1024,15 @@ def track_record(cal, season_asof, cfg, bt, lookback=365, step=1, scorer=score_s
     Each row also keeps the 30-day forecast made that day (pred30), so the timeline
     can show what the agent expected next to what really happened.
     The last 30 days are replayed too (for the timeline's call strip) with after30 =
-    None; only days whose 30 days are over count in the summaries."""
+    None; only days whose 30 days are over count in the summaries.
+
+    Two passes. 1: every day's raw rule votes. 2: walk forward through the days, weighing
+    each day's votes with each rule's record from the days whose 30 days were ALREADY
+    over then (weigh()), exactly as the live agent would have. The old equal-weight call
+    is kept per row (signal_equal) so the two ways can be compared honestly.
+    Returns (track record, RuleBook with every graded day - the weights for today)."""
     n = len(cal)
-    rows = []
+    raw = []
     for t in range(120, n, step):  # whole history; the headline table is the last `lookback` days
         hist = cal[: t + 1]
         later = cal[t + 30][1] if t + 30 < n else None
@@ -691,11 +1045,24 @@ def track_record(cal, season_asof, cfg, bt, lookback=365, step=1, scorer=score_s
         if not fc:
             continue
         score, ev, ind = scorer(hist, idx, cfg, fc, bt)
-        rows.append({"date": hist[-1][0].isoformat(), "score": score,
-                     "signal": action_for(score, ev, actions)["key"],
-                     "price": round(hist[-1][1]), "pred30": fc[29]["price"],
-                     "after30": round(later) if later else None,
-                     "move_pct": round(pct(later, hist[-1][1]), 2) if later else None})
+        raw.append((hist[-1][0], ev, {"date": hist[-1][0].isoformat(), "score_equal": score,
+                                      "signal_equal": action_for(score, ev, actions)["key"],
+                                      "price": round(hist[-1][1]), "pred30": fc[29]["price"],
+                                      "after30": round(later) if later else None,
+                                      "move_pct": round(pct(later, hist[-1][1]), 2) if later else None}))
+    book, rows, j = RuleBook(), [], 0
+    for dy, ev, row in raw:
+        while j < len(raw) and raw[j][0] + timedelta(days=30) <= dy:  # outcomes known by this day
+            if raw[j][2]["move_pct"] is not None:
+                book.add([(e["rule"], e["points"]) for e in raw[j][1]], raw[j][2]["move_pct"])
+            j += 1
+        ev = [dict(e) for e in ev]
+        sc = weigh(ev, book)[0]
+        row.update({"score": sc, "signal": action_key(sc, ev)})
+        rows.append(row)
+    for _dy, ev, row in raw[j:]:  # the rest that are graded (all of them, for today's weights)
+        if row["move_pct"] is not None:
+            book.add([(e["rule"], e["points"]) for e in ev], row["move_pct"])
     done = [r for r in rows if r["after30"] is not None]
     cut = (cal[-31][0] - timedelta(days=lookback)).isoformat()
     recent = [r for r in done if r["date"] > cut]
@@ -709,15 +1076,23 @@ def track_record(cal, season_asof, cfg, bt, lookback=365, step=1, scorer=score_s
                 "rose_pct": round(100.0 * sum(r["move_pct"] > 0 for r in g) / len(g), 1),
                 "beat_holding_cost_pct": round(100.0 * sum(r["move_pct"] > cc for r in g) / len(g), 1)}
     groups = {
-        "buy_days": lambda r: r["score"] >= 1,
+        "buy_days": lambda r: CALL_GROUP[r["signal"]] == "buy",
         "hold_days": lambda r: r["signal"] == "HOLD",
         "wait_days": lambda r: r["signal"] == "WAIT",
-        "sell_days": lambda r: r["score"] <= -1,
+        "sell_days": lambda r: CALL_GROUP[r["signal"]] == "sell",
         "all_days": lambda r: True,
     }
+    # The weighted way (now) vs equal weights (up to 2.1), on the same days.
+    compare = {name: {g: call_record(done, k, field) for g, k in
+                      (("buy", "BUY"), ("hold", "HOLD"), ("wait", "WAIT"), ("sell", "SELL"))}
+               for name, field in (("weighted", "signal"), ("equal", "signal_equal"))}
     return {"summary": {k: grp(f) for k, f in groups.items()},
             "summary_all": {k: grp(f, done) for k, f in groups.items()},
-            "since": done[0]["date"] if done else None, "rows": rows[-1130:]}
+            "compare": compare,
+            "rules": {r: book.stat(r) for r in sorted(book.r)},
+            "graded_days": book.days,
+            "since": done[0]["date"] if done else None,
+            "rows": [{k: v for k, v in r.items() if k not in ("score_equal", "signal_equal")} for r in rows[-1130:]]}, book
 
 
 def predictions_made(cal, season_asof, back=60, days=None):
@@ -735,6 +1110,28 @@ def predictions_made(cal, season_asof, back=60, days=None):
 
 
 
+def decide(cal, idx, cfg, fc, bt, season_asof, scorer=score_signal, carry=carrying_cost_pct,
+           actions=ACTIONS, days=None, fmt=money):
+    """Today's call with everything that explains it. Returns (signal, track record)."""
+    score_eq, evidence, ind = scorer(cal, idx, cfg, fc, bt)
+    eq_key = action_key(score_eq, [dict(e) for e in evidence])
+    tr, book = track_record(cal, season_asof, cfg, bt, scorer=scorer, carry=carry, actions=actions, days=days)
+    score, most, cap_note = weigh(evidence, book)
+    key = action_key(score, evidence)
+    rec = tr["compare"]["weighted"][CALL_GROUP[key]]
+    conf, conf_why = confidence(score, bt, ind, rec)
+    plain, plain_te = plain_reason(key, evidence)
+    trig = triggers(cal, idx, cfg, bt, scorer, book, key)
+    sig = {"score": score, "confidence": conf, "confidence_why": conf_why, **action_info(key, actions),
+           "evidence": evidence, "max_score": most, "trend_cap": cap_note,
+           "plain": plain, "plain_te": plain_te,
+           "record": rec, "record_line": record_line(rec),
+           "triggers": trig, "change_line": trigger_line(trig, fmt, key),
+           "change_line_te": trigger_line_te(trig, fmt, actions),
+           "equal": {"score": score_eq, "key": eq_key, "label": eq_key.replace("_", " ")}}
+    return sig, tr, ind
+
+
 # --------------------------------------------------------------------------- main entry
 def run(rows, cfg, current_rows=None):
     mdaily = market_daily(rows)
@@ -750,13 +1147,11 @@ def run(rows, cfg, current_rows=None):
     season_asof = SeasonAsOf(bench)
     bt = backtest(cal, season_asof)
     fc = forecast(cal, idx["index"], bt)
-    score, evidence, ind = score_signal(cal, idx, cfg, fc, bt)
-    act = action_for(score, evidence)
+    sig, tr, ind = decide(cal, idx, cfg, fc, bt, season_asof)
     asof = cal[-1][0].isoformat()
     lt = landed_table(cfg, mdaily, asof)
     feed_day, states = state_table(cfg, current_rows or rows)
     sell_ref = median([s["median"] for s in states if s["role"] == "selling"])
-    tr = track_record(cal, season_asof, cfg, bt)
     preds = predictions_made(cal, season_asof, days=set(bench))
 
     all_watched_today = median([r["mandi_price"] for r in lt])
@@ -765,12 +1160,10 @@ def run(rows, cfg, current_rows=None):
         "feed_day": feed_day,
         "benchmark": {"markets": index_markets, **ind},
         "watched_median": all_watched_today,
-        "signal": {"score": score, "confidence": confidence(score, bt, ind), **act,
-                   "evidence": evidence,
-                   "max_score": sum(e["max"] for e in evidence)},
+        "signal": sig,
         "forecast": fc,
         "forecast_points": {str(h): fc[h - 1] for h in (7, 14, 30) if len(fc) >= h},
-        "forecast_reason": forecast_reason(cal, idx, bt, fc, evidence, "wheat"),
+        "forecast_reason": forecast_reason(cal, idx, bt, fc, sig["evidence"], "wheat"),
         "backtest": {str(k): v for k, v in bt.items()},
         "seasonality": {"months": MONTHS, **idx, "index": [round(x, 4) for x in idx["index"]]},
         "timing": timing(idx, cal, bench),

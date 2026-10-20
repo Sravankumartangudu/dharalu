@@ -6,17 +6,29 @@
 No. Treat it as a well-informed second opinion. For wheat it only sees mandi prices, the season, MSP and OMSS; for metals, the world price, the rupee and the season. It knows nothing about a broker's quote, your cash position, or news it wasn't given. Read the proof table and decide.
 
 **Why is confidence "Low" so often?**
-Prices are hard to forecast. Confidence is Low when the score is small, or when the forecast hasn't beaten "price stays the same" in the backtest. That honesty is on purpose.
+Prices are hard to forecast. Confidence is Low when the score is small, when the forecast hasn't beaten "price stays the same" in the backtest, or (since 2.2) when past days with this call were barely more right than any day. That honesty is on purpose.
+
+**Why is the score a fraction, like +1.5?**
+Since 2.2 each rule's points are multiplied by a weight learned from its own record (×2, ×1, ×½ or ×0), so counted points can be halves. The calls use bands: +1 up to +3 is BUY, between −1 and +1 is HOLD or WAIT, and so on.
+
+**Why does a rule show points but count 0?**
+Its weight is ×0: on past days it was right less often than a blind guess. It is still shown so you can see what it says. The *Agent track record* tab has each rule's record.
+
+**Gold says SELL but "Saving for years" says GO SLOW, not sell. Which one?**
+They answer different questions. The call is about the next 30 days. *Saving for years* is about money you'll keep a year or more. Long-term metal buyers usually keep regular small buys and avoid one big purchase when it says GO SLOW.
+
+**Did the learned weights make it better?**
+Mostly, but not everywhere. The *Agent track record* tab replays both ways. Silver and platinum BUY/SELL improved a lot. Gold's SELL and HOLD improved but its BUY got worse, and platinum HOLD got worse. See [HOW_IT_WORKS.md](HOW_IT_WORKS.md#7-track-record---no-peeking).
 
 **What is the difference between HOLD and WAIT?**
-Both have score 0.
+Both have a score between −1 and +1.
 - **HOLD:** the forecast and season still point up. Keep your stock, but don't buy more at today's price.
 - **WAIT:** no clear edge either way.
 
 See [HOW_IT_WORKS.md](HOW_IT_WORKS.md#6-the-score).
 
 **The call changed from yesterday. Why?**
-Compare the proof table with yesterday's (or read the Telegram alert). Usually one rule crossed its threshold. For example, the price moved into the dearest 15% of the year, or the rupee moved more than 1% in a month.
+Look at **🔄 What changed since …** on the Today tab: it lists the rules that moved. Usually one rule crossed its threshold. For example, the price moved into the dearest 15% of the year, or the rupee moved more than 1% in a month.
 
 **The track record shows only a handful of HOLD days last year.**
 HOLD needs a specific mix of rules, so it's rarer than the others. That's why the dashboard also shows the **whole history** (wheat since 2016, metals about 10 years), and quotes it when the last year has fewer than 10 such days.

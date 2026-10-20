@@ -1,13 +1,13 @@
 {
   "gold": {
-    "signal": "STRONG_SELL",
+    "signal": "SELL",
     "weekly": [
       2026,
       43
     ]
   },
   "platinum": {
-    "signal": "SELL",
+    "signal": "BUY",
     "weekly": [
       2026,
       43
@@ -20,7 +20,7 @@
     "wheat_turn": 1
   },
   "silver": {
-    "signal": "SELL",
+    "signal": "BUY",
     "weekly": [
       2026,
       43

@@ -37,6 +37,7 @@ METAL_LOG_FIELDS = ["date", "score", "signal", "price"]
 KEEP_OTHER_DAYS = 120  # all-India rows (not watched mandis) kept this long, for the state table
 FULL_EVERY_H = 6       # --quick still does a full wheat fetch this often
 BUSY_WAIT_H = 0.5      # data.gov.in said "too many requests": leave wheat alone this long
+HOLD_CHECKS = 2        # a metal's new call is shown only after it holds this many checks in a row
 
 
 def now():
@@ -111,13 +112,53 @@ def live_record(log_rows, series):
                       if k in px), None)
         if later:
             mv = analyze.pct(px[later], float(r["price"]))
-            s = int(r["score"])
-            # HOLD was right if keeping the stock paid (price rose); WAIT if nothing big happened
-            right = (mv > 0) if s > 0 or r.get("signal") == "HOLD" else (mv < 0) if s < 0 else (abs(mv) < 3)
+            # BUY/HOLD were right if the price rose, SELL if it fell, WAIT if it moved less than 3%
+            right = analyze.group_right(analyze.CALL_GROUP.get(r.get("signal"), "wait"), mv)
             graded.append({**r, "after30": px[later], "move_pct": round(mv, 2), "right": right})
     return {"calls": len(log_rows), "graded": len(graded),
             "right_pct": round(100.0 * sum(g["right"] for g in graded) / len(graded), 1) if graded else None,
             "rows": graded[-60:], "pending": [r for r in log_rows if r["date"] not in {g["date"] for g in graded}][-30:]}
+
+
+def since_last_day(old, a):
+    """Keep the previous prices day's final call (rules + points), and list what moved."""
+    o = (old or {}).get("signal")
+    if not o or not o.get("evidence"):
+        prev = None
+    elif old.get("asof") != a["asof"]:
+        prev = analyze.snapshot(old["asof"], o)
+    else:
+        prev = o.get("previous")
+    a["signal"]["previous"] = prev
+    a["signal"]["changes"] = analyze.changes(prev, a["asof"], a["signal"])
+
+
+def steady(k, a, rstate, actions):
+    """Live metal prices wiggle every few minutes: near a boundary the call could flip
+    back and forth. A new call is shown only once it has held for HOLD_CHECKS checks in
+    a row; until then the old call stays, with a note saying what the score says now."""
+    s = a["signal"]
+    shown = rstate.setdefault("shown", {})
+    was, raw = shown.get(k) or {}, s["key"]
+    if not was.get("key") or was["key"] == raw:
+        shown[k] = {"key": raw}
+        return
+    n = was.get("n", 0) + 1 if was.get("pending") == raw else 1
+    if n >= HOLD_CHECKS:
+        shown[k] = {"key": raw}
+        return
+    shown[k] = {"key": was["key"], "pending": raw, "n": n}
+    keep = analyze.action_info(was["key"], actions)
+    s["raw"] = {"key": raw, "label": s["label"], "telugu": s["telugu"]}
+    s.update(keep)
+    s["pending"] = {"key": raw, "label": s["raw"]["label"], "checks": n, "needs": HOLD_CHECKS,
+                    "note": "The score now says %s; the call stays %s until that holds for %d checks in a row (%d of %d so far)." % (
+                        s["raw"]["label"], keep["label"], HOLD_CHECKS, n, HOLD_CHECKS)}
+    s["plain"], s["plain_te"] = analyze.plain_reason(keep["key"], s["evidence"])
+    s["record"] = a["track_record"]["compare"]["weighted"][analyze.CALL_GROUP[keep["key"]]]
+    s["record_line"] = analyze.record_line(s["record"])
+    s["change_line"] = "Already turning: the score says %s now - it switches if the next check (in 5 minutes) agrees." % s["raw"]["label"]
+    s["change_line_te"] = "స్కోరు ఇప్పుడే %s అంటోంది - తదుపరి తనిఖీ (5 నిమిషాల్లో) కూడా అదే అంటే మారుతుంది." % s["raw"]["telugu"]
 
 
 # --------------------------------------------------------------------------- wheat
@@ -179,6 +220,7 @@ def wheat(cfg, mode, rstate):
         why.append("wheat +%d mandi rows" % added)
     rows = [r for r in fetch.load_prices() if keep(r)]
     a = analyze.run(rows, cfg, current_rows=current or None)
+    since_last_day(old, a)
     best = a.get("best_source") or {}
     log_rows = log_signal(LOG, LOG_FIELDS, {
         "date": a["asof"], "score": a["signal"]["score"], "signal": a["signal"]["key"],
@@ -194,10 +236,10 @@ def wheat(cfg, mode, rstate):
     a["series_weekly"] = weekly_wheat(rows, cfg)
     write_json(OUT, a)
     s = a["signal"]
-    print("Wheat %s  %s  score %+d/%d  confidence %s  price %s" % (
-        a["asof"], s["label"], s["score"], s["max_score"], s["confidence"], round(a["benchmark"]["price"])))
+    print("Wheat %s  %s  score %s/%g  confidence %s  price %s" % (
+        a["asof"], s["label"], analyze.score_str(s["score"]), s["max_score"], s["confidence"], round(a["benchmark"]["price"])))
     for e in s["evidence"]:
-        print("   %+d  %-34s %s" % (e["points"], e["rule"], e["value"]))
+        print("   %+d x%g  %-34s %s" % (e["points"], e["weight"], e["rule"], e["value"]))
     return a, why
 
 
@@ -209,7 +251,7 @@ def weekly_wheat(rows, cfg):
 
 
 # --------------------------------------------------------------------------- metals
-def metal_runs(cfg, offline):
+def metal_runs(cfg, offline, rstate):
     if offline:
         live = read_json(os.path.join(metals.DIR, "live.json")) or {}
     else:
@@ -228,6 +270,9 @@ def metal_runs(cfg, offline):
             if old:
                 out[k] = old
             continue
+        if not offline:  # --offline re-analyses saved data: show the plain call, leave the 2-check state alone
+            steady(k, a, rstate, metals.METAL_ACTIONS)
+        since_last_day(read_json(os.path.join(DATA, k + ".json")), a)
         log_rows = log_signal(os.path.join(ROOT, "data", "signals_%s.csv" % k), METAL_LOG_FIELDS, {
             "date": a["asof"], "score": a["signal"]["score"], "signal": a["signal"]["key"], "price": a["price"]})
         a["track_record"]["live"] = live_record(log_rows, a["series"])
@@ -246,8 +291,9 @@ def metal_runs(cfg, offline):
         light["track_record"] = {x: v for x, v in a["track_record"].items() if x != "rows"}
         write_json(os.path.join(DATA, k + ".json"), light)
         s = a["signal"]
-        print("%-8s %s  %s  score %+d/%d  %s  %s" % (
-            a["label"], a["asof"], s["label"], s["score"], s["max_score"], s["confidence"], metals.inr(a["price"])))
+        print("%-8s %s  %s  score %s/%g  %s  %s%s" % (
+            a["label"], a["asof"], s["label"], analyze.score_str(s["score"]), s["max_score"], s["confidence"],
+            metals.inr(a["price"]), ("  (" + s["pending"]["note"] + ")") if s.get("pending") else ""))
         out[k] = a
     return out
 
@@ -269,8 +315,17 @@ def entry(key, a):
     f30 = (a.get("forecast_points") or {}).get("30")
     e = {
         "key": key, "asof": a["asof"], "generated_at": a.get("generated_at"),
-        "signal": {k: s[k] for k in ("key", "label", "telugu", "score", "max_score", "confidence", "buyer", "holder")},
-        "evidence": [{k: x[k] for k in ("rule", "value", "test", "points", "max", "source")} for x in s["evidence"]],
+        "signal": {**{k: s[k] for k in ("key", "label", "telugu", "score", "max_score", "confidence", "buyer", "holder")},
+                   **{k: s.get(k) for k in ("plain", "plain_te", "record_line", "change_line", "change_line_te",
+                                            "confidence_why", "trend_cap")},
+                   "pending": (s.get("pending") or {}).get("note"), "equal": s.get("equal")},
+        "evidence": [{k: x.get(k) for k in ("rule", "value", "test", "points", "max", "source", "weight", "counted")}
+                     for x in s["evidence"]],
+        "changes": dict({k: s["changes"][k] for k in ("since", "label_was", "call_changed")},
+                        rules=[{k: r[k] for k in ("rule", "was", "now")} for r in s["changes"]["rules"]])
+                   if s.get("changes") else None,
+        "long_term": {k: a["long_term"].get(k) for k in ("key", "label", "telugu", "advice", "advice_te", "why", "why_te",
+                                                         "record_line", "cagr_pct")} if a.get("long_term") else None,
         "forecast30": f30,
         "forecast_why": {k: (a.get("forecast_reason") or {}).get(k) for k in ("summary", "biggest")}
                         if a.get("forecast_reason") else None,
@@ -326,7 +381,7 @@ def main():
     rstate = state.setdefault("run", {})
 
     w, why = wheat(cfg, mode, rstate)
-    ms = metal_runs(cfg, offline)
+    ms = metal_runs(cfg, offline, rstate)
     all_ = {"wheat": w, **ms}
 
     summary = {"generated_at": stamp(), "site": SITE, "order": ["wheat"] + list(metals.METALS),
@@ -363,7 +418,7 @@ def main():
             reasons, sent = notify.maybe_alert(a, a["briefing"], cfg, SITE + "#" + k, key=k,
                                                title="%s Dharalu · %s" % (m["emoji"], m["label"]),
                                                move=a["indicators"].get("chg_1d"), move_limit=m["move_alert_pct"],
-                                               confirm=2, state=state)
+                                               state=state)  # the call itself already waits 2 checks (steady)
         if reasons:
             print("Alert %s: %s (%s)" % (k, ", ".join(reasons), "sent" if sent else "Telegram not set up"))
     notify.save_state(state)
