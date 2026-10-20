@@ -7,9 +7,9 @@
     ]
   },
   "platinum": {
-    "pending": "STRONG_SELL",
+    "pending": "SELL",
     "pending_n": 1,
-    "signal": "SELL",
+    "signal": "STRONG_SELL",
     "weekly": [
       2026,
       43
