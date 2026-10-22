@@ -2,3 +2,4 @@ date,score,signal,price,best_source,best_landed
 2026-10-13,-1,SELL,2700,Satna APMC,2928
 2026-10-17,-1,SELL,2693,Jabalpur APMC,2906
 2026-10-19,1.0,BUY,2533,Jabalpur APMC,2728
+2026-10-21,-1.5,SELL,2907,Jabalpur APMC,2728
