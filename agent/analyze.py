@@ -110,28 +110,48 @@ TE_PLACE = {"Jabalpur": "జబల్‌పూర్", "Indore": "ఇండో�
             "Rajasthan": "రాజస్థాన్", "Maharashtra": "మహారాష్ట్ర"}
 
 
-def where_wheat(cfg, index_markets, best):
+def places(cfg):
+    """The places a trader can pick (Srikakulam, Hyderabad). The default place uses the km on
+    source_markets / state_km; the others carry their own km maps."""
+    out = []
+    for p in cfg.get("places") or [{"key": "home", "name": cfg["business"]["location"].split(",")[0],
+                                     "state": cfg["business"]["location"].split(",")[-1].strip(), "default": True}]:
+        q = dict(p)
+        if p.get("default"):
+            q["km"] = {m["name"]: m["km"] for m in cfg["source_markets"]}
+            q["state_km"] = cfg["state_km"]
+        q["location"] = "%s, %s" % (q["name"], q["state"])
+        out.append(q)
+    return out
+
+
+def default_place(cfg):
+    return next((p for p in places(cfg) if p.get("default")), places(cfg)[0])
+
+
+def where_wheat(cfg, index_markets, best, place=None):
     """Which place the wheat price is from - shown beside every price."""
+    place = place or default_place(cfg)
     state = {m["name"]: m.get("state") for m in cfg["source_markets"]}
     towns = [m.replace(" APMC", "").replace("APMC ", "") for m in index_markets]
     states = sorted({state.get(m) for m in index_markets if state.get(m)}, key=[state.get(m) for m in index_markets].index)
-    home = cfg["business"]["location"]
+    home, town = place["location"], place["name"]
     join = lambda xs: ", ".join(xs[:-1]) + " & " + xs[-1] if len(xs) > 1 else "".join(xs)
     w = {
         "short": "Wholesale mandi price · %s (%s)" % (join(towns), ", ".join(states)),
         "short_te": "మండీ టోకు ధర · %s (%s)" % (", ".join(TE_PLACE.get(t, t) for t in towns),
                                                ", ".join(TE_PLACE.get(s, s) for s in states)),
         "detail": "The middle of the day's modal (most-traded) wholesale prices at %s APMC mandis (%s), from "
-                  "data.gov.in Agmarknet. Andhra Pradesh publishes no wheat mandi prices, so this is not a %s "
-                  "rate." % (join(towns), ", ".join(states), home.split(",")[0]),
+                  "data.gov.in Agmarknet. %s publishes no wheat mandi prices, so this is not a %s "
+                  "rate - the %s price is the landed cost below." % (join(towns), ", ".join(states), place["state"], town, town),
         "home": home,
+        "place": place["key"],
     }
     if best:
         w["landed"] = "At %s: cheapest landed %s/qtl from %s, %s (%s km) = mandi %s + fee + freight + handling." % (
-            home.split(",")[0], money(best["landed"]), best["market"], best["state"], best["km"], money(best["mandi_price"]))
+            town, money(best["landed"]), best["market"], best["state"], best["km"], money(best["mandi_price"]))
         w["landed_te"] = "%s వద్ద: %s, %s (%s కి.మీ) నుండి తెచ్చిన ధర %s/క్వింటాల్ (మండీ ధర + ఫీజు + రవాణా)." % (
-            "శ్రీకాకుళం" if home.startswith("Srikakulam") else home.split(",")[0],
-            best["market"], best["state"], best["km"], money(best["landed"]))
+            place.get("telugu") or town, best["market"], best["state"], best["km"], money(best["landed"]))
     return w
 
 
@@ -998,17 +1018,20 @@ def landed(cfg, price, km, override=None):
             "extras": round(extras), "landed": round(price + fee + freight + extras)}
 
 
-def landed_table(cfg, mdaily, asof):
+def landed_table(cfg, mdaily, asof, place=None):
+    place = place or default_place(cfg)
     out = []
     cutoff = (d(asof) - timedelta(days=6)).isoformat()
     for m in cfg["source_markets"]:
         series = mdaily.get(m["name"], {})
         recent = sorted(k for k in series if k >= cutoff)
-        if not recent:
+        km = place["km"].get(m["name"])
+        if not recent or not km:
             continue
         k = recent[-1]
-        row = landed(cfg, series[k], m["km"], m.get("freight_override"))
-        row.update({"market": m["name"], "state": m["state"], "km": m["km"], "date": k})
+        # a freight quote is for one route, so it only applies to the default place
+        row = landed(cfg, series[k], km, m.get("freight_override") if place.get("default") else None)
+        row.update({"market": m["name"], "state": m["state"], "km": km, "date": k})
         out.append(row)
     out.sort(key=lambda r: r["landed"])
     return out
@@ -1034,9 +1057,13 @@ def state_table(cfg, rows):
         row = {"state": s, "median": round(st.median(v)), "mandis": len(v),
                "low": round(min(v)), "high": round(max(v)),
                "role": "selling" if s in cfg["consumer_states"] else "source"}
-        km = cfg["state_km"].get(s)
-        if km and row["role"] == "source":
-            row["landed"] = landed(cfg, row["median"], km)["landed"]
+        if row["role"] == "source":
+            by_place = {p["key"]: landed(cfg, row["median"], p["state_km"][s])["landed"]
+                        for p in places(cfg) if p["state_km"].get(s)}
+            if by_place:
+                row["landed_by_place"] = by_place
+                if default_place(cfg)["key"] in by_place:
+                    row["landed"] = by_place[default_place(cfg)["key"]]
         out.append(row)
     out.sort(key=lambda r: -r["mandis"])
     return last, out
@@ -1178,9 +1205,21 @@ def run(rows, cfg, current_rows=None):
     fc = forecast(cal, idx["index"], bt)
     sig, tr, ind = decide(cal, idx, cfg, fc, bt, season_asof)
     asof = cal[-1][0].isoformat()
-    lt = landed_table(cfg, mdaily, asof)
+    home = default_place(cfg)
+    lt = landed_table(cfg, mdaily, asof, home)
     feed_day, states = state_table(cfg, current_rows or rows)
     sell_ref = median([s["median"] for s in states if s["role"] == "selling"])
+    by_place = {}
+    for p in places(cfg):
+        plt = lt if p["key"] == home["key"] else landed_table(cfg, mdaily, asof, p)
+        best = plt[0] if plt else None
+        by_place[p["key"]] = {
+            "key": p["key"], "name": p["name"], "state": p["state"], "telugu": p.get("telugu"),
+            "location": p["location"], "default": bool(p.get("default")), "note": p.get("note"),
+            "landed": plt, "best_source": best,
+            "where": where_wheat(cfg, index_markets, best, p),
+            "margin_vs_selling_ref": (sell_ref - best["landed"]) if (sell_ref and best) else None,
+        }
     preds = predictions_made(cal, season_asof, days=set(bench))
 
     all_watched_today = median([r["mandi_price"] for r in lt])
@@ -1201,7 +1240,9 @@ def run(rows, cfg, current_rows=None):
                 "floor": msp_floor(cfg, cal[-1][0])[0], "season": msp_floor(cfg, cal[-1][0])[1]},
         "landed": lt,
         "best_source": lt[0] if lt else None,
-        "where": where_wheat(cfg, index_markets, lt[0] if lt else None),
+        "where": by_place[home["key"]]["where"],
+        "place_default": home["key"],
+        "places": by_place,
         "states": states,
         "selling_reference": sell_ref,
         "margin_vs_selling_ref": (sell_ref - lt[0]["landed"]) if (sell_ref and lt) else None,

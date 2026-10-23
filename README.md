@@ -1,10 +1,10 @@
 # ⚖️ Dharalu · ధరలు - buy / hold / sell calls for wheat, gold, silver and platinum
 
-Dharalu ("prices" in Telugu) watches four prices for a trader and family in Srikakulam, Andhra Pradesh:
+Dharalu ("prices" in Telugu) watches four prices for a trader and family in **Srikakulam, Andhra Pradesh** or **Hyderabad, Telangana** (pick the place with the 📍 picklist):
 
 | | What it watches | Price shown |
 |---|---|---|
-| 🌾 **Wheat** | The mandis that supply Srikakulam (Agmarknet) | ₹ per quintal, landed at Srikakulam |
+| 🌾 **Wheat** | The mandis that supply Srikakulam and Hyderabad (Agmarknet) | ₹ per quintal, landed at your place |
 | 🥇 **Gold** | World spot price × ₹ rate + import duty | ₹ per 10 g, 24 carat (GST shown on top) |
 | 🥈 **Silver** | The same | ₹ per kg, 999 fine |
 | 💠 **Platinum** | The same | ₹ per 10 g, 999.5 fine |
@@ -46,8 +46,8 @@ Since 2.2 the score can be fractional (e.g. +1.5), because each rule's points ar
 
 **Every call comes with:**
 - **📍 Where the price is from**, next to every price:
-  - wheat is the **wholesale mandi price at Jabalpur, Indore & Kota** (Madhya Pradesh, Rajasthan), plus the cheapest *landed at Srikakulam* cost;
-  - gold, silver and platinum are the **all-India import price** (world spot × ₹ rate + import duty, before GST), not a Srikakulam jeweller's rate.
+  - wheat is the **wholesale mandi price at Jabalpur, Indore & Kota** (Madhya Pradesh, Rajasthan), plus the cheapest *landed at Srikakulam* or *landed at Hyderabad* cost, for the place you pick;
+  - gold, silver and platinum are the **all-India import price** (world spot × ₹ rate + import duty, before GST). It is the same in both places and is not a local jeweller's rate.
 - **One plain line**: why, in English and తెలుగు, e.g. *"Mainly because the 30-day forecast doesn't beat the holding cost and prices have been falling for weeks."*
 - **What would change it**: the prices at which the call would turn, e.g. *"Turns WAIT if the price falls to ₹1,17,670 (−11.8%)."*
 - **Its record**: how often past days with this call were right, next to how often *any* day was, e.g. *"Past SELL days (1047 since 2017): lower 30 days later on 44% vs 38% of all days → edge +5 points."*
@@ -150,13 +150,15 @@ python3 -m http.server -d docs    # open http://localhost:8000
 
 ## Wheat: landed cost, not a "Srikakulam price"
 
-Andhra Pradesh has reported no wheat mandi prices since 2017, because the state buys its wheat from other states. So Dharalu works out what the wheat costs at your door:
+Andhra Pradesh has reported no wheat mandi prices since 2017, because the state buys its wheat from other states. Telangana publishes none either. So Dharalu works out what the wheat costs at your door, in **Srikakulam** or **Hyderabad** (📍 picklist on the dashboard, *Settings › Place* in the Mac app):
 
 ```
 landed = mandi price + mandi fee (1.7%) + freight (km × ₹0.30/qtl/km) + handling ₹25 + bags ₹15 + brokerage ₹10
 ```
 
-**These are starting estimates - change them to your real costs in `config.json`.** Enter your local selling rate in the dashboard's *Mandis* tab to see your margin.
+**These are starting estimates - change them to your real costs in `config.json`.** The Hyderabad road distances are estimates too (`places` in `config.json`). Enter your local selling rate in the dashboard's *Mandis* tab to see your margin; it is kept separately for each place.
+
+The buy / hold / sell call is the same in both places, because it reads the benchmark mandi price. Only the landed cost, margins and 📍 lines change.
 
 The **benchmark price** comes from Jabalpur, Indore and Kota, the mandis with the longest unbroken history. Each is chain-linked to a common level, so a day when one mandi doesn't report doesn't make the price jump. Sixteen source mandis are compared for landed cost.
 

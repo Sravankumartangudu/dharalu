@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 APP="Dharalu.app"
-VERSION="2.3.0"
+VERSION="2.4.0"
 ARCHS="$(uname -m)"
 [[ "${1:-}" == "--universal" ]] && ARCHS="arm64 x86_64"
 

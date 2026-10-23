@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.4.0 - 23 Oct 2026
+
+**📍 Pick your place: Srikakulam or Hyderabad.** Every price follows it.
+- **Where to pick it:**
+  - the dashboard: the 📍 picklist at the top of every page (or a `?place=hyderabad` link);
+  - the Mac app: *Settings › Place*.
+  - The two stay in step inside the Mac app's dashboard window.
+- **Wheat follows the place.** Neither Andhra Pradesh nor Telangana publishes wheat mandi prices, so a place's price is the landed cost: mandi price + fee + freight from each mandi to that place + handling. Today's cheapest, both from Jabalpur:
+  - Srikakulam ₹2,779/qtl (960 km);
+  - Hyderabad ₹2,722/qtl (770 km).
+- **What changes with the place:**
+  - the header and 📍 lines;
+  - the cheapest-landed tile;
+  - the Mandis table (km, freight, landed);
+  - the state table's landed column;
+  - the gap vs the selling states;
+  - pre-trade (sources, landed cost, checklist);
+  - unrealised profit on your trades;
+  - What to watch;
+  - the overview card;
+  - the briefing (it now names the cheapest source for both places);
+  - the Mac menu's 📍 and landed lines.
+- **Your selling rate is kept per place.** The Srikakulam rate you already entered stays.
+- **Gold, silver, platinum:** one all-India import price, so the number is the same in both places. The 📍 line says so and names your place: a local jeweller adds their premium, making charges and GST.
+- **Hyderabad road km are estimates** (via Nagpur on NH44 for the MP mandis). Put your transporter's real distances or quotes in `config.json` → `places`.
+- **The call itself doesn't change with the place.** It reads the benchmark mandi price, which is the same for everyone.
+- **Data:** the agent writes `places` (per-place landed table, best source, 📍 and margin) in `latest.json`, plus `where_by_place` in each metal's file. `summary.json` gets `places`, `where_by_place` and `lines_by_place`. The old single-place fields stay, for Srikakulam.
+
 ## 2.3.0 - 20 Oct 2026
 
 **📍 Every price now says where it is from.**

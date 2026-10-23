@@ -215,7 +215,18 @@ function spark(el, hist, fc, color) {
 }
 
 /* ------------------------------------------------------------------ helpers */
-const localRate = () => store.get("localRate", null);
+// 📍 Place: the wheat landed cost, margins and your selling rate follow it (metals are one all-India price).
+const PLACE0 = { key: "srikakulam", name: "Srikakulam", state: "Andhra Pradesh", telugu: "శ్రీకాకుళం", default: true };
+const placeList = () => (S && S.places && S.places.length) ? S.places : [PLACE0];
+const place = () => { const k = store.get("place", null), ps = placeList(); return ps.find(p => p.key === k) || ps.find(p => p.default) || ps[0]; };
+const town = () => place().name;
+// Wheat for the chosen place (older data has only the default place's fields)
+const PW = (a = D.wheat || A) => (a && a.places && a.places[place().key]) ||
+  { landed: (a && a.landed) || [], best_source: a && a.best_source, where: a && a.where, margin_vs_selling_ref: a && a.margin_vs_selling_ref };
+const whereFor = a => (a.places && a.places[place().key] && a.places[place().key].where) || (a.where_by_place && a.where_by_place[place().key]) || a.where;
+// Your selling rate is kept per place; the default place keeps the old "localRate" key.
+const rateKey = () => place().default ? "localRate" : "localRate." + place().key;
+const localRate = () => store.get(rateKey(), null);
 const priceOf = a => a.benchmark ? a.benchmark.price : a.price;
 const unitTxt = () => C === "wheat" ? "₹ per quintal" : A.unit.replace("Rs ", "₹ ");
 const qtyUnit = () => C === "wheat" ? "qtl" : "g";
@@ -255,7 +266,7 @@ function scoreGauge(s) {
     <b class="${cls(s.score)}" style="${s.score >= 0 ? "left" : "right"}:50%;width:${w}%"></b>${[-3, -1, 1, 3].filter(v => Math.abs(v) < m).map(band).join("")}</div>`;
 }
 function signalCard(s, brief) {
-  const te = LANG === "te";
+  const te = LANG === "te", W = whereFor(A);
   return `
   <div class="card signal">
     <div class="badge ${s.key}">
@@ -270,8 +281,8 @@ function signalCard(s, brief) {
       ${s.pending ? `<div class="pending">⏳ ${esc(s.pending.note)}</div>` : ""}
       <div class="advice"><div><b>If you are buying</b>${esc(s.buyer)}</div><div><b>If you are holding ${C === "wheat" ? "stock" : esc(A.label.toLowerCase())}</b>${esc(s.holder)}</div></div>
       <div class="facts">
-        ${A.where ? `<div><span>📍 Prices from</span><span title="${esc(A.where.detail)}"><span data-en="${esc(A.where.short)}" data-te="${esc(A.where.short_te || A.where.short)}">${esc(te ? A.where.short_te || A.where.short : A.where.short)}</span>
-          <br><span class="muted">${esc(A.where.detail)}</span>${A.where.landed ? `<br><span data-en="${esc(A.where.landed)}" data-te="${esc(A.where.landed_te || A.where.landed)}">${esc(te ? A.where.landed_te || A.where.landed : A.where.landed)}</span>` : ""}</span></div>` : ""}
+        ${W ? `<div><span>📍 Prices from</span><span title="${esc(W.detail)}"><span data-en="${esc(W.short)}" data-te="${esc(W.short_te || W.short)}">${esc(te ? W.short_te || W.short : W.short)}</span>
+          <br><span class="muted">${esc(W.detail)}</span>${W.landed ? `<br><span data-en="${esc(W.landed)}" data-te="${esc(W.landed_te || W.landed)}">${esc(te ? W.landed_te || W.landed : W.landed)}</span>` : ""}${W.place_note ? `<br><b>${esc(W.place_note)}.</b>` : ""}</span></div>` : ""}
         ${s.change_line ? `<div><span>🎯 What would change it</span><span data-en="${esc(s.change_line)}" data-te="${esc(s.change_line_te || s.change_line)}">${esc(te ? s.change_line_te || s.change_line : s.change_line)}</span></div>` : ""}
         ${s.record_line ? `<div><span>📊 Its record</span><span>${esc(s.record_line)}</span></div>` : ""}
         ${s.confidence_why ? `<div><span>🤔 Why ${esc(s.confidence)} confidence</span><span>${s.confidence_why.map(esc).join(" · ")}</span></div>` : ""}
@@ -371,7 +382,7 @@ function workedBefore(s) {
 function renderToday() { (C === "wheat" ? renderTodayWheat : renderTodayMetal)(); }
 
 function renderTodayWheat() {
-  const s = A.signal, b = A.benchmark, f30 = A.forecast_points["30"], best = A.best_source;
+  const s = A.signal, b = A.benchmark, f30 = A.forecast_points["30"], best = PW().best_source;
   const brief = A.briefing.ai || A.briefing.rules;
   const lr = localRate();
   $("#today").innerHTML = `${signalCard(s, brief)}${proofTable(s)}${workedBefore(s)}
@@ -382,11 +393,11 @@ function renderTodayWheat() {
     <div class="tile"><div class="k">30-day forecast</div><div class="v">${f30 ? rs(f30.price) : "–"}</div>
       <div class="d">${f30 ? `Likely ${rs(f30.low)} – ${rs(f30.high)} (${pc((f30.price / b.price - 1) * 100)})` : ""}
         ${A.forecast_reason ? `<br>🔮 Why: ${esc(A.forecast_reason.biggest)} · <a href="#${C}/timeline">details</a>` : ""}</div></div>
-    <div class="tile"><div class="k">Cheapest landed at Srikakulam</div><div class="v">${best ? rs(best.landed) : "–"}</div>
+    <div class="tile"><div class="k">Cheapest landed at ${esc(town())}</div><div class="v">${best ? rs(best.landed) : "–"}</div>
       <div class="d">${best ? `${esc(best.market)}, ${best.km} km · mandi ${rs(best.mandi_price)}` : ""}</div></div>
     <div class="tile"><div class="k">Govt floor (MSP)</div><div class="v">${rs(A.msp.floor)}</div>
       <div class="d">Price is ${pc((b.price / A.msp.floor - 1) * 100)} above · next MSP ${rs(A.msp.next_value)}</div></div>
-    <div class="tile"><div class="k">Your Srikakulam selling rate</div><div class="v">${lr ? rs(lr) : "–"}</div>
+    <div class="tile"><div class="k">Your ${esc(town())} selling rate</div><div class="v">${lr ? rs(lr) : "–"}</div>
       <div class="d">${lr && best ? `Margin vs cheapest landed: <b class="${cls(lr - best.landed)}">${rs(lr - best.landed)}</b>/qtl` : `<a href="#wheat/mandis">Enter it</a> to see your margin`}</div></div>
     <div class="tile"><div class="k">Cost of holding stock 30 days</div><div class="v">${pc(A.carrying_cost_30d_pct)}</div>
       <div class="d">Interest + godown + losses (≈ ${rs(b.price * A.carrying_cost_30d_pct / 100)}/qtl)</div></div>
@@ -592,11 +603,11 @@ function renderForecast() {
 function renderPre() { (C === "wheat" ? renderPreWheat : renderPreMetal)(); }
 
 function renderPreWheat() {
-  const lt = A.landed, cfg = A.config, b = A.benchmark;
+  const lt = PW().landed, cfg = A.config, b = A.benchmark;
   const opts = lt.map((r, i) => `<option value="${i}">${esc(r.market)} (${esc(r.state)}) - ${rs(r.mandi_price)}, ${r.km} km</option>`).join("") + `<option value="custom">Other / custom</option>`;
   $("#pre").innerHTML = `
   <h2>Before you trade - pre-analysis</h2>
-  <p class="ink2 small">Enter a planned purchase. The agent works out your all-in cost at Srikakulam, the price you must sell at to break even, and what the forecast says you are likely to make.</p>
+  <p class="ink2 small">Enter a planned purchase. The agent works out your all-in cost at ${esc(town())} (📍 change the place at the top), the price you must sell at to break even, and what the forecast says you are likely to make.</p>
   <div class="card"><form class="row" id="preForm" onsubmit="return false">
     <label>Buy from<select name="src">${opts}</select></label>
     <label>Mandi price ₹/qtl<input type="number" name="price" step="5"></label>
@@ -632,16 +643,16 @@ function renderPreWheat() {
       [edge > 0, `Forecast move ${pc((fc.price / b.price - 1) * 100)} vs holding cost ${pc(carry / landed * 100)} over ${days} days`, "Expected rise beats holding cost", "Expected rise does NOT beat holding cost"],
       [lt.length ? landed <= lt[0].landed * 1.02 : null, `This source lands at ${rs(landed)} vs cheapest ${rs(lt.length ? lt[0].landed : landed)}`, "Among the cheapest sources", "A cheaper source exists"],
       [b.price <= A.msp.floor * 1.08, `Benchmark ${rs(b.price)} vs MSP ${rs(A.msp.floor)}`, "Close to the MSP floor (limited downside)", "Well above MSP (more downside if prices fall)"],
-      [lr ? lr > landed : null, lr ? `Your selling rate ${rs(lr)} vs landed ${rs(landed)}` : "Enter your Srikakulam rate in the Mandis tab", "Immediate resale margin is positive", "No margin at today's local rate"],
+      [lr ? lr > landed : null, lr ? `Your selling rate ${rs(lr)} vs landed ${rs(landed)}` : `Enter your ${esc(town())} rate in the Mandis tab`, "Immediate resale margin is positive", "No margin at today's local rate"],
     ];
     $("#preOut").innerHTML = `
     <div class="grid">
-      <div class="tile"><div class="k">Landed cost at Srikakulam</div><div class="v">${rs(landed)}</div><div class="d">mandi ${rs(price)} + fee ${rs(fee)} + freight ${rs(freight)} + handling/bags/brokerage ${rs(extras)}</div></div>
+      <div class="tile"><div class="k">Landed cost at ${esc(town())}</div><div class="v">${rs(landed)}</div><div class="d">mandi ${rs(price)} + fee ${rs(fee)} + freight ${rs(freight)} + handling/bags/brokerage ${rs(extras)}</div></div>
       <div class="tile"><div class="k">Total money needed</div><div class="v">${rs(landed * qty)}</div><div class="d">${qty} qtl (${(qty / 10).toFixed(1)} tonnes)</div></div>
       <div class="tile"><div class="k">Holding cost for ${days} days</div><div class="v">${rs(carry)}/qtl</div><div class="d">${rs(carry * qty)} in total</div></div>
       <div class="tile"><div class="k">Break-even sell price</div><div class="v">${rs(breakeven)}</div><div class="d">Sell above this to make money</div></div>
     </div>
-    ${scenarioTable(days, scen, +f.sell.value ? "Using your planned sell price." : lr ? "Sell price = your Srikakulam rate moved in line with the forecast." : "Sell price = today's landed cost moved in line with the forecast (enter your local rate for a better estimate).", "Profit per qtl")}
+    ${scenarioTable(days, scen, +f.sell.value ? "Using your planned sell price." : lr ? `Sell price = your ${esc(town())} rate moved in line with the forecast.` : "Sell price = today's landed cost moved in line with the forecast (enter your local rate for a better estimate).", "Profit per qtl")}
     ${checklist(checks)}`;
   }
 }
@@ -752,7 +763,8 @@ function renderTrades() {
   const wheat = C === "wheat", qu = qtyUnit(), pu = wheat ? "₹/qtl" : "₹" + A.unit_short;
   const list = trades(), { lots, sells } = fifo(list), lr = localRate();
   const stock = lots.reduce((s, l) => s + l.left, 0), stockCost = lots.reduce((s, l) => s + units(l.left) * l.price, 0);
-  const mark = wheat ? lr || (A.best_source ? A.best_source.landed : null) : nowPrice(C) * (1 - A.costs.sell_discount_pct / 100);
+  const best = wheat ? PW().best_source : null;
+  const mark = wheat ? lr || (best ? best.landed : null) : nowPrice(C) * (1 - A.costs.sell_discount_pct / 100);
   const realised = sells.reduce((s, x) => s + x.net, 0);
   const ts = list.map(timingScore).filter(Boolean);
   const avgTiming = ts.length ? ts.reduce((s, x) => s + x.score, 0) / ts.length : null;
@@ -777,7 +789,7 @@ function renderTrades() {
   $("#trades").innerHTML = `
   <h2>My ${esc(A.label.toLowerCase())} trades - post-analysis</h2>
   <p class="ink2 small">Record each purchase and sale. Stored only in this browser - export a CSV to back up or move to another phone.
-    ${wheat ? "Buy price = your all-in cost per quintal at Srikakulam." : `Quantity in grams; price ${esc(unitTxt())} - what you actually paid or were paid (put making charges and GST into the buy price).`}</p>
+    ${wheat ? `Buy price = your all-in cost per quintal at ${esc(town())}.` : `Quantity in grams; price ${esc(unitTxt())} - what you actually paid or were paid (put making charges and GST into the buy price).`}</p>
   <div class="card"><form class="row" id="tradeForm">
     <label>Date<input type="date" name="date" required value="${A.asof}"></label>
     <label>Type<select name="type"><option value="buy">Buy</option><option value="sell">Sell</option></select></label>
@@ -791,7 +803,7 @@ function renderTrades() {
   <div class="grid">
     <div class="tile"><div class="k">Realised profit (after holding cost)</div><div class="v ${cls(realised)}">${rs(realised)}</div><div class="d">${sells.length} sales matched first-in-first-out</div></div>
     <div class="tile"><div class="k">${wheat ? "Stock on hand" : "Holding now"}</div><div class="v">${stock.toFixed(wheat ? 1 : 2)} ${qu}</div><div class="d">Avg cost ${stock ? rs(stockCost / units(stock)) : "–"}${wheat ? "" : A.unit_short}</div></div>
-    <div class="tile"><div class="k">Unrealised profit</div><div class="v ${cls(stock && mark ? units(stock) * mark - stockCost : 0)}">${stock && mark ? rs(units(stock) * mark - stockCost) : "–"}</div><div class="d">${wheat ? (lr ? "at your Srikakulam rate" : "at today's cheapest landed cost") : `at today's price less the ${A.costs.sell_discount_pct}% buy-back cut`} ${mark ? rs(mark) : ""}</div></div>
+    <div class="tile"><div class="k">Unrealised profit</div><div class="v ${cls(stock && mark ? units(stock) * mark - stockCost : 0)}">${stock && mark ? rs(units(stock) * mark - stockCost) : "–"}</div><div class="d">${wheat ? (lr ? `at your ${esc(town())} rate` : `at today's cheapest landed cost at ${esc(town())}`) : `at today's price less the ${A.costs.sell_discount_pct}% buy-back cut`} ${mark ? rs(mark) : ""}</div></div>
     <div class="tile"><div class="k">Your timing score</div><div class="v">${avgTiming != null ? Math.round(avgTiming) + "/100" : "–"}</div><div class="d">100 = bought at the lowest / sold at the highest price of the surrounding 2 months</div></div>
     <div class="tile"><div class="k">Followed the agent</div><div class="v">${judged ? Math.round(agree / judged * 100) + "%" : "–"}</div><div class="d">${judged} trades on days with a signal</div></div>
   </div>
@@ -892,12 +904,13 @@ function renderRecord() {
 
 /* ------------------------------------------------------------------ MANDIS (wheat) */
 function renderMandis() {
-  const lt = A.landed, lr = localRate(), cfg = A.config;
+  const pw = PW(), lt = pw.landed, lr = localRate(), cfg = A.config, pk = place().key;
   $("#mandis").innerHTML = `
-  <h2>Mandis & landed cost at Srikakulam</h2>
+  <h2>Mandis & landed cost at ${esc(town())}</h2>
   <div class="card"><form class="row" onsubmit="return false">
-    <label>Your Srikakulam selling rate ₹/qtl<input type="number" id="lr" value="${lr ?? ""}" step="5" placeholder="e.g. 3200"></label>
-    <span class="small ink2" style="align-self:center">Saved in this browser. Used for margins, pre-trade and unrealised profit.</span></form></div>
+    <label>Your ${esc(town())} selling rate ₹/qtl<input type="number" id="lr" value="${lr ?? ""}" step="5" placeholder="e.g. 3200"></label>
+    <span class="small ink2" style="align-self:center">Saved in this browser, one rate per place. Used for margins, pre-trade and unrealised profit.</span></form></div>
+  ${pw.note ? `<p class="small ink2">🚚 ${esc(pw.note)}</p>` : ""}
   <p class="small ink2">Landed = mandi price + mandi fee (${cfg.costs.source_mandi_fee_pct}%) + freight (₹${cfg.freight.rate_per_qtl_per_km}/qtl/km) + handling ₹${cfg.costs.handling_per_qtl} + bags ₹${cfg.costs.bags_per_qtl} + brokerage ₹${cfg.costs.brokerage_per_qtl}. Change these in <code>config.json</code> to match your real costs.</p>
   <div class="card tablewrap"><table><tr><th>Mandi</th><th>State</th><th class="num">km</th><th class="num">Mandi price</th><th class="num">Fee</th><th class="num">Freight</th><th class="num">Other</th><th class="num">Landed</th><th class="num">${lr ? "Your margin" : ""}</th><th>Price date</th></tr>
     ${lt.map(r => `<tr data-mk="${esc(r.market)}" style="cursor:pointer"><td><b>${esc(r.market)}</b></td><td>${esc(r.state)}</td><td class="num">${r.km}</td><td class="num">${rs(r.mandi_price)}</td><td class="num">${rs(r.fee)}</td><td class="num">${rs(r.freight)}</td><td class="num">${rs(r.extras)}</td><td class="num"><b>${rs(r.landed)}</b></td><td class="num ${lr ? cls(lr - r.landed) : ""}">${lr ? rs(lr - r.landed) : ""}</td><td class="small">${fmtDate(r.date)}</td></tr>`).join("")}
@@ -905,11 +918,11 @@ function renderMandis() {
   <div class="card"><h3 style="margin-top:0" id="mkTitle"></h3><div id="mkChart"></div></div>
   <h3>All-India today (${A.feed_day ? fmtDate(A.feed_day) : ""})</h3>
   <p class="small ink2">"Source" states grow wheat (where you buy). "Selling" states are deficit markets like yours - their prices are a reference for what wheat fetches in the south and east.
-   Median selling-state price: <b>${rs(A.selling_reference)}</b>${A.margin_vs_selling_ref != null ? ` → gap vs cheapest landed: <b class="${cls(A.margin_vs_selling_ref)}">${rs(A.margin_vs_selling_ref)}</b>/qtl` : ""}.</p>
-  <div class="card tablewrap"><table><tr><th>State</th><th>Role</th><th class="num">Mandis</th><th class="num">Median</th><th class="num">Low – high</th><th class="num">Landed at Srikakulam (approx.)</th></tr>
-    ${A.states.map(s => `<tr><td>${esc(s.state)}</td><td><span class="chip">${s.role}</span></td><td class="num">${s.mandis}</td><td class="num">${rs(s.median)}</td><td class="num">${rs(s.low)} – ${rs(s.high)}</td><td class="num">${s.landed ? rs(s.landed) : ""}</td></tr>`).join("")}
+   Median selling-state price: <b>${rs(A.selling_reference)}</b>${pw.margin_vs_selling_ref != null ? ` → gap vs cheapest landed at ${esc(town())}: <b class="${cls(pw.margin_vs_selling_ref)}">${rs(pw.margin_vs_selling_ref)}</b>/qtl` : ""}.</p>
+  <div class="card tablewrap"><table><tr><th>State</th><th>Role</th><th class="num">Mandis</th><th class="num">Median</th><th class="num">Low – high</th><th class="num">Landed at ${esc(town())} (approx.)</th></tr>
+    ${A.states.map(s => `<tr><td>${esc(s.state)}</td><td><span class="chip">${s.role}</span></td><td class="num">${s.mandis}</td><td class="num">${rs(s.median)}</td><td class="num">${rs(s.low)} – ${rs(s.high)}</td><td class="num">${s.landed_by_place ? (s.landed_by_place[pk] ? rs(s.landed_by_place[pk]) : "") : s.landed && place().default ? rs(s.landed) : ""}</td></tr>`).join("")}
   </table></div>`;
-  $("#lr").oninput = e => { store.set("localRate", e.target.value ? +e.target.value : null); };
+  $("#lr").oninput = e => { store.set(rateKey(), e.target.value ? +e.target.value : null); };
   $("#lr").onchange = () => renderMandis();
   const show = mk => {
     $("#mkTitle").textContent = mk + " - modal price, last 6 months";
@@ -935,7 +948,7 @@ function renderWatchWheat() {
   const items = [
     ["Season phase", phase[0], phase[1], "Seasonal index (Forecast tab)"],
     ["Mandi prices in MP / Rajasthan", b.chg_7d > 2 ? "serious" : b.chg_7d < -2 ? "good" : "", `Benchmark ${rs(b.price)}, 7 days ${pc(b.chg_7d)}, 30 days ${pc(b.chg_30d)}`, "Agmarknet - checked every 5 minutes here"],
-    ["Landed cost vs your local rate", localRate() ? (localRate() - (A.best_source?.landed || 0) > 0 ? "good" : "critical") : "", localRate() ? (A.best_source ? `Margin ${rs(localRate() - A.best_source.landed)}/qtl` : "No recent source price") : "Enter your rate in the Mandis tab", "Your own selling rate"],
+    [`Landed cost at ${town()} vs your local rate`, localRate() ? (localRate() - (PW().best_source?.landed || 0) > 0 ? "good" : "critical") : "", localRate() ? (PW().best_source ? `Margin ${rs(localRate() - PW().best_source.landed)}/qtl` : "No recent source price") : "Enter your rate in the Mandis tab", "Your own selling rate"],
     ["MSP (govt floor)", b.price <= A.msp.floor * 1.04 ? "good" : "", `MSP ${rs(A.msp.floor)} (${A.msp.season}); next ${rs(A.msp.next_value)} (${A.msp.next_season})`, "Announced each Sep/Oct by the Cabinet (CCEA) - pib.gov.in"],
     ["FCI OMSS wheat sales (govt ceiling)", omss ? (b.price >= omss ? "critical" : "warning") : "", omss ? `Reserve price ${rs(omss)}` : "Not running / not set - set omss.reserve_price in config.json when FCI announces sales", "fci.gov.in → OMSS e-auctions (weekly, usually Aug–Mar)"],
     ["Central pool wheat stock vs buffer norm", "", "Low stock = govt sells less in OMSS = prices can run up. Norms: 1 Apr 74.6, 1 Jul 275.8, 1 Oct 205.2, 1 Jan 138 lakh tonnes", "FCI stock position (monthly) - fci.gov.in"],
@@ -951,7 +964,7 @@ function renderWatchWheat() {
   <h2>What to watch - and why it matters</h2>
   <p class="ink2 small">These move wheat prices. The agent tracks the first few automatically; the rest are announcements to check (links given). Colour = how much attention it needs right now.</p>
   ${watchTable(items)}
-  <h3>Wheat year at a glance (for a Srikakulam trader)</h3>
+  <h3>Wheat year at a glance (for a ${esc(town())} trader)</h3>
   <div class="card"><div class="cal">${MON.map((mo, i) => `<div class="${t.cheapest_months.includes(mo) || (i >= 2 && i <= 4) ? "buy" : t.dearest_months.includes(mo) || i >= 9 || i <= 1 ? "sell" : ""} ${i === m - 1 ? "now" : ""}">${mo}</div>`).join("")}</div>
   <div class="small" style="margin-top:8px">
     <div>• <b>Mar–May</b>: new crop arrives in MP/Rajasthan → <b>buy & stock</b> (ధర తక్కువ - కొనండి).</div>
@@ -1025,7 +1038,8 @@ function renderOverview() {
       <div class="spark" id="sp-${k}"></div>
       <div class="d">${f ? `30-day forecast <b>${rs(f.price)}</b> (${pc((f.price / it.price - 1) * 100)})` : ""} · score ${scoreTxt(s.score)} of ±${absTxt(s.max_score)} · ${esc(s.confidence)} confidence</div>
       ${s.plain ? `<div class="d"><b>${esc(s.plain)}</b></div>` : ""}
-      ${it.where ? `<div class="d where" title="${esc(it.where.detail)}">📍 ${esc(it.where.short)}</div>` : ""}
+      ${whereFor(it) ? `<div class="d where" title="${esc(whereFor(it).detail)}">📍 ${esc(whereFor(it).short)}</div>` : ""}
+      ${k === "wheat" && it.lines_by_place && it.lines_by_place[place().key] ? `<div class="d">🚚 ${esc(it.lines_by_place[place().key][0].replace(/Rs /g, "₹"))}</div>` : ""}
       ${s.change_line ? `<div class="d">🎯 ${esc(s.change_line)}</div>` : ""}
       ${s.pending ? `<div class="d">⏳ ${esc(s.pending)}</div>` : ""}
       ${it.long_term ? `<div class="d">📅 Saving for years: <b>${esc(it.long_term.label)}</b></div>` : ""}
@@ -1037,8 +1051,8 @@ function renderOverview() {
   <h2>Today's prices and calls · ఈరోజు ధరలు</h2>
   <p class="ink2 small">One card per commodity: the agent's call, its price and the 30-day forecast (dashed, shaded side of each little chart). Click a card for the proof, the timeline and your trades.
     Gold, silver and platinum refresh live every 5 minutes; wheat when the mandis report.</p>
-  <p class="ink2 small">📍 <b>Where the prices are from:</b> wheat is the wholesale mandi price at ${esc(S.items.wheat?.where?.short.split("· ")[1] || "Jabalpur, Indore & Kota")} - Andhra Pradesh publishes no wheat mandi prices, so the Srikakulam figure is that price plus fee, freight and handling.
-    Gold, silver and platinum are the all-India import price (world spot × ₹ rate + import duty), before GST - a Srikakulam jeweller adds their own premium, making charges and GST.</p>
+  <p class="ink2 small">📍 <b>Where the prices are from (place: ${esc(town())}, ${esc(place().state)}):</b> wheat is the wholesale mandi price at ${esc(S.items.wheat?.where?.short.split("· ")[1] || "Jabalpur, Indore & Kota")} - ${esc(place().state)} publishes no wheat mandi prices, so the ${esc(town())} figure is that price plus fee, freight from each mandi to ${esc(town())} and handling.
+    Gold, silver and platinum are the all-India import price (world spot × ₹ rate + import duty), before GST - the same in ${esc(town())} as anywhere in India; a ${esc(town())} jeweller adds their own premium, making charges and GST.</p>
   <div class="cards">${order.map(card).join("")}</div>
   <h2>Last 12 months side by side</h2>
   <p class="ink2 small">Each line starts at 100 a year ago, so you can compare how much each has risen or fallen (110 = up 10%).</p>
@@ -1115,12 +1129,12 @@ function header() {
   const stale = age >= 3 ? ` · ⚠︎ agent last ran ${Math.round(age)} h ago` : "";
   let t;
   if (C === "all") {
-    t = `For Srikakulam, AP · 📍 wheat: MP & Rajasthan mandis · metals: all-India import price · checked every 5 minutes · agent ran ${hm(g)}${stale}`;
+    t = `For ${town()}, ${place().state} · 📍 wheat: MP & Rajasthan mandis · metals: all-India import price · checked every 5 minutes · agent ran ${hm(g)}${stale}`;
   } else if (C === "wheat") {
-    const oldDays = Math.floor((Date.now() - new Date(A.asof + "T00:00:00+05:30")) / 864e5), best = A.best_source;
-    t = `Wheat · ${fmtDate(A.asof)}${oldDays >= 3 ? ` ⚠︎ ${oldDays} days old` : ""} · 📍 ${A.benchmark.markets.map(x => x.replace(" APMC", "")).join(", ")} mandis ${rs(A.benchmark.price)}/qtl` + (best ? ` · landed at Srikakulam ${rs(best.landed)}/qtl` : "") + stale;
+    const oldDays = Math.floor((Date.now() - new Date(A.asof + "T00:00:00+05:30")) / 864e5), best = PW().best_source;
+    t = `Wheat · ${fmtDate(A.asof)}${oldDays >= 3 ? ` ⚠︎ ${oldDays} days old` : ""} · 📍 ${A.benchmark.markets.map(x => x.replace(" APMC", "")).join(", ")} mandis ${rs(A.benchmark.price)}/qtl` + (best ? ` · landed at ${town()} ${rs(best.landed)}/qtl` : "") + stale;
   } else {
-    t = `${A.label} ${rs(nowPrice(C))}${A.unit_short} · 📍 all-India import price, before GST${LIVE[C] ? ` · live ${hm(LIVE[C].updated)}` : ""} · call ${A.signal.label} (${fmtDate(A.asof)})${stale}`;
+    t = `${A.label} ${rs(nowPrice(C))}${A.unit_short} · 📍 all-India import price (same in ${town()}), before GST${LIVE[C] ? ` · live ${hm(LIVE[C].updated)}` : ""} · call ${A.signal.label} (${fmtDate(A.asof)})${stale}`;
   }
   $("#asof").textContent = t;
   document.querySelectorAll("#commodities button").forEach(b => b.setAttribute("aria-selected", b.dataset.c === C));
@@ -1170,6 +1184,7 @@ async function tick() {
     const s = await getJSON("data/summary.json");
     const changed = s.generated_at !== S.generated_at;
     S = s;
+    placePicker();
     if (changed) await Promise.all(Object.keys(D).map(k => load(k).catch(() => null)));
     if (C !== "all") { A = D[C]; PX = A._px; SIG = A._sig; }
   } catch { }
@@ -1177,6 +1192,20 @@ async function tick() {
   // Forms (pre-trade, trades, mandis) keep what you typed; the rest re-draws with the new prices.
   if (C === "all" || ["today", "timeline", "record", "forecast", "watch"].includes(V)) renderView(); else header();
 }
+
+function placePicker() {
+  $("#place").innerHTML = placeList().map(p => `<option value="${esc(p.key)}" title="${esc(p.name)}, ${esc(p.state)}">${esc(p.name)}</option>`).join("");
+  $("#place").value = place().key;
+}
+// The page's picklist and the Mac app's Settings › Place both land here.
+function setPlace(k, fromPage) {
+  if (!placeList().some(p => p.key === k)) return;
+  store.set("place", k);
+  $("#place").value = k;
+  if (fromPage) try { window.webkit.messageHandlers.dharaluPlace.postMessage(k); } catch { }
+  if (S) renderView();
+}
+window.setPlace = setPlace;
 
 async function boot() {
   // Theme: "system" (default, follows prefers-color-scheme), "light" or "dark". The Mac app may set dh.theme.
@@ -1205,6 +1234,10 @@ async function boot() {
     $("#all").hidden = false;
     $("#all").innerHTML = `<div class="card">Could not load data/summary.json - the agent has not run yet (${esc(e.message)}).</div>`; return;
   }
+  const qp = new URLSearchParams(location.search).get("place");   // ?place=hyderabad links straight to a place
+  if (qp && placeList().some(p => p.key === qp)) store.set("place", qp);
+  placePicker();
+  $("#place").onchange = e => setPlace(e.target.value, true);
   $("#commodities").innerHTML = `<button data-c="all">📊 All</button>` + S.order.map(k =>
     `<button data-c="${k}">${S.items[k].emoji} ${esc(S.items[k].label)} <span class="px" data-k="${k}"></span></button>`).join("");
   $("#commodities").querySelectorAll("button").forEach(b => b.onclick = () => go(b.dataset.c, b.dataset.c === C ? V : (b.dataset.c === "wheat" || V !== "mandis" ? V : "today")));

@@ -33,8 +33,14 @@ Look at **🔄 What changed since …** on the Today tab: it lists the rules tha
 **The track record shows only a handful of HOLD days last year.**
 HOLD needs a specific mix of rules, so it's rarer than the others. That's why the dashboard also shows the **whole history** (wheat since 2016, metals about 10 years), and quotes it when the last year has fewer than 10 such days.
 
-**Why no Srikakulam mandi price?**
-Andhra Pradesh hasn't reported wheat mandi prices since 2017; it buys wheat from other states. So Dharalu works out the landed cost from 16 source mandis. Enter your local selling rate in *Mandis* to see your margin.
+**Why no Srikakulam (or Hyderabad) mandi price?**
+Andhra Pradesh hasn't reported wheat mandi prices since 2017; it buys wheat from other states. Telangana reports none either. So Dharalu works out the landed cost from 16 source mandis, for the place you pick. Enter your local selling rate in *Mandis* to see your margin.
+
+**Does the call change when I switch to Hyderabad?**
+No. The buy / hold / sell call reads the benchmark mandi price (Jabalpur, Indore, Kota), which is the same for everyone. The place changes the landed cost, the margins and the 📍 lines. Hyderabad is closer to the MP mandis, so wheat lands there about ₹50-90/qtl cheaper than in Srikakulam. The Hyderabad km are estimates: replace them with your transporter's in `config.json` → `places`.
+
+**Are gold and silver dearer in Hyderabad?**
+Dharalu's price is the same: the all-India import price. Local jewellers' rates differ a little by city (their premium), and jewellery adds making charges and GST.
 
 **Why does the forecast say the price will rise (or fall)?**
 Open 🔮 *Why the forecast says this* on the Timeline or Forecast tab. The move is split into the recent trend, the season and the last few days' average, with the biggest named as the main reason. The forecast reads only the price's own history, so news and policy changes (MSP, duty, US rates…) are not in it. When the card says it is NOT better than "price stays the same", trust the range more than the single number.
@@ -56,8 +62,8 @@ The live price updates every 5 minutes, but the call only changes when the agent
 ## Data
 
 **Which place are the prices for?**
-- **Wheat**: the wholesale mandi price at **Jabalpur, Indore & Kota** (Madhya Pradesh, Rajasthan). These three have the longest daily records on data.gov.in Agmarknet. Andhra Pradesh publishes no wheat mandi prices, so there is no "Srikakulam wheat price" to show. Instead the agent works out what wheat costs **landed at Srikakulam** from each source mandi: mandi price + mandi fee + freight + handling (Mandis & landed cost tab).
-- **Gold, silver, platinum**: the **all-India import price**: the world spot price × the ₹ rate + import duty, before GST. It is the same for all of India. A Srikakulam jeweller's rate is usually a little higher (their premium), and jewellery adds making charges and GST.
+- **Wheat**: the wholesale mandi price at **Jabalpur, Indore & Kota** (Madhya Pradesh, Rajasthan). These three have the longest daily records on data.gov.in Agmarknet. Andhra Pradesh and Telangana publish no wheat mandi prices, so there is no "Srikakulam" or "Hyderabad" wheat price to show. Instead the agent works out what wheat costs **landed** at the place you pick (📍) from each source mandi: mandi price + mandi fee + freight + handling (Mandis & landed cost tab).
+- **Gold, silver, platinum**: the **all-India import price**: the world spot price × the ₹ rate + import duty, before GST. It is the same for all of India, Srikakulam and Hyderabad included. A local jeweller's rate is usually a little higher (their premium), and jewellery adds making charges and GST.
 - Every price shows a 📍 line saying this.
 
 **The dashboard shows an old date (⚠︎ N days old).**

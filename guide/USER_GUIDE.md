@@ -4,9 +4,11 @@ Dashboard: https://sravankumartangudu.github.io/dharalu/
 
 The top row picks the commodity: **All**, 🌾 **Wheat**, 🥇 **Gold**, 🥈 **Silver**, 💠 **Platinum**. Each button shows today's price and is coloured by its call (green buy · orange hold · grey wait · red sell). Under it are the tabs for that commodity. The address remembers where you are (for example `#gold/timeline`), so you can bookmark or share a page.
 
+**📍 Place** (top right): **Srikakulam** or **Hyderabad**. The wheat landed cost, the margins, your selling rate and every "at …" line follow it. Gold, silver and platinum are one all-India price, the same in both. A link can pick the place: `…/dharalu/?place=hyderabad#wheat/mandis`.
+
 | | Unit | Price |
 |---|---|---|
-| 🌾 Wheat | ₹ per quintal (100 kg) | The **benchmark** (Jabalpur, Indore, Kota) and the cheapest **landed** price at Srikakulam |
+| 🌾 Wheat | ₹ per quintal (100 kg) | The **benchmark** (Jabalpur, Indore, Kota) and the cheapest **landed** price at your place (Srikakulam or Hyderabad) |
 | 🥇 Gold | ₹ per 10 g, 24 carat | World spot × ₹ rate + 6% import duty. GST (3%) on top |
 | 🥈 Silver | ₹ per kg, 999 | The same |
 | 💠 Platinum | ₹ per 10 g, 999.5 | The same, 6.4% duty |
@@ -55,8 +57,8 @@ Each call gives two pieces of advice, because the right move depends on your pos
 ### Today · ఈరోజు
 - **The call**, with the score gauge (the middle is 0; the ticks are the ±1 and ±3 call bands), confidence, and date of the latest prices.
 - **📍 Prices from**: which place the price is for, also in the header of every tab and on each overview card.
-  - **Wheat**: the middle of the day's modal (most-traded) wholesale prices at the **Jabalpur, Indore & Kota APMC mandis** (Madhya Pradesh, Rajasthan), from data.gov.in Agmarknet. Andhra Pradesh publishes no wheat mandi prices, so it also shows the cheapest **landed at Srikakulam** cost (mandi price + fee + freight + handling).
-  - **Gold, silver, platinum**: the **all-India import price**: world spot (US$ per ounce) × the ₹ rate + import duty, before GST. The same anywhere in India, so it is not a Srikakulam jeweller's rate; shops add their own premium, making charges and GST.
+  - **Wheat**: the middle of the day's modal (most-traded) wholesale prices at the **Jabalpur, Indore & Kota APMC mandis** (Madhya Pradesh, Rajasthan), from data.gov.in Agmarknet. Andhra Pradesh and Telangana publish no wheat mandi prices, so it also shows the cheapest **landed** cost at your place (mandi price + fee + freight to Srikakulam or Hyderabad + handling).
+  - **Gold, silver, platinum**: the **all-India import price**: world spot (US$ per ounce) × the ₹ rate + import duty, before GST. The same anywhere in India, Srikakulam and Hyderabad included, so it is not a local jeweller's rate; shops add their own premium, making charges and GST.
 - **The plain line, what would change it, its record, why this confidence**: see *Reading a call in 30 seconds* above.
 - **🔄 What changed since <date>**: shown on a new prices day. Which rules moved (counted points then → now) and whether the call changed.
 - **Saving for years** (metals): ADD / STEADY / GO SLOW for money you'll keep a year or more, its reason, its 1-year record, and the 5- and 10-year growth. Open *The long-term rules and their record* for each rule and whether it counts.
@@ -94,7 +96,7 @@ Everything on one time axis:
 
 ### Before you trade (pre-analysis)
 **Wheat:** pick the source mandi, price, quantity, freight and holding days. You get:
-- the landed cost at Srikakulam and the total money needed;
+- the landed cost at your place (Srikakulam or Hyderabad) and the total money needed;
 - holding cost for the period, and the **break-even sell price**;
 - profit in the pessimistic / likely / optimistic case (from the forecast range).
 
@@ -132,7 +134,8 @@ Each commodity has its own list.
 How to read it: a useful BUY row has a positive average move and "price rose" well above 50%. If the rows stop looking like that, trust the call less.
 
 ### Mandis & landed cost (wheat only)
-- **Your Srikakulam selling rate:** type your local rate to see your margin on every source.
+- **Your selling rate** for the chosen place: type your local rate to see your margin on every source. Each place keeps its own rate.
+- The **🚚 note** says the road km are estimates; put your transporter's figures in `config.json` → `places`.
 - The **16 source mandis**, sorted by landed cost. Each shows the mandi price, fee, freight, extras and landed total, plus the date of its latest report.
 - Click a mandi for its price chart.
 - **All-India today:** state medians from today's feed.

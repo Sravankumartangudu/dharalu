@@ -435,6 +435,7 @@ def where(m, home):
     """Which place the metal price is for - shown beside every price."""
     town = home.split(",")[0]
     return {
+        "place_note": "Same import price in %s as everywhere in India" % town,
         "short": "All-India import price · world spot + %g%% duty, before GST" % m["duty_pct"],
         "short_te": "అఖిల భారత దిగుమతి ధర · ప్రపంచ ధర + %g%% సుంకం, GST లేకుండా" % m["duty_pct"],
         "detail": "World spot %s in US$ per troy ounce (gold-api.com; history COMEX %s, Yahoo Finance) x the US$/Rs "
@@ -509,7 +510,8 @@ def analyse(key, cfg, live):
         "ratio_gold_silver": round(ratio_at(cal[-1][0]), 1) if ratio_at else None,
         "costs": {k: m[k] for k in ("duty_pct", "gst_pct", "sell_discount_pct", "interest_pct_per_month")},
         "convert": {"oz_g": OZ_G, "grams": m["grams"], "duty_pct": m["duty_pct"]},
-        "where": where(m, cfg["business"]["location"]),
+        "where": where(m, az.default_place(cfg)["location"]),
+        "where_by_place": {p["key"]: where(m, p["location"]) for p in az.places(cfg)},
     }
 
 

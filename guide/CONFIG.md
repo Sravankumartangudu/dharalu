@@ -4,7 +4,7 @@ Every cost in `config.json` is a **starting estimate**. Replace each one with wh
 
 To edit on GitHub: open `config.json`, click the ✏️ pencil, change the numbers, then *Commit changes*. The next run (or *Actions → Run workflow*) uses the new values. Keep the JSON shape: commas between items, no comma after the last one.
 
-## Costs - landed price at Srikakulam
+## Costs - landed price at Srikakulam / Hyderabad
 
 | Key | Default | Meaning |
 |---|---|---|
@@ -33,13 +33,26 @@ Each entry in `source_markets`:
 | `name` | Agmarknet market name (as in today's feed, e.g. `Katni APMC`) |
 | `old_name` | Name before Nov 2025, used to download older history |
 | `state` | State |
-| `km` | Road distance to Srikakulam |
+| `km` | Road distance to Srikakulam (the default place) |
 | `long_history` | `true` = part of the benchmark (Jabalpur, Indore, Kota). Change with care: the track record is built on these |
 | `freight_override` | Optional fixed freight in ₹/qtl if you have a quote, e.g. `"freight_override": 310` |
 
 To add a mandi, copy an entry, change the name, state and km, then run with *bootstrap* ticked once to fetch its history.
 
-`state_km` is the rough distance per state, used for the all-India state table. `consumer_states` lists the states shown as "selling" markets for comparison.
+`state_km` is the rough distance per state from Srikakulam, used for the all-India state table.
+
+## Places - Srikakulam and Hyderabad
+
+`places` lists the places in the 📍 picklist. The one with `"default": true` (Srikakulam) uses the `km` on each source mandi and `state_km` above. Every other place carries its own maps:
+
+| Key | Meaning |
+|---|---|
+| `key`, `name`, `state`, `telugu` | How the place is named in the picklist and the 📍 lines |
+| `km` | Road distance from this place to each source mandi, by mandi `name`. A mandi missing here is left out of this place's table |
+| `state_km` | Rough distance per state from this place, for the state table |
+| `note` | The 🚚 note on the Mandis tab |
+
+The Hyderabad distances are **estimates** (via Nagpur on NH44 for the MP mandis). Replace them with your transporter's. A `freight_override` is a quote for one route, so it applies to the default place only. To add a place, copy the Hyderabad entry and change its key, names and km. `consumer_states` lists the states shown as "selling" markets for comparison.
 
 ## MSP - update every year
 

@@ -69,6 +69,16 @@ enum Settings {
             ? "try{localStorage.removeItem('dh.theme');delete document.documentElement.dataset.theme;}catch(e){}"
             : "try{localStorage.setItem('dh.theme','\"\(v)\"');document.documentElement.dataset.theme='\(v)';}catch(e){}"
     }
+    /// 📍 Which place the wheat landed cost, margins and 📍 lines are for ("srikakulam", "hyderabad").
+    /// The dashboard page keeps the same choice in `dh.place`.
+    static var place: String {
+        get { d.string(forKey: "place") ?? "srikakulam" }
+        set { d.set(newValue, forKey: "place") }
+    }
+    static var placeScript: String {
+        let k = place.filter { $0.isLetter || $0.isNumber || $0 == "-" }
+        return "try{localStorage.setItem('dh.place','\"\(k)\"');}catch(e){}"
+    }
     static func lastSignal(_ k: String) -> String? { d.string(forKey: "lastSignal.\(k)") }
     static func setLastSignal(_ k: String, _ v: String?) { d.set(v, forKey: "lastSignal.\(k)") }
     static func lastMove(_ k: String) -> String? { d.string(forKey: "lastMove.\(k)") }
@@ -102,7 +112,9 @@ struct Summary: Decodable {
     struct Live: Decodable { let symbol: String; let usd: Double; let factor: Double; let prev_close: Double?; let updated: String? }
     struct ForecastWhy: Decodable { let summary: String?; let biggest: String? }
     /// Which place the price is from (wheat: the benchmark mandis; metals: the all-India import price).
-    struct Where: Decodable { let short: String; let detail: String?; let landed: String? }
+    struct Where: Decodable { let short: String; let detail: String?; let landed: String?; let place_note: String? }
+    /// The places a trader can pick (since 2.4): Srikakulam, Hyderabad.
+    struct Place: Decodable { let key: String; let name: String; let state: String; let telugu: String?; let `default`: Bool? }
     struct Item: Decodable {
         let key: String
         let asof: String
@@ -131,11 +143,21 @@ struct Summary: Decodable {
         let live: Live?
         let lines: [String]?
         let `where`: Where?
+        /// Since 2.4: the same, for each place (wheat landed cost differs; metals are one all-India price).
+        let lines_by_place: [String: [String]]?
+        let where_by_place: [String: Where]?
     }
 
     let generated_at: String
     let order: [String]?
     let items: [String: Item]
+    let places: [Place]?
+
+    /// The chosen place if this data knows it, else the default place.
+    var place: Place? {
+        let ps = places ?? []
+        return ps.first { $0.key == Settings.place } ?? ps.first { $0.default == true } ?? ps.first
+    }
 
     var generated: Date? { isoDate(generated_at) }
     var keys: [String] { (order ?? defaultOrder).filter { items[$0] != nil } }
@@ -469,16 +491,18 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         } else {
             menu.addItem(info("Price \(rs(it.price))\(it.unit_short) on \(prettyDate(it.asof)) · 1d \(pc(it.chg_1d)) · 7d \(pc(it.chg_7d)) · 30d \(pc(it.chg_30d))"))
         }
-        if let w = it.where {
+        let pk = summary?.place?.key ?? Settings.place
+        if let w = it.where_by_place?[pk] ?? it.where {
             let row = info(wrap("📍 \(w.short)", 70))
             row.toolTip = w.detail
             menu.addItem(row)
+            if let n = w.place_note { menu.addItem(info(wrap("📍 \(n)", 70))) }
         }
         if let f = it.forecast30 {
             menu.addItem(info("30-day forecast \(rs(f.price)) (likely \(rs(f.low)) – \(rs(f.high)))"))
             if let why = it.forecast_why?.summary { menu.addItem(info(wrap("🔮 Why: \(why)", 70))) }
         }
-        for line in it.lines ?? [] { menu.addItem(info(wrap(rupee(line), 70))) }
+        for line in it.lines_by_place?[pk] ?? it.lines ?? [] { menu.addItem(info(wrap(rupee(line), 70))) }
         if let cc = it.carrying_cost_30d_pct { menu.addItem(info("Holding cost \(String(format: "%.1f", cc))% per 30 days")) }
         if pricesOld(it) {
             menu.addItem(info(wrap("⚠︎ The newest price is from \(prettyDate(it.asof)) (\(priceAgeDays(it)) days ago)." +
@@ -570,6 +594,12 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         m.addItem(groupHeader("Menu bar"))
         m.addItem(segmentRow("Show", ["🌾 Wheat", "🥇 Gold", "🥈 Silver", "💠 Plat."], defaultOrder.firstIndex(of: Settings.barItem) ?? 0, #selector(segBar(_:))))
         m.addItem(switchRow("Show price", Settings.showPrice, #selector(switchPrice(_:))))
+        // Place
+        m.addItem(.separator())
+        m.addItem(groupHeader("Place"))
+        let ps = placeChoices
+        m.addItem(segmentRow("📍 Wheat landed cost & margins for", ps.map { $0.name },
+                             ps.firstIndex { $0.key == (summary?.place?.key ?? Settings.place) } ?? 0, #selector(segPlace(_:))))
         // Alerts
         m.addItem(.separator())
         m.addItem(groupHeader("Alerts"))
@@ -638,6 +668,17 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
     @objc func pickBar(_ m: NSMenuItem) {
         guard let k = m.representedObject as? String else { return }
         Settings.barItem = k; updateTitle()
+    }
+    /// From summary.json; the two built-in places until the first load.
+    var placeChoices: [Summary.Place] {
+        summary?.places ?? [Summary.Place(key: "srikakulam", name: "Srikakulam", state: "Andhra Pradesh", telugu: nil, default: true),
+                            Summary.Place(key: "hyderabad", name: "Hyderabad", state: "Telangana", telugu: nil, default: false)]
+    }
+    @objc func segPlace(_ s: NSSegmentedControl) {
+        let ps = placeChoices
+        guard ps.indices.contains(s.selectedSegment) else { return }
+        Settings.place = ps[s.selectedSegment].key
+        dashboard.applyPlace()
     }
     @objc func switchPrice(_ s: NSSwitch) { Settings.showPrice = s.state == .on; updateTitle() }
     @objc func switchNotify(_ s: NSSwitch) { Settings.notify = s.state == .on }
@@ -745,7 +786,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
 
 /// The full dashboard in a window. Trades you enter here are kept in this app's own
 /// web storage (separate from your browser) - use Export CSV / Import CSV to move them.
-final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDelegate, WKDownloadDelegate {
+final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDelegate, WKDownloadDelegate, WKScriptMessageHandler {
     var window: NSWindow?
     var web: WKWebView?
 
@@ -755,8 +796,10 @@ final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDel
         if window == nil {
             let cfg = WKWebViewConfiguration()
             cfg.websiteDataStore = .default()   // keeps trades (localStorage) between launches
-            // Apply the Appearance choice before the page's own script reads its saved theme.
-            cfg.userContentController.addUserScript(WKUserScript(source: Settings.themeScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+            // Apply the Appearance and Place choices before the page's own script reads them.
+            Dashboard.addScripts(cfg.userContentController)
+            // The page's 📍 picklist tells the app, so Settings › Place and the menu follow it.
+            cfg.userContentController.add(self, name: "dharaluPlace")
             let w = WKWebView(frame: .zero, configuration: cfg)
             w.navigationDelegate = self
             w.uiDelegate = self
@@ -787,9 +830,24 @@ final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDel
     /// Re-theme the open page at once (the script is re-read on every load, so it is always current).
     func applyTheme() {
         guard let w = web else { return }
-        w.configuration.userContentController.removeAllUserScripts()
-        w.configuration.userContentController.addUserScript(WKUserScript(source: Settings.themeScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        Dashboard.addScripts(w.configuration.userContentController)
         w.evaluateJavaScript(Settings.themeScript + ";if(typeof renderAll==='function'){try{renderAll()}catch(e){}}", completionHandler: nil)
+    }
+
+    static func addScripts(_ u: WKUserContentController) {
+        u.removeAllUserScripts()
+        u.addUserScript(WKUserScript(source: Settings.themeScript + Settings.placeScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+    }
+
+    /// Switch the open page to the place picked in Settings.
+    func applyPlace() {
+        guard let w = web else { return }
+        Dashboard.addScripts(w.configuration.userContentController)
+        w.evaluateJavaScript(Settings.placeScript + ";if(typeof setPlace==='function'){try{setPlace(JSON.parse(localStorage.getItem('dh.place')))}catch(e){}}", completionHandler: nil)
+    }
+
+    func userContentController(_ u: WKUserContentController, didReceive m: WKScriptMessage) {
+        if m.name == "dharaluPlace", let k = m.body as? String, !k.isEmpty { Settings.place = k }
     }
 
     func windowWillClose(_ n: Notification) { NSApp.setActivationPolicy(.accessory) }

@@ -46,7 +46,7 @@ Each commodity's submenu:
 | If buying / If holding | The advice for each case |
 | 🎯 · 📊 · 🤔 | What would change the call, its past record vs any day, why this confidence |
 | 🔄 · 📅 | The call on the previous prices day (when it changed); metals: *Saving for years* (ADD / STEADY / GO SLOW) |
-| 📍 Prices from … | Which place the price is for: wheat *Wholesale mandi price · Jabalpur, Indore & Kota*; metals *All-India import price · world spot + duty, before GST*. Hover it for the full detail |
+| 📍 Prices from … | Which place the price is for: wheat *Wholesale mandi price · Jabalpur, Indore & Kota*, then *Cheapest landed at Srikakulam* (or Hyderabad); metals *All-India import price · world spot + duty, before GST* and *Same import price in Hyderabad as everywhere in India*. Hover it for the full detail. Follows *Settings › Place* |
 | Live … at 18:52 · since last close … | Metals: the live price and how far it has moved today; then the agent's price with its 7- and 30-day changes |
 | Key numbers | 30-day forecast with its likely range and **🔮 Why** (e.g. *Expected to fall about 5.7% in 30 days. Biggest reason: recent trend (−4.2%)*); wheat: cheapest landed source and MSP; metals: price with GST and the world price × ₹ rate; holding cost |
 | **Why this call - the proof ▸** | Every rule with its value, test and points × weight = counted (e.g. *−1 ×0.5 = −0.5*), the trend cap note, then the total and the equal-weights call when it differs |
@@ -60,12 +60,13 @@ The menu-bar title shows **⚠︎** when the data can't be loaded or the agent h
 
 ## Settings
 
-The Settings menu is grouped: **Menu bar**, **Alerts** and **General**. On/off settings are switches; the rest are segmented controls.
+The Settings menu is grouped: **Menu bar**, **Place**, **Alerts** and **General**. On/off settings are switches; the rest are segmented controls.
 
 | Setting | Default | What |
 |---|---|---|
 | Show | 🌾 Wheat | Which commodity the menu bar shows: Wheat / Gold / Silver / Platinum |
 | Show price | On | `⚖️ 🌾 SELL ₹2,693`, or just `⚖️ 🌾 SELL` |
+| 📍 Place | Srikakulam | Srikakulam / Hyderabad: which place the wheat landed cost, margins and 📍 lines are for. The dashboard window follows it, and picking a place in the window's 📍 picklist changes it here too. Metals are one all-India price |
 | Notify on call changes / big moves | On | For every commodity: notify when its call changes, or when its price moves a lot in a day - wheat 2.5%, gold 2%, silver and platinum 3% (once a day each). Clicking a notification opens that commodity |
 | Check prices every | 5 min | 5 / 15 / 30 minutes or 1 hour. Each check reloads the agent's data and the live gold, silver and platinum prices |
 | Launch at login | Off | Start with your Mac |

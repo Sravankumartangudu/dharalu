@@ -232,7 +232,7 @@ def wheat(cfg, mode, rstate):
     a["briefing"] = {"rules": briefing.rule_based(a), "ai": old["briefing"]["ai"]} if reuse else briefing.build(a)
     a["generated_at"] = stamp()
     a["config"] = {k: cfg[k] for k in ("business", "msp", "omss", "freight", "costs", "carrying",
-                                       "source_markets", "state_km", "consumer_states")}
+                                       "source_markets", "state_km", "consumer_states", "places")}
     a["series_weekly"] = weekly_wheat(rows, cfg)
     write_json(OUT, a)
     s = a["signal"]
@@ -335,6 +335,7 @@ def entry(key, a):
         "timing": {k: a["timing"][k] for k in ("cheapest_months", "dearest_months", "next_buy_window", "days_to_buy_window")},
         "carrying_cost_30d_pct": a.get("carrying_cost_30d_pct"),
         "where": a.get("where"),
+        "where_by_place": a.get("where_by_place") or {k: p["where"] for k, p in (a.get("places") or {}).items()},
     }
     if key == "wheat":
         b, best = a["benchmark"], a.get("best_source") or {}
@@ -342,12 +343,16 @@ def entry(key, a):
                   "unit_short": "/qtl", "price": round(b["price"]),
                   "chg_1d": b.get("chg_1d"), "chg_7d": b.get("chg_7d"), "chg_30d": b.get("chg_30d"),
                   "move_alert_pct": None, "live": None})
-        lines = []
-        if best:
-            lines.append("Cheapest landed at Srikakulam: %s Rs %s/qtl (mandi Rs %s + freight Rs %s)" % (
-                best["market"], format(best["landed"], ","), format(best["mandi_price"], ","), format(best["freight"], ",")))
-        lines.append("MSP Rs %s (%+.1f%%)" % (format(a["msp"]["floor"], ","), analyze.pct(b["price"], a["msp"]["floor"])))
-        e["lines"] = lines
+        msp = "MSP Rs %s (%+.1f%%)" % (format(a["msp"]["floor"], ","), analyze.pct(b["price"], a["msp"]["floor"]))
+
+        def landed_lines(town, best):
+            out = ["Cheapest landed at %s: %s Rs %s/qtl (mandi Rs %s + freight Rs %s)" % (
+                town, best["market"], format(best["landed"], ","), format(best["mandi_price"], ","),
+                format(best["freight"], ","))] if best else []
+            return out + [msp]
+        home = (a.get("places") or {}).get(a.get("place_default")) or {}
+        e["lines"] = landed_lines(home.get("name", "Srikakulam"), best)
+        e["lines_by_place"] = {k: landed_lines(p["name"], p.get("best_source")) for k, p in (a.get("places") or {}).items()}
     else:
         ind, w = a["indicators"], a["world"]
         factor = w["usdinr"] / a["convert"]["oz_g"] * a["grams"] * (1 + a["convert"]["duty_pct"] / 100.0)
@@ -386,6 +391,7 @@ def main():
     all_ = {"wheat": w, **ms}
 
     summary = {"generated_at": stamp(), "site": SITE, "order": ["wheat"] + list(metals.METALS),
+               "places": [{k: p.get(k) for k in ("key", "name", "state", "telugu", "default")} for p in analyze.places(cfg)],
                "items": {k: entry(k, a) for k, a in all_.items()}}
     for k, it in summary["items"].items():
         if k != "wheat":

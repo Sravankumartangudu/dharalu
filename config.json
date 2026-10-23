@@ -4,6 +4,54 @@
     "unit": "Rs per quintal (100 kg)",
     "note": "Andhra Pradesh has no wheat mandi data (AP buys wheat from other states), so Srikakulam prices are worked out as source-mandi price + mandi fee + freight + handling."
   },
+  "places": [
+    {
+      "key": "srikakulam",
+      "name": "Srikakulam",
+      "state": "Andhra Pradesh",
+      "telugu": "శ్రీకాకుళం",
+      "default": true,
+      "note": "Road km from Srikakulam to each mandi are estimates - put your transporter's real distances or quotes in config.json."
+    },
+    {
+      "key": "hyderabad",
+      "name": "Hyderabad",
+      "state": "Telangana",
+      "telugu": "హైదరాబాద్",
+      "km": {
+        "Jabalpur APMC": 770,
+        "Katni APMC": 860,
+        "Narsinghpur APMC": 790,
+        "Damoh APMC": 870,
+        "Satna APMC": 960,
+        "Rewa APMC": 1010,
+        "Itarsi APMC": 800,
+        "Sagar APMC": 950,
+        "Harda APMC": 860,
+        "Bhopal APMC": 850,
+        "Sehore APMC": 890,
+        "Dewas APMC": 860,
+        "Indore APMC": 830,
+        "Ujjain APMC": 880,
+        "Kota APMC": 1150,
+        "APMC Nagpur": 500
+      },
+      "state_km": {
+        "Madhya Pradesh": 850,
+        "Chattisgarh": 780,
+        "Chhattisgarh": 780,
+        "Maharashtra": 600,
+        "Rajasthan": 1150,
+        "Uttar Pradesh": 1250,
+        "Gujarat": 1100,
+        "Bihar": 1450,
+        "Punjab": 1800,
+        "Haryana": 1650,
+        "Uttarakhand": 1750
+      },
+      "note": "Road km from Hyderabad to each mandi are estimates (via Nagpur on NH44 for the MP mandis) - put your transporter's real distances or quotes in config.json."
+    }
+  ],
   "msp": {
     "value": 2585,
     "season": "RMS 2026-27 (wheat harvested Mar-Jun 2026)",
