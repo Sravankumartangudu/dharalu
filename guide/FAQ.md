@@ -42,6 +42,9 @@ No. The buy / hold / sell call reads the benchmark mandi price (Jabalpur, Indore
 **Are gold and silver dearer in Hyderabad?**
 Dharalu's price is the same: the all-India import price. Local jewellers' rates differ a little by city (their premium), and jewellery adds making charges and GST.
 
+**I picked Hyderabad but the numbers below didn't change.**
+Fixed in 2.4.1. A page opened while 2.4.0 was being published could hold wheat data with only the Srikakulam figures. Now the page downloads the wheat data again when it lacks the place you pick. If an old page is still open, reload it in the browser, or quit and reopen the Mac app. The *Prices from* line should then say "At Hyderabad: …" and the header "landed at Hyderabad".
+
 **Why does the forecast say the price will rise (or fall)?**
 Open 🔮 *Why the forecast says this* on the Timeline or Forecast tab. The move is split into the recent trend, the season and the last few days' average, with the biggest named as the main reason. The forecast reads only the price's own history, so news and policy changes (MSP, duty, US rates…) are not in it. When the card says it is NOT better than "price stays the same", trust the range more than the single number.
 

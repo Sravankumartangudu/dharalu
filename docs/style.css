@@ -44,10 +44,12 @@ a { color: var(--s1); }
 header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--border);
   background: var(--surface); position: sticky; top: 0; z-index: 5; flex-wrap: wrap; }
 header h1 { font-size: 19px; margin: 0; }
-header .sub { color: var(--ink-2); font-size: 13px; }
-header .spacer { flex: 1; }
-header .place { display: flex; flex-direction: row; align-items: center; gap: 4px; font-size: 14px; margin: 0; }
-header .place select { width: auto; min-width: 0; padding: 5px 8px; border-radius: 8px; cursor: pointer; }
+/* The status line takes the free space and wraps inside it; the 📍 picklist + buttons stay one group on the right,
+   so they never jump about when the line is longer on one view than another. */
+header .sub { color: var(--ink-2); font-size: 13px; flex: 1 1 260px; min-width: 0; }
+header .tools { display: flex; align-items: center; gap: 12px; flex: none; margin-left: auto; }
+header .place { display: flex; align-items: center; gap: 4px; font-size: 14px; white-space: nowrap; }
+header .place select { width: 9.5em; padding: 5px 8px; border-radius: 8px; cursor: pointer; }
 button, .btn { font: inherit; border: 1px solid var(--border); background: var(--surface); color: var(--ink);
   border-radius: 8px; padding: 6px 12px; cursor: pointer; }
 button:hover, .btn:hover { background: var(--wash); }
@@ -203,9 +205,9 @@ header h1 .te { font-weight: 500; color: var(--ink-2); font-size: 16px; }
 @media (max-width: 640px) {
   header { padding: 10px 14px; gap: 8px 8px; }
   header h1 { font-size: 18px; }
-  header .spacer { display: none; }
   header .sub { order: 5; flex-basis: 100%; font-size: 12px; }
-  header .place { margin-left: auto; }
+  header .tools { gap: 8px; }
+  header .place select { width: auto; }
   header button, header .btn { padding: 5px 10px; }
   nav { padding: 6px 14px; }
   main { padding: 14px 14px 48px; }

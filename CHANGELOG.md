@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.4.1 - 23 Oct 2026
+
+**📍 The place picklist now always updates the page, and it stays put.**
+- **Picking Hyderabad now changes the numbers below it.** A page opened while 2.4.0 was being published could hold wheat data without the Hyderabad figures, so the picklist changed but the 📍 lines, landed cost and margins stayed on Srikakulam. Now, if the loaded wheat data doesn't have the place you pick, the page downloads it again first. The 5-minute check does the same.
+- **The picklist no longer jumps around.** The header line under the title was a different length on each page (and for each place), so the picklist and buttons moved, or dropped to a second row on *All*. The 📍 picklist, Help, Share and Theme are now one group that always sits top right. The header line wraps beside it.
+- **An open picklist isn't rebuilt under you.** The 5-minute check only rebuilds the options when the list of places changes.
+- **Mac app:** a place picked in the dashboard window now sticks if the page reloads.
+
 ## 2.4.0 - 23 Oct 2026
 
 **📍 Pick your place: Srikakulam or Hyderabad.** Every price follows it.

@@ -847,7 +847,10 @@ final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDel
     }
 
     func userContentController(_ u: WKUserContentController, didReceive m: WKScriptMessage) {
-        if m.name == "dharaluPlace", let k = m.body as? String, !k.isEmpty { Settings.place = k }
+        guard m.name == "dharaluPlace", let k = m.body as? String, !k.isEmpty, k != Settings.place else { return }
+        Settings.place = k
+        // The start-of-page script carries the place too: keep it current so a reload doesn't switch back.
+        if let w = web { Dashboard.addScripts(w.configuration.userContentController) }
     }
 
     func windowWillClose(_ n: Notification) { NSApp.setActivationPolicy(.accessory) }

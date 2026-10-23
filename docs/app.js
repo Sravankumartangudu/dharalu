@@ -1082,7 +1082,7 @@ async function getJSON(p) {
 
 async function load(k, refresh = false) {
   const it = S.items[k], have = D[k];
-  if (have && have.generated_at === it.generated_at) return have;
+  if (have && !refresh && have.generated_at === it.generated_at) return have;
   let a;
   if (k === "wheat") {
     a = await getJSON("data/latest.json");
@@ -1186,6 +1186,7 @@ async function tick() {
     S = s;
     placePicker();
     if (changed) await Promise.all(Object.keys(D).map(k => load(k).catch(() => null)));
+    if (needsPlaceData()) await load("wheat", true).catch(() => null);
     if (C !== "all") { A = D[C]; PX = A._px; SIG = A._sig; }
   } catch { }
   await pollLive();
@@ -1193,17 +1194,23 @@ async function tick() {
   if (C === "all" || ["today", "timeline", "record", "forecast", "watch"].includes(V)) renderView(); else header();
 }
 
+// Options are only rebuilt when the list of places changes, so an open picklist is never pulled from under you.
 function placePicker() {
-  $("#place").innerHTML = placeList().map(p => `<option value="${esc(p.key)}" title="${esc(p.name)}, ${esc(p.state)}">${esc(p.name)}</option>`).join("");
-  $("#place").value = place().key;
+  const sel = $("#place"), html = placeList().map(p => `<option value="${esc(p.key)}" title="${esc(p.name)}, ${esc(p.state)}">${esc(p.name)}</option>`).join("");
+  if (sel.dataset.opts !== html) { sel.innerHTML = html; sel.dataset.opts = html; }
+  if (sel.value !== place().key) sel.value = place().key;
 }
+// Wheat data published before 2.4 (or loaded while it was being published) has only the default place's figures.
+const needsPlaceData = () => D.wheat && !place().default && !(D.wheat.places && D.wheat.places[place().key]);
 // The page's picklist and the Mac app's Settings › Place both land here.
 function setPlace(k, fromPage) {
   if (!placeList().some(p => p.key === k)) return;
   store.set("place", k);
-  $("#place").value = k;
+  if ($("#place").value !== k) $("#place").value = k;
   if (fromPage) try { window.webkit.messageHandlers.dharaluPlace.postMessage(k); } catch { }
-  if (S) renderView();
+  if (!S) return;
+  if (!needsPlaceData()) { renderView(); return; }
+  load("wheat", true).catch(() => null).then(() => { if (C === "wheat") { A = D.wheat; PX = A._px; SIG = A._sig; } renderView(); });
 }
 window.setPlace = setPlace;
 
