@@ -5,4 +5,4 @@ date,score,signal,price,best_source,best_landed
 2026-10-21,-1.5,SELL,2907,Jabalpur APMC,2728
 2026-10-22,-0.5,WAIT,2679,Jabalpur APMC,2779
 2026-10-23,-1.5,SELL,2950,Jabalpur APMC,2916
-2026-10-24,-1.0,SELL,2730,Jabalpur APMC,2832
+2026-10-24,-0.5,HOLD,2731,Jabalpur APMC,2832
