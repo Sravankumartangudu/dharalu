@@ -27,10 +27,10 @@
         "key": "BUY"
       }
     },
-    "wheat_busy_at": "2026-10-25T09:13:07+00:00",
+    "wheat_busy_at": "2026-10-25T10:19:14+00:00",
     "wheat_full_at": "2026-10-25T07:18:25+00:00",
     "wheat_try_at": "2026-10-25T07:18:15+00:00",
-    "wheat_turn": 2
+    "wheat_turn": 1
   },
   "silver": {
     "move_alert_for": "2026-10-22",
