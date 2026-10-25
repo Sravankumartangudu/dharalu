@@ -4,7 +4,7 @@
     "signal": "SELL",
     "weekly": [
       2026,
-      43
+      44
     ]
   },
   "platinum": {
@@ -12,7 +12,7 @@
     "signal": "BUY",
     "weekly": [
       2026,
-      43
+      44
     ]
   },
   "run": {
@@ -27,17 +27,17 @@
         "key": "BUY"
       }
     },
-    "wheat_busy_at": "2026-10-25T13:30:24+00:00",
+    "wheat_busy_at": "2026-10-25T19:28:30+00:00",
     "wheat_full_at": "2026-10-25T14:25:28+00:00",
     "wheat_try_at": "2026-10-25T14:25:12+00:00",
-    "wheat_turn": 3
+    "wheat_turn": 2
   },
   "silver": {
     "move_alert_for": "2026-10-22",
     "signal": "BUY",
     "weekly": [
       2026,
-      43
+      44
     ]
   },
   "wheat": {
