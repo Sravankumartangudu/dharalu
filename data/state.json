@@ -18,19 +18,25 @@
   "run": {
     "shown": {
       "gold": {
-        "key": "SELL"
+        "key": "SELL",
+        "n": 1,
+        "pending": "STRONG_SELL"
       },
       "platinum": {
-        "key": "STRONG_BUY"
+        "key": "STRONG_BUY",
+        "n": 1,
+        "pending": "BUY"
       },
       "silver": {
-        "key": "BUY"
+        "key": "BUY",
+        "n": 1,
+        "pending": "WAIT"
       }
     },
-    "wheat_busy_at": "2026-10-26T12:52:43+00:00",
+    "wheat_busy_at": "2026-10-26T13:26:50+00:00",
     "wheat_full_at": "2026-10-26T11:37:37+00:00",
     "wheat_try_at": "2026-10-26T11:36:59+00:00",
-    "wheat_turn": 1
+    "wheat_turn": 3
   },
   "silver": {
     "move_alert_for": "2026-10-22",
