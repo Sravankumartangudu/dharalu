@@ -15620,7 +15620,7 @@ date,state,district,market,variety,grade,min,max,modal
 2026-10-12,Madhya Pradesh,Damoh,Damoh APMC,Mill Quality,Non-FAQ,2510.0,2550.0,2510.0
 2026-10-12,Madhya Pradesh,Dewas,Dewas APMC,Wheat,FAQ,1785.0,3045.0,2750.0
 2026-10-12,Madhya Pradesh,Harda,Harda APMC,Mill Quality,FAQ,2519.0,2714.0,2662.0
-2026-10-12,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2405.0,3105.0,2881.0
+2026-10-12,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2550.0,3105.0,2881.0
 2026-10-12,Madhya Pradesh,Narmadapuram,Itarsi APMC,Mill Quality,FAQ,2551.0,2698.0,2698.0
 2026-10-12,Madhya Pradesh,Narmadapuram,Itarsi APMC,Wheat,FAQ,2515.0,2690.0,2610.0
 2026-10-12,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2300.0,2700.0,2640.0
@@ -17058,7 +17058,7 @@ date,state,district,market,variety,grade,min,max,modal
 2026-10-20,Uttarakhand,Haridwar,Lakshar APMC,Other,Local,2585.0,2600.0,2590.0
 2026-10-20,West Bengal,Bankura,Bishnupur(Bankura) APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
 2026-10-20,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2750.0,2700.0
-2026-10-21,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2699.0,3216.0,3020.0
+2026-10-21,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2699.0,3195.0,3021.0
 2026-10-21,Rajasthan,Kota,Kota APMC,Local,Local,2800.0,2800.0,2800.0
 2026-10-22,Assam,Kamrup,Fancy Bazaar APMC,Wheat Atta,FAQ,6600.0,9200.0,7600.0
 2026-10-22,Bihar,Sheikhpura,Barbigha APMC,147 Average,FAQ,2600.0,2750.0,2655.0
