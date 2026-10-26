@@ -21,13 +21,15 @@
         "key": "SELL"
       },
       "platinum": {
-        "key": "BUY"
+        "key": "BUY",
+        "n": 1,
+        "pending": "STRONG_BUY"
       },
       "silver": {
         "key": "BUY"
       }
     },
-    "wheat_busy_at": "2026-10-25T21:14:20+00:00",
+    "wheat_busy_at": "2026-10-26T01:05:18+00:00",
     "wheat_full_at": "2026-10-25T20:35:20+00:00",
     "wheat_try_at": "2026-10-25T20:34:24+00:00",
     "wheat_turn": 3
