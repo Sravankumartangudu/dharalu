@@ -24,19 +24,17 @@
         "key": "STRONG_BUY"
       },
       "silver": {
-        "key": "WAIT",
-        "n": 1,
-        "pending": "BUY"
+        "key": "BUY"
       }
     },
-    "wheat_busy_at": "2026-10-26T20:59:50+00:00",
+    "wheat_busy_at": "2026-10-27T06:53:11+00:00",
     "wheat_full_at": "2026-10-26T11:37:37+00:00",
     "wheat_try_at": "2026-10-27T06:34:48+00:00",
-    "wheat_turn": 1
+    "wheat_turn": 2
   },
   "silver": {
     "move_alert_for": "2026-10-22",
-    "signal": "WAIT",
+    "signal": "BUY",
     "weekly": [
       2026,
       44
