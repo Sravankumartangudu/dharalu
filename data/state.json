@@ -9,7 +9,7 @@
   },
   "platinum": {
     "move_alert_for": "2026-10-29",
-    "signal": "STRONG_BUY",
+    "signal": "BUY",
     "weekly": [
       2026,
       44
@@ -21,7 +21,7 @@
         "key": "SELL"
       },
       "platinum": {
-        "key": "STRONG_BUY"
+        "key": "BUY"
       },
       "silver": {
         "key": "BUY"
