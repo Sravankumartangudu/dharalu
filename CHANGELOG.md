@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.5.0 - 29 Oct 2026
+
+**🎨 Pick a design for the dashboard in the Mac app.**
+- **Settings › Style** has 14 designs: Standard, Skeuomorphic, Flat, Material, Neumorphic, Glassmorphism, Liquid Glass, Claymorphism, Neo-brutalism, Swiss minimal, Bento grid, Retro, Aurora and Cyber. Each has a light and a dark look, so Theme still applies. The dashboard window changes at once.
+- With [Nexus](https://github.com/Sravankumartangudu/nexus) 1.12 installed, the Style can also be picked in the common settings (🎨 Style per App). Both always show the same one.
+- In a browser the dashboard keeps its own look.
+
 ## 2.4.1 - 23 Oct 2026
 
 **📍 The place picklist now always updates the page, and it stays put.**

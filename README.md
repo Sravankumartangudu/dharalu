@@ -127,7 +127,7 @@ This repository is already set up and running. To run your own copy, follow **[g
 5. **Run the agent from your Mac:** `scripts/mac-schedule.sh install` (checks every 5 minutes). See [guide/SETUP.md](guide/SETUP.md#8-run-the-agent-from-your-mac-important).
 6. **Edit `config.json`** with your real wheat costs and the metal duty / GST / bank interest: [guide/CONFIG.md](guide/CONFIG.md).
 
-**Mac app:** download `Dharalu-<version>.dmg` from [Releases](https://github.com/Sravankumartangudu/dharalu/releases/latest), drag it to Applications, then on first open use *System Settings → Privacy & Security → Open Anyway*. Details: [guide/MAC_APP.md](guide/MAC_APP.md).
+**Mac app:** download `Dharalu-<version>.dmg` from [Releases](https://github.com/Sravankumartangudu/dharalu/releases/latest), drag it to Applications, then on first open use *System Settings → Privacy & Security → Open Anyway*. Details: [guide/MAC_APP.md](guide/MAC_APP.md). In the Mac app, *Settings › Style* gives the dashboard one of 14 designs (Skeuomorphic, Glassmorphism, Neo-brutalism, Retro, Cyber…), each with a light and a dark look. With Nexus installed it can also be picked in the common settings, and both stay in sync.
 
 ## Use
 

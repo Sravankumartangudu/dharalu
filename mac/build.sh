@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 APP="Dharalu.app"
-VERSION="2.4.1"
+VERSION="2.5.0"
 ARCHS="$(uname -m)"
 [[ "${1:-}" == "--universal" ]] && ARCHS="arm64 x86_64"
 
@@ -14,7 +14,7 @@ ARCHS="$(uname -m)"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
-SRC="main.swift NexusBeacon.swift"
+SRC="main.swift FleetStyles.swift NexusBeacon.swift"
 BINS=()
 for arch in $ARCHS; do
   swiftc -O -target "$arch-apple-macos13.0" \

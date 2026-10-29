@@ -249,6 +249,8 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
             return ("ok", "\(it.label) \(it.signal.label) \(rs(self.now(it)))")
         }
         Settings.applyAppearance()
+        // The 14 design styles: the dashboard wears the pick; Settings › Style or the common settings change it.
+        FleetStyles.start(app: appName)
         installEditMenu()
         let menu = NSMenu()
         menu.delegate = self
@@ -611,10 +613,32 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotifica
         m.addItem(groupHeader("General"))
         m.addItem(switchRow("Launch at login", SMAppService.mainApp.status == .enabled, #selector(switchLogin(_:))))
         m.addItem(segmentRow("Appearance", ["System", "Light", "Dark"], ["system", "light", "dark"].firstIndex(of: Settings.appearance) ?? 0, #selector(segAppearance(_:))))
+        m.addItem(styleItem())
         m.addItem(.separator())
         m.addItem(action("Data Source…", #selector(editSource)))
         it.submenu = m
         return it
+    }
+
+    /// Settings › Style: the design the dashboard wears (the same pick as in the common settings).
+    func styleItem() -> NSMenuItem {
+        let it = NSMenuItem(title: "Style: \(FleetStyles.all.first { $0.id == FleetStyles.pick }?.name ?? "Standard")", action: nil, keyEquivalent: "")
+        let m = NSMenu()
+        for st in FleetStyles.all {
+            let o = action(st.name, #selector(pickStyle(_:)), represented: st.id)
+            o.state = st.id == FleetStyles.pick ? .on : .off
+            o.toolTip = st.blurb
+            m.addItem(o)
+        }
+        m.addItem(.separator())
+        m.addItem(info("Every style has a light and a dark look."))
+        it.submenu = m
+        return it
+    }
+    @objc func pickStyle(_ m: NSMenuItem) {
+        guard let id = m.representedObject as? String else { return }
+        FleetStyles.choose(id)
+        if let w = dashboard.web { Dashboard.addScripts(w.configuration.userContentController) }
     }
 
     // MARK: Settings rows (grouped, with switches and segmented controls)
@@ -801,6 +825,7 @@ final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDel
             // The page's 📍 picklist tells the app, so Settings › Place and the menu follow it.
             cfg.userContentController.add(self, name: "dharaluPlace")
             let w = WKWebView(frame: .zero, configuration: cfg)
+            FleetStyles.wear(w)
             w.navigationDelegate = self
             w.uiDelegate = self
             w.allowsBackForwardNavigationGestures = true
@@ -837,6 +862,9 @@ final class Dashboard: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDel
     static func addScripts(_ u: WKUserContentController) {
         u.removeAllUserScripts()
         u.addUserScript(WKUserScript(source: Settings.themeScript + Settings.placeScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        // The design style (FleetStyles): put back here because this clears every start-of-page script.
+        u.addUserScript(WKUserScript(source: "document.documentElement.setAttribute('data-style','\(FleetStyles.pick)')",
+                                     injectionTime: .atDocumentStart, forMainFrameOnly: true))
     }
 
     /// Switch the open page to the place picked in Settings.
