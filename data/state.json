@@ -1,6 +1,6 @@
 {
   "gold": {
-    "move_alert_for": "2026-10-22",
+    "move_alert_for": "2026-10-30",
     "signal": "STRONG_SELL",
     "weekly": [
       2026,
@@ -18,7 +18,9 @@
   "run": {
     "shown": {
       "gold": {
-        "key": "STRONG_SELL"
+        "key": "STRONG_SELL",
+        "n": 1,
+        "pending": "SELL"
       },
       "platinum": {
         "key": "STRONG_BUY"
@@ -29,7 +31,7 @@
     },
     "wheat_busy_at": "2026-10-30T12:25:37+00:00",
     "wheat_full_at": "2026-10-30T08:15:17+00:00",
-    "wheat_try_at": "2026-10-30T08:14:44+00:00",
+    "wheat_try_at": "2026-10-30T19:06:43+00:00",
     "wheat_turn": 1
   },
   "silver": {
