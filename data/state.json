@@ -30,8 +30,8 @@
       }
     },
     "wheat_busy_at": "2026-10-30T12:25:37+00:00",
-    "wheat_full_at": "2026-10-30T08:15:17+00:00",
-    "wheat_try_at": "2026-10-30T19:06:43+00:00",
+    "wheat_full_at": "2026-10-31T01:51:46+00:00",
+    "wheat_try_at": "2026-10-30T19:46:13+00:00",
     "wheat_turn": 1
   },
   "silver": {
@@ -44,7 +44,7 @@
   },
   "wheat": {
     "move_alert_for": "2026-10-30",
-    "signal": "BUY",
+    "signal": "HOLD",
     "weekly": [
       2026,
       44
