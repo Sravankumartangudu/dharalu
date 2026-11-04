@@ -18370,7 +18370,7 @@ date,state,district,market,variety,grade,min,max,modal
 2026-10-27,Madhya Pradesh,Khandwa,Harsood APMC,Wheat,FAQ,2940.0,3024.0,2951.0
 2026-10-27,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2650.0,3804.0,3100.0
 2026-10-27,Madhya Pradesh,Jabalpur,Jabalpur APMC,Mill Quality,Non-FAQ,2325.0,2500.0,2500.0
-2026-10-27,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,1830.0,2912.0,2750.0
+2026-10-27,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2570.0,2912.0,2740.0
 2026-10-27,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,Non-FAQ,2700.0,2700.0,2700.0
 2026-10-27,Madhya Pradesh,Sagar,Jaisinagar APMC,Mill Quality,FAQ,2630.0,2725.0,2650.0
 2026-10-27,Madhya Pradesh,Tikamgarh,Jatara APMC,Mill Quality,Non-FAQ,2615.0,2701.0,2685.0
@@ -18395,7 +18395,7 @@ date,state,district,market,variety,grade,min,max,modal
 2026-10-27,Rajasthan,Jhalawar,Iklera APMC,Other,Local,2550.0,2990.0,2770.0
 2026-10-27,Rajasthan,Ganganagar,Raisingh Nagar APMC,Other,Non-FAQ,2751.0,2949.0,2860.0
 2026-10-27,Telangana,Sangareddy,Zaheerabad APMC,Local,Local,2420.0,2420.0,2420.0
-2026-10-28,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2200.0,3700.0,2900.0
+2026-10-28,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2200.0,3700.0,3095.0
 2026-10-28,Madhya Pradesh,Indore,Indore APMC,Wheat,Non-FAQ,3400.0,3400.0,3400.0
 2026-10-28,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2550.0,3100.0,2800.0
 2026-10-28,Rajasthan,Kota,Kota APMC,Local,Local,3000.0,3000.0,3000.0
@@ -19706,3 +19706,10 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-03,West Bengal,Nadia,Karimpur APMC,Other,Grade Range-1,2500.0,2650.0,2600.0
 2026-11-03,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2750.0,2700.0
 2026-11-03,West Bengal,Birbhum,Rampurhat APMC,Other,FAQ,2590.0,2610.0,2600.0
+2026-11-04,Madhya Pradesh,Rewa,Chaakghat APMC,Wheat,FAQ,2638.0,2638.0,2638.0
+2026-11-04,Madhya Pradesh,Damoh,Javera APMC,Mill Quality,Non-FAQ,2700.0,2700.0,2700.0
+2026-11-04,Madhya Pradesh,Rajgarh,Jeerapur APMC,Wheat,FAQ,2750.0,2810.0,2800.0
+2026-11-04,Madhya Pradesh,Sidhi,Sidhi APMC,Mill Quality,Non-FAQ,2450.0,2458.0,2458.0
+2026-11-04,Uttar Pradesh,Badaun,Babrala APMC,Dara,Local,2580.0,2600.0,2590.0
+2026-11-04,West Bengal,Bankura,Bishnupur(Bankura) APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
+2026-11-04,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2750.0,2700.0
