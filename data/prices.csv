@@ -20266,5 +20266,40 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-07,West Bengal,Bankura,Bishnupur(Bankura) APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
 2026-11-07,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2750.0,2700.0
 2026-11-09,Bihar,Aurangabad,Aurangabad APMC,Other,Local,2450.0,2850.0,2650.0
+2026-11-09,Madhya Pradesh,Ratlam,A lot APMC,Wheat,FAQ,2410.0,2410.0,2410.0
+2026-11-09,Madhya Pradesh,Rewa,Baikunthpur APMC,Mill Quality,FAQ,2550.0,2600.0,2550.0
+2026-11-09,Madhya Pradesh,Sehore,Baktara APMC,Mill Quality,FAQ,2725.0,2725.0,2725.0
+2026-11-09,Madhya Pradesh,Khargone,Bhikangaon APMC,Wheat,FAQ,2811.0,2900.0,2900.0
+2026-11-09,Madhya Pradesh,Bhopal,Bhopal APMC,Wheat,FAQ,2620.0,2620.0,2620.0
+2026-11-09,Madhya Pradesh,Raisen,Gairatganj APMC,Wheat,Non-FAQ,2620.0,2650.0,2650.0
+2026-11-09,Madhya Pradesh,Bhind,Gohad APMC,Wheat,FAQ,3700.0,3700.0,3700.0
+2026-11-09,Madhya Pradesh,Khandwa,Khandwa APMC,Mill Quality,FAQ,2817.0,2817.0,2817.0
+2026-11-09,Madhya Pradesh,Khargone,Khargone APMC,Wheat,FAQ,3015.0,3015.0,3015.0
+2026-11-09,Madhya Pradesh,Khandwa,Mundi APMC,Wheat,FAQ,2870.0,2910.0,2895.0
+2026-11-09,Madhya Pradesh,Narsinghpur,Narsinghpur APMC,Mill Quality,FAQ,2650.0,2750.0,2700.0
+2026-11-09,Madhya Pradesh,Rajgarh,Sarangpur APMC,Mill Quality,FAQ,2890.0,2910.0,2910.0
+2026-11-09,Maharashtra,Ahilyanagar,APMC Ahilyanagar,Other,FAQ,2950.0,3500.0,3225.0
+2026-11-09,Maharashtra,Thane,APMC Kalyan,Sharbati,FAQ,3500.0,4500.0,4000.0
+2026-11-09,Maharashtra,Nagpur,APMC Nagpur,Other,FAQ,2610.0,2880.0,2812.0
+2026-11-09,Maharashtra,Nagpur,APMC Nagpur,Sharbati,FAQ,3200.0,3500.0,3425.0
+2026-11-09,Maharashtra,Chattrapati Sambhajinagar,APMC Sillod,Other,FAQ,2700.0,3000.0,3000.0
+2026-11-09,Maharashtra,Solapur,APMC Solapur,Sharbati,FAQ,2785.0,4470.0,3760.0
+2026-11-09,Maharashtra,Ahilyanagar,Shevgaon(Bodhegaon),Maharashtra 2189,FAQ,3000.0,3300.0,3000.0
+2026-11-09,Uttar Pradesh,Azamgarh,Azamgarh APMC,Dara,FAQ,2585.0,2585.0,2585.0
+2026-11-09,Uttar Pradesh,Badaun,Babrala APMC,Dara,Local,2430.0,2450.0,2440.0
+2026-11-09,Uttar Pradesh,Deoria,Devariya APMC,Dara,FAQ,2751.11,2751.11,2751.11
+2026-11-09,Uttar Pradesh,Deoria,Devariya APMC,White,FAQ,2780.0,2790.0,2783.18
+2026-11-09,Uttar Pradesh,Amroha,Dhanaura APMC,Dara,FAQ,2650.0,2650.0,2650.0
+2026-11-09,Uttar Pradesh,Lakhimpur,Golagokarnath APMC,PBW-343,FAQ,2400.0,2400.0,2400.0
+2026-11-09,Uttar Pradesh,Amroha,Hasanpur APMC,Dara,FAQ,2600.0,2600.0,2600.0
+2026-11-09,Uttar Pradesh,Jalaun (Orai),Konch APMC,Deshi,FAQ,2459.0,2459.0,2459.0
+2026-11-09,Uttar Pradesh,Sambhal,Muradabad APMC,Other,FAQ,2520.0,2520.0,2520.0
+2026-11-09,Uttar Pradesh,Pratapgarh,Pratapgarh APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-11-09,Uttar Pradesh,Barabanki,Safdarganj APMC,Dara,FAQ,2700.0,2700.0,2700.0
+2026-11-09,Uttar Pradesh,Raebarelli,Salon APMC,Medium,FAQ,2520.0,2520.0,2520.0
+2026-11-09,Uttar Pradesh,Gorakhpur,Sehjanwa APMC,Dara,FAQ,2750.0,2750.0,2750.0
 2026-11-09,West Bengal,Paschim Bardhaman,Asansol APMC,Kalyan,FAQ,2625.0,2850.0,2765.0
+2026-11-09,West Bengal,Bankura,Bishnupur(Bankura) APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
 2026-11-09,West Bengal,Murshidabad,Jangipur APMC,Deshi,FAQ,2600.0,2700.0,2650.0
+2026-11-09,West Bengal,Nadia,Karimpur APMC,Other,Grade Range-1,2600.0,2800.0,2700.0
+2026-11-09,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
