@@ -20265,3 +20265,6 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-07,Uttar Pradesh,Unnao,Unnao APMC,Other,FAQ,2585.0,2585.0,2585.0
 2026-11-07,West Bengal,Bankura,Bishnupur(Bankura) APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
 2026-11-07,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2750.0,2700.0
+2026-11-09,Bihar,Aurangabad,Aurangabad APMC,Other,Local,2450.0,2850.0,2650.0
+2026-11-09,West Bengal,Paschim Bardhaman,Asansol APMC,Kalyan,FAQ,2625.0,2850.0,2765.0
+2026-11-09,West Bengal,Murshidabad,Jangipur APMC,Deshi,FAQ,2600.0,2700.0,2650.0
