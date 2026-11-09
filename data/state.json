@@ -8,7 +8,7 @@
     ]
   },
   "platinum": {
-    "move_alert_for": "2026-11-04",
+    "move_alert_for": "2026-11-09",
     "signal": "BUY",
     "weekly": [
       2026,
@@ -27,10 +27,10 @@
         "key": "WAIT"
       }
     },
-    "wheat_busy_at": "2026-11-09T07:28:19+00:00",
+    "wheat_busy_at": "2026-11-09T08:37:35+00:00",
     "wheat_full_at": "2026-11-09T04:33:17+00:00",
     "wheat_try_at": "2026-11-09T04:33:09+00:00",
-    "wheat_turn": 2
+    "wheat_turn": 1
   },
   "silver": {
     "move_alert_for": "2026-11-04",
