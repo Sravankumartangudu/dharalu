@@ -1,7 +1,7 @@
 {
   "gold": {
     "move_alert_for": "2026-11-04",
-    "signal": "SELL",
+    "signal": "STRONG_SELL",
     "weekly": [
       2026,
       46
@@ -18,7 +18,7 @@
   "run": {
     "shown": {
       "gold": {
-        "key": "SELL"
+        "key": "STRONG_SELL"
       },
       "platinum": {
         "key": "BUY"
