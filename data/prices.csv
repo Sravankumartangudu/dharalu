@@ -20353,3 +20353,32 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-10,Uttar Pradesh,Amethi,Sultanpur APMC,Dara,FAQ,2600.0,2600.0,2600.0
 2026-11-10,West Bengal,Murshidabad,Beldanga APMC,Other,FAQ,2600.0,2700.0,2650.0
 2026-11-10,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
+2026-11-11,Assam,Kamrup,Fancy Bazaar APMC,Wheat Atta,FAQ,6600.0,9200.0,7600.0
+2026-11-11,Madhya Pradesh,Dewas,Dewas APMC,Wheat,FAQ,2640.0,2640.0,2640.0
+2026-11-11,Madhya Pradesh,Katni,Katni APMC,Mill Quality,Non-FAQ,2500.0,2525.0,2525.0
+2026-11-11,Madhya Pradesh,Dhar,Kukshi APMC,Wheat,FAQ,2410.0,2505.0,2505.0
+2026-11-11,Madhya Pradesh,Gwalior,Lashkar APMC,Mill Quality,FAQ,2498.0,2505.0,2505.0
+2026-11-11,Madhya Pradesh,Khandwa,Mundi APMC,Wheat,FAQ,2880.0,2895.0,2895.0
+2026-11-11,Madhya Pradesh,Ratlam,Ratlam APMC,Wheat,FAQ,2773.0,2773.0,2773.0
+2026-11-11,Madhya Pradesh,Ratlam,Ratlam APMC,Wheat,Non-FAQ,2630.0,2660.0,2630.0
+2026-11-11,Madhya Pradesh,Seoni,Seoni APMC,Wheat,Non-FAQ,2675.0,2700.0,2700.0
+2026-11-11,Madhya Pradesh,Mandsaur,Shamgarh APMC,Wheat,FAQ,3200.0,3300.0,3200.0
+2026-11-11,Maharashtra,Ahilyanagar,APMC Rahuri,Other,FAQ,2700.0,2800.0,2750.0
+2026-11-11,Maharashtra,Ahilyanagar,Karjat(Rashin),Other,FAQ,2900.0,3500.0,3300.0
+2026-11-11,Telangana,Adilabad,Boath APMC,147 Average,Local,2600.0,2600.0,2600.0
+2026-11-11,Uttar Pradesh,Azamgarh,Azamgarh APMC,Dara,FAQ,2585.0,2585.0,2585.0
+2026-11-11,Uttar Pradesh,Lucknow,Banthara APMC,Dara,FAQ,2721.0,2721.0,2721.0
+2026-11-11,Uttar Pradesh,Barabanki,Barabanki APMC,Dara,FAQ,2700.0,2700.0,2700.0
+2026-11-11,Uttar Pradesh,Fatehpur,Bindki APMC,Other,FAQ,2700.0,2700.0,2700.0
+2026-11-11,Uttar Pradesh,Gorakhpur,Gorakhpur APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-11-11,Uttar Pradesh,Sant Kabir Nagar,Khalilabad APMC,Dara,FAQ,2790.0,2790.0,2790.0
+2026-11-11,Uttar Pradesh,Lalitpur,Lalitpur APMC,Other,FAQ,2500.0,2500.0,2500.0
+2026-11-11,Uttar Pradesh,Ayodhya,Rudauli APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-11-11,Uttar Pradesh,Kanpur Dehat,Rura APMC,Dara,FAQ,2450.0,2450.0,2450.0
+2026-11-11,Uttar Pradesh,Kanpur Dehat,Rura APMC,Deshi,FAQ,2450.0,2450.0,2450.0
+2026-11-11,Uttar Pradesh,Kanpur Dehat,Rura APMC,Kalawal,FAQ,2450.0,2450.0,2450.0
+2026-11-11,Uttar Pradesh,Barabanki,Safdarganj APMC,Dara,FAQ,2700.0,2700.0,2700.0
+2026-11-11,Uttar Pradesh,Barabanki,Safdarganj APMC,Other,FAQ,2700.0,2700.0,2700.0
+2026-11-11,Uttar Pradesh,Siddharth Nagar,Sahiyapur APMC,Dara,FAQ,2430.0,2430.0,2430.0
+2026-11-11,Uttar Pradesh,Siddharth Nagar,Sahiyapur APMC,Sharbati,FAQ,2430.0,2430.0,2430.0
+2026-11-11,Uttar Pradesh,Ghazipur,Yusufpur APMC,Dara,FAQ,2425.0,2430.0,2427.38
