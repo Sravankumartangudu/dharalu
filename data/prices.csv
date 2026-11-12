@@ -20549,3 +20549,30 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-11,West Bengal,Murshidabad,Jangipur APMC,Deshi,FAQ,2625.0,2750.0,2700.0
 2026-11-11,West Bengal,Murshidabad,Kasimbazar APMC,Sonalika,FAQ,2700.0,2800.0,2750.0
 2026-11-11,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
+2026-11-12,Assam,Kamrup,Fancy Bazaar APMC,Wheat Atta,FAQ,6600.0,9200.0,7600.0
+2026-11-12,Gujarat,Gir Somnath,Veraval APMC,Medium Fine,FAQ,2755.0,3370.0,3250.0
+2026-11-12,Madhya Pradesh,Khargone,Bhikangaon APMC,Wheat,FAQ,2550.0,2600.0,2600.0
+2026-11-12,Madhya Pradesh,Narsinghpur,Gadarwada APMC,Mill Quality,FAQ,2500.0,2550.0,2550.0
+2026-11-12,Madhya Pradesh,Shivpuri,Karera APMC,Mill Quality,Non-FAQ,2640.0,2665.0,2665.0
+2026-11-12,Madhya Pradesh,Khandwa,Mundi APMC,Wheat,FAQ,2850.0,2875.0,2875.0
+2026-11-12,Madhya Pradesh,Rewa,Rewa APMC,Mill Quality,FAQ,2610.0,2610.0,2610.0
+2026-11-12,Madhya Pradesh,Sidhi,Sidhi APMC,Mill Quality,Non-FAQ,2400.0,2465.0,2465.0
+2026-11-12,Uttar Pradesh,Ambedkarnagar,Akbarpur APMC,Other,FAQ,2700.0,2700.0,2700.0
+2026-11-12,Uttar Pradesh,Banda,Atarra APMC,Deshi,FAQ,2500.0,2500.0,2500.0
+2026-11-12,Uttar Pradesh,Azamgarh,Azamgarh APMC,Dara,FAQ,2585.0,2585.0,2585.0
+2026-11-12,Uttar Pradesh,Raebarelli,Bachranwa APMC,Dara,FAQ,2480.0,2480.0,2480.0
+2026-11-12,Uttar Pradesh,Basti,Basti APMC,Dara,FAQ,2650.0,2700.0,2676.25
+2026-11-12,Uttar Pradesh,Deoria,Devariya APMC,Dara,FAQ,2650.0,2670.0,2656.43
+2026-11-12,Uttar Pradesh,Jalaun (Orai),Jalaun APMC,Mill Quality,FAQ,2650.0,2650.0,2650.0
+2026-11-12,Uttar Pradesh,Fatehpur,Khaga APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-11-12,Uttar Pradesh,Sant Kabir Nagar,Khalilabad APMC,Dara,FAQ,2550.0,2550.0,2550.0
+2026-11-12,Uttar Pradesh,Lalitpur,Lalitpur APMC,Other,FAQ,2490.0,2630.0,2573.85
+2026-11-12,Uttar Pradesh,Sitapur,Maholi APMC,Dara,FAQ,2510.0,2510.0,2510.0
+2026-11-12,Uttar Pradesh,Khiri (Lakhimpur),Maigalganj APMC,Dara,FAQ,2700.0,2700.0,2700.0
+2026-11-12,Uttar Pradesh,Hamirpur,Maudaha APMC,Deshi,FAQ,2600.0,2600.0,2600.0
+2026-11-12,Uttar Pradesh,Balrampur,Panchpedwa APMC,Dara,FAQ,2380.0,2380.0,2380.0
+2026-11-12,Uttar Pradesh,Shravasti,Payagpur APMC,Other,FAQ,2600.0,2600.0,2600.0
+2026-11-12,Uttar Pradesh,Barabanki,Safdarganj APMC,Dara,FAQ,2700.0,2700.0,2700.0
+2026-11-12,Uttar Pradesh,Barabanki,Safdarganj APMC,Other,FAQ,2700.0,2700.0,2700.0
+2026-11-12,Uttar Pradesh,Ghazipur,Saidpur APMC,Other,FAQ,2450.0,2450.0,2450.0
+2026-11-12,Uttar Pradesh,Raebarelli,Salon APMC,Dara,FAQ,2600.0,2600.0,2600.0
