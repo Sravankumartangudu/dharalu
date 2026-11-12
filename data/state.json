@@ -1,6 +1,6 @@
 {
   "gold": {
-    "move_alert_for": "2026-11-04",
+    "move_alert_for": "2026-11-12",
     "signal": "SELL",
     "weekly": [
       2026,
@@ -27,13 +27,13 @@
         "key": "WAIT"
       }
     },
-    "wheat_busy_at": "2026-11-12T12:22:59+00:00",
+    "wheat_busy_at": "2026-11-12T13:02:14+00:00",
     "wheat_full_at": "2026-11-12T05:34:36+00:00",
-    "wheat_try_at": "2026-11-12T12:04:51+00:00",
-    "wheat_turn": 2
+    "wheat_try_at": "2026-11-12T13:36:20+00:00",
+    "wheat_turn": 3
   },
   "silver": {
-    "move_alert_for": "2026-11-11",
+    "move_alert_for": "2026-11-12",
     "signal": "WAIT",
     "weekly": [
       2026,
