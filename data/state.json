@@ -27,10 +27,10 @@
         "key": "WAIT"
       }
     },
-    "wheat_busy_at": "2026-11-12T06:40:44+00:00",
+    "wheat_busy_at": "2026-11-12T08:40:08+00:00",
     "wheat_full_at": "2026-11-12T05:34:36+00:00",
     "wheat_try_at": "2026-11-12T05:34:31+00:00",
-    "wheat_turn": 1
+    "wheat_turn": 3
   },
   "silver": {
     "move_alert_for": "2026-11-11",
