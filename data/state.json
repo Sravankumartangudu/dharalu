@@ -30,7 +30,7 @@
     "wheat_busy_at": "2026-11-11T21:09:42+00:00",
     "wheat_full_at": "2026-11-11T23:32:08+00:00",
     "wheat_try_at": "2026-11-11T23:31:30+00:00",
-    "wheat_turn": 3
+    "wheat_turn": 1
   },
   "silver": {
     "move_alert_for": "2026-11-11",
