@@ -4,7 +4,7 @@
     "signal": "HOLD",
     "weekly": [
       2026,
-      46
+      47
     ]
   },
   "platinum": {
@@ -12,7 +12,7 @@
     "signal": "BUY",
     "weekly": [
       2026,
-      46
+      47
     ]
   },
   "run": {
@@ -29,7 +29,7 @@
     },
     "wheat_busy_at": "2026-11-14T00:23:01+00:00",
     "wheat_full_at": "2026-11-14T01:15:20+00:00",
-    "wheat_try_at": "2026-11-15T14:29:53+00:00",
+    "wheat_try_at": "2026-11-15T19:40:07+00:00",
     "wheat_turn": 1
   },
   "silver": {
@@ -37,7 +37,7 @@
     "signal": "WAIT",
     "weekly": [
       2026,
-      46
+      47
     ]
   },
   "wheat": {
@@ -45,7 +45,7 @@
     "signal": "STRONG_SELL",
     "weekly": [
       2026,
-      46
+      47
     ]
   }
 }
