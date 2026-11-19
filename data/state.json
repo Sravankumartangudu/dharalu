@@ -18,7 +18,9 @@
   "run": {
     "shown": {
       "gold": {
-        "key": "BUY"
+        "key": "BUY",
+        "n": 1,
+        "pending": "HOLD"
       },
       "platinum": {
         "key": "STRONG_BUY"
