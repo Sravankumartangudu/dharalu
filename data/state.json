@@ -24,12 +24,14 @@
         "key": "STRONG_BUY"
       },
       "silver": {
-        "key": "BUY"
+        "key": "BUY",
+        "n": 1,
+        "pending": "STRONG_BUY"
       }
     },
-    "wheat_busy_at": "2026-11-20T11:53:48+00:00",
+    "wheat_busy_at": "2026-11-20T12:39:11+00:00",
     "wheat_full_at": "2026-11-20T06:51:24+00:00",
-    "wheat_try_at": "2026-11-20T06:49:11+00:00",
+    "wheat_try_at": "2026-11-20T13:13:05+00:00",
     "wheat_turn": 2
   },
   "silver": {
