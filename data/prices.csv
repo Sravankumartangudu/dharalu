@@ -23123,3 +23123,37 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-21,Uttarakhand,Haridwar,Lakshar APMC,Other,Local,2585.0,2600.0,2600.0
 2026-11-21,West Bengal,Bankura,Bishnupur(Bankura) APMC,Sonalika,FAQ,2600.0,2750.0,2700.0
 2026-11-21,West Bengal,Bankura,Khatra APMC,Sonalika,FAQ,2600.0,2800.0,2700.0
+2026-11-22,Bihar,Aurangabad,Aurangabad APMC,Other,Local,2450.0,2850.0,2650.0
+2026-11-22,Madhya Pradesh,Morena,Banmorkalan APMC,Wheat,Non-FAQ,2750.0,2750.0,2750.0
+2026-11-22,Madhya Pradesh,Rewa,Chaakghat APMC,Mill Quality,FAQ,2650.0,2650.0,2650.0
+2026-11-22,Madhya Pradesh,Dewas,Kannod APMC,Wheat,FAQ,2611.0,2801.0,2801.0
+2026-11-22,Madhya Pradesh,Khargone,Kasrawad APMC,Wheat Mix,Non-FAQ,3000.0,3000.0,3000.0
+2026-11-22,Madhya Pradesh,Katni,Katni APMC,Local,FAQ,2610.0,2610.0,2610.0
+2026-11-22,Madhya Pradesh,Katni,Katni APMC,Mill Quality,Non-FAQ,2600.0,2600.0,2600.0
+2026-11-22,Madhya Pradesh,Satna,Satna APMC,Mill Quality,FAQ,2530.0,2530.0,2530.0
+2026-11-22,Madhya Pradesh,Dindori,Shahpura Niwas APMC,Mill Quality,FAQ,2575.0,2575.0,2575.0
+2026-11-22,Madhya Pradesh,Sidhi,Sidhi APMC,Mill Quality,Non-FAQ,2420.0,2435.0,2435.0
+2026-11-22,Uttar Pradesh,Ambedkarnagar,Akbarpur APMC,Dara,FAQ,2700.0,2700.0,2700.0
+2026-11-22,Uttar Pradesh,Ayodhya,Ayodhya APMC,Dara Mill Quality,FAQ,2700.0,2700.0,2700.0
+2026-11-22,Uttar Pradesh,Ayodhya,Ayodhya APMC,Other,FAQ,2510.0,2510.0,2510.0
+2026-11-22,Uttar Pradesh,Azamgarh,Azamgarh APMC,Dara,FAQ,2585.0,2600.0,2596.56
+2026-11-22,Uttar Pradesh,Azamgarh,Azamgarh APMC,Local,FAQ,2585.0,2585.0,2585.0
+2026-11-22,Uttar Pradesh,Raebarelli,Bachranwa APMC,Dara,FAQ,2450.0,2455.0,2453.99
+2026-11-22,Uttar Pradesh,Barabanki,Barabanki APMC,Dara,FAQ,2750.0,2750.0,2750.0
+2026-11-22,Uttar Pradesh,Basti,Basti APMC,Dara,FAQ,2450.0,2450.0,2450.0
+2026-11-22,Uttar Pradesh,Badaun,Dataganj APMC,PBW-343,FAQ,2500.0,2500.0,2500.0
+2026-11-22,Uttar Pradesh,Shahjahanpur,Jalalabad APMC,Other,FAQ,2550.0,2550.0,2550.0
+2026-11-22,Uttar Pradesh,Raebarelli,Lalganj APMC,Dara,FAQ,2600.0,2600.0,2600.0
+2026-11-22,Uttar Pradesh,Jalaun (Orai),Madhogarh APMC,Dara,FAQ,2650.0,2650.0,2650.0
+2026-11-22,Uttar Pradesh,Chitrakut,Mau(Chitrakut) APMC,Medium,FAQ,2600.0,2600.0,2600.0
+2026-11-22,Uttar Pradesh,Jhansi,Mauranipur APMC,Medium,FAQ,2600.0,2600.0,2600.0
+2026-11-22,Uttar Pradesh,Shahjahanpur,Meeranpur Katra APMC,Dara,FAQ,2525.0,2525.0,2525.0
+2026-11-22,Uttar Pradesh,Bahraich,Naanpara APMC,Medium,FAQ,2500.0,2500.0,2500.0
+2026-11-22,Uttar Pradesh,Pratapgarh,Pratapgarh APMC,Dara,FAQ,2500.0,2500.0,2500.0
+2026-11-22,Uttar Pradesh,Prayagraj,Prayagraj APMC,Dara,FAQ,2250.0,2250.0,2250.0
+2026-11-22,Uttar Pradesh,Raebarelli,Raibareilly APMC,Dara,FAQ,2550.0,2570.0,2564.34
+2026-11-22,Uttar Pradesh,Kanpur Dehat,Rura APMC,Other,FAQ,2550.0,2550.0,2550.0
+2026-11-22,Uttar Pradesh,Barabanki,Safdarganj APMC,Dara,FAQ,2700.0,2700.0,2700.0
+2026-11-22,Uttar Pradesh,Siddharth Nagar,Sahiyapur APMC,Medium,FAQ,2430.0,2430.0,2430.0
+2026-11-22,Uttar Pradesh,Balrampur,Utraula APMC,Medium,FAQ,2450.0,2450.0,2450.0
+2026-11-22,Uttar Pradesh,Badaun,Wazirganj APMC,Other,FAQ,2650.0,2650.0,2650.0
