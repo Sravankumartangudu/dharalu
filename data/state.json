@@ -4,7 +4,7 @@
     "signal": "HOLD",
     "weekly": [
       2026,
-      47
+      48
     ]
   },
   "platinum": {
@@ -12,7 +12,7 @@
     "signal": "STRONG_BUY",
     "weekly": [
       2026,
-      47
+      48
     ]
   },
   "run": {
@@ -27,7 +27,7 @@
         "key": "STRONG_BUY"
       }
     },
-    "wheat_busy_at": "2026-11-22T15:40:23+00:00",
+    "wheat_busy_at": "2026-11-22T17:50:31+00:00",
     "wheat_full_at": "2026-11-22T14:37:23+00:00",
     "wheat_try_at": "2026-11-22T14:37:03+00:00",
     "wheat_turn": 2
@@ -37,7 +37,7 @@
     "signal": "STRONG_BUY",
     "weekly": [
       2026,
-      47
+      48
     ]
   },
   "wheat": {
