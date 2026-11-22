@@ -23127,7 +23127,7 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-22,Madhya Pradesh,Ratlam,A lot APMC,Wheat,FAQ,2600.0,2600.0,2600.0
 2026-11-22,Madhya Pradesh,Shajapur,Agar APMC,Wheat,FAQ,2760.0,2760.0,2760.0
 2026-11-22,Madhya Pradesh,Bhind,Alampur APMC,Wheat,Non-FAQ,2700.0,2750.0,2750.0
-2026-11-22,Madhya Pradesh,Maihar,Amarpatan APMC,Mill Quality,FAQ,2620.0,2620.0,2620.0
+2026-11-22,Madhya Pradesh,Maihar,Amarpatan APMC,Mill Quality,FAQ,2620.0,2660.0,2660.0
 2026-11-22,Madhya Pradesh,Sehore,Ashta APMC,Wheat,FAQ,2700.0,2780.0,2700.0
 2026-11-22,Madhya Pradesh,Narmadapuram,Babai (Makhan Nagar) APMC,Mill Quality,Non-FAQ,2755.0,2755.0,2755.0
 2026-11-22,Madhya Pradesh,Narmadapuram,Babai (Makhan Nagar) APMC,Mill Quality,FAQ,2725.0,2850.0,2850.0
@@ -23135,10 +23135,10 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-22,Madhya Pradesh,Rewa,Baikunthpur APMC,Wheat,Non-FAQ,2600.0,2600.0,2600.0
 2026-11-22,Madhya Pradesh,Sagar,Banda APMC,Wheat,Non-FAQ,2610.0,2630.0,2630.0
 2026-11-22,Madhya Pradesh,Morena,Banmorkalan APMC,Wheat,Non-FAQ,2750.0,2750.0,2750.0
-2026-11-22,Madhya Pradesh,Shehdol,Beohari APMC,Mill Quality,FAQ,2540.0,2570.0,2570.0
+2026-11-22,Madhya Pradesh,Shehdol,Beohari APMC,Mill Quality,FAQ,2540.0,2660.0,2660.0
 2026-11-22,Madhya Pradesh,Mandsaur,Bhanpura APMC,Mill Quality,Non-FAQ,2800.0,2800.0,2800.0
 2026-11-22,Madhya Pradesh,Sehore,Bherunda (Nasrullaganj) APMC,Wheat,Non-FAQ,2800.0,2825.0,2825.0
-2026-11-22,Madhya Pradesh,Khargone,Bhikangaon APMC,Wheat,FAQ,2700.0,3098.0,3098.0
+2026-11-22,Madhya Pradesh,Khargone,Bhikangaon APMC,Wheat,FAQ,2700.0,3125.0,3125.0
 2026-11-22,Madhya Pradesh,Rajgarh,Biaora APMC,Wheat,FAQ,2500.0,3085.0,2880.0
 2026-11-22,Madhya Pradesh,Rewa,Chaakghat APMC,Mill Quality,FAQ,2525.0,2710.0,2630.0
 2026-11-22,Madhya Pradesh,Ashoknagar,Chanderi APMC,Mill Quality,Non-FAQ,2700.0,2700.0,2700.0
@@ -23153,7 +23153,7 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-22,Madhya Pradesh,Mauganj,Hanumana APMC,Mill Quality,FAQ,2400.0,2400.0,2400.0
 2026-11-22,Madhya Pradesh,Khandwa,Harsood APMC,Mill Quality,Non-FAQ,2810.0,2810.0,2810.0
 2026-11-22,Madhya Pradesh,Khandwa,Harsood APMC,Wheat,FAQ,2803.0,2831.0,2831.0
-2026-11-22,Madhya Pradesh,Tikamgarh,Jatara APMC,Wheat,Non-FAQ,2675.0,2720.0,2675.0
+2026-11-22,Madhya Pradesh,Tikamgarh,Jatara APMC,Wheat,Non-FAQ,2670.0,2720.0,2675.0
 2026-11-22,Madhya Pradesh,Rajgarh,Jeerapur APMC,Wheat,FAQ,2775.0,2775.0,2775.0
 2026-11-22,Madhya Pradesh,Dewas,Kannod APMC,Wheat,FAQ,2611.0,2801.0,2801.0
 2026-11-22,Madhya Pradesh,Khargone,Kasrawad APMC,Wheat Mix,Non-FAQ,3000.0,3000.0,3000.0
@@ -23167,14 +23167,17 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-22,Madhya Pradesh,Dhar,Kukshi APMC,Wheat,FAQ,2900.0,2925.0,2900.0
 2026-11-22,Madhya Pradesh,Bhind,Lahar APMC,Wheat,FAQ,2650.0,2797.0,2750.0
 2026-11-22,Madhya Pradesh,Gwalior,Lashkar APMC,Mill Quality,FAQ,2500.0,2525.0,2500.0
+2026-11-22,Madhya Pradesh,Gwalior,Lashkar APMC,Wheat,FAQ,2820.0,2875.0,2875.0
 2026-11-22,Madhya Pradesh,Chhatarpur,LavKush Nagar(Laundi) APMC,Mill Quality,FAQ,2570.0,2600.0,2600.0
 2026-11-22,Madhya Pradesh,Maihar,Maihar APMC,Local,Non-FAQ,2580.0,2690.0,2650.0
+2026-11-22,Madhya Pradesh,Maihar,Maihar APMC,Local,FAQ,2550.0,2600.0,2600.0
 2026-11-22,Madhya Pradesh,Maihar,Maihar APMC,Wheat,Non-FAQ,2600.0,2625.0,2625.0
 2026-11-22,Madhya Pradesh,Dhar,Manawar APMC,Wheat,Non-FAQ,3000.0,3000.0,3000.0
 2026-11-22,Madhya Pradesh,Mandla,Mandla APMC,Local,Non-FAQ,2400.0,2607.0,2607.0
 2026-11-22,Madhya Pradesh,Mandla,Mandla APMC,Mill Quality,FAQ,2525.0,2540.0,2540.0
 2026-11-22,Madhya Pradesh,Balaghat,Mohgaon APMC,Mill Quality,FAQ,2525.0,2528.0,2528.0
-2026-11-22,Madhya Pradesh,Bhind,Mow APMC,Wheat,Non-FAQ,2700.0,2740.0,2740.0
+2026-11-22,Madhya Pradesh,Bhind,Mow APMC,Wheat,Non-FAQ,2690.0,2740.0,2700.0
+2026-11-22,Madhya Pradesh,Satna,Nagod APMC,Wheat,FAQ,2650.0,2660.0,2660.0
 2026-11-22,Madhya Pradesh,Agar Malwa,Nalkheda APMC,Wheat,FAQ,2700.0,2880.0,2850.0
 2026-11-22,Madhya Pradesh,Narsinghpur,Narsinghpur APMC,Mill Quality,FAQ,2700.0,2700.0,2700.0
 2026-11-22,Madhya Pradesh,Raisen,Obedullaganj APMC,Local,FAQ,2700.0,2705.0,2705.0
@@ -23187,17 +23190,20 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-22,Madhya Pradesh,Satna,Satna APMC,Mill Quality,FAQ,2530.0,2650.0,2650.0
 2026-11-22,Madhya Pradesh,Satna,Satna APMC,Wheat,Non-FAQ,2602.0,2612.0,2612.0
 2026-11-22,Madhya Pradesh,Satna,Satna APMC,Wheat,FAQ,2500.0,2700.0,2700.0
+2026-11-22,Madhya Pradesh,Sehore,Sehore APMC,Wheat,FAQ,2700.0,2700.0,2700.0
 2026-11-22,Madhya Pradesh,Seoni,Seoni APMC,Wheat,FAQ,2650.0,2665.0,2665.0
 2026-11-22,Madhya Pradesh,Sagar,Shahagarh APMC,Wheat,FAQ,2550.0,2590.0,2590.0
 2026-11-22,Madhya Pradesh,Shehdol,Shahdol APMC,Wheat,Non-FAQ,2500.0,2675.0,2500.0
 2026-11-22,Madhya Pradesh,Dindori,Shahpura Niwas APMC,Mill Quality,FAQ,2575.0,2575.0,2575.0
-2026-11-22,Madhya Pradesh,Vidisha,Shamshabad APMC,Mill Quality,FAQ,2670.0,2675.0,2675.0
+2026-11-22,Madhya Pradesh,Vidisha,Shamshabad APMC,Mill Quality,FAQ,2670.0,2675.0,2670.0
 2026-11-22,Madhya Pradesh,Sehore,Shyampur APMC,Mill Quality,FAQ,2701.0,2702.0,2702.0
-2026-11-22,Madhya Pradesh,Sidhi,Sidhi APMC,Mill Quality,Non-FAQ,2410.0,2450.0,2435.0
+2026-11-22,Madhya Pradesh,Sidhi,Sidhi APMC,Mill Quality,Non-FAQ,2410.0,2540.0,2425.0
 2026-11-22,Madhya Pradesh,Sidhi,Sidhi APMC,Wheat,Non-FAQ,2410.0,2430.0,2430.0
 2026-11-22,Madhya Pradesh,Singroli,Singroli APMC,Wheat,Non-FAQ,2400.0,2400.0,2400.0
 2026-11-22,Madhya Pradesh,Vidisha,Sironj APMC,Wheat,FAQ,4200.0,4200.0,4200.0
 2026-11-22,Madhya Pradesh,Agar Malwa,Soyatkalan APMC,Wheat,Non-FAQ,2750.0,2800.0,2800.0
+2026-11-22,Madhya Pradesh,Rajgarh,Suthalia APMC,Wheat,FAQ,2700.0,2750.0,2750.0
+2026-11-22,Madhya Pradesh,Umariya,Umariya APMC,Local,Non-FAQ,2625.0,2625.0,2625.0
 2026-11-22,Madhya Pradesh,Umariya,Umariya APMC,Mill Quality,FAQ,2390.0,2410.0,2400.0
 2026-11-22,Madhya Pradesh,Umariya,Umariya APMC,Other,Non-FAQ,2500.0,2500.0,2500.0
 2026-11-22,Madhya Pradesh,Umariya,Umariya APMC,Wheat,Non-FAQ,2650.0,2650.0,2650.0
@@ -23235,3 +23241,4 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-22,Uttar Pradesh,Balrampur,Utraula APMC,Medium,FAQ,2450.0,2450.0,2450.0
 2026-11-22,Uttar Pradesh,Badaun,Wazirganj APMC,Other,FAQ,2650.0,2650.0,2650.0
 2026-11-22,West Bengal,Bankura,Bishnupur(Bankura) APMC,Sonalika,FAQ,2585.0,2700.0,2650.0
+2026-11-22,West Bengal,Birbhum,Rampurhat APMC,Other,FAQ,2750.0,2800.0,2780.0
