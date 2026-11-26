@@ -1,7 +1,7 @@
 {
   "gold": {
     "move_alert_for": "2026-11-26",
-    "signal": "HOLD",
+    "signal": "SELL",
     "weekly": [
       2026,
       48
@@ -18,7 +18,7 @@
   "run": {
     "shown": {
       "gold": {
-        "key": "HOLD"
+        "key": "SELL"
       },
       "platinum": {
         "key": "STRONG_BUY"
@@ -27,7 +27,7 @@
         "key": "STRONG_BUY"
       }
     },
-    "wheat_busy_at": "2026-11-26T07:15:08+00:00",
+    "wheat_busy_at": "2026-11-26T08:45:17+00:00",
     "wheat_full_at": "2026-11-26T04:13:59+00:00",
     "wheat_try_at": "2026-11-26T03:06:09+00:00",
     "wheat_turn": 3
