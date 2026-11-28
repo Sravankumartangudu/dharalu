@@ -28,9 +28,9 @@
       }
     },
     "wheat_busy_at": "2026-11-28T15:58:11+00:00",
-    "wheat_full_at": "2026-11-28T11:14:48+00:00",
-    "wheat_try_at": "2026-11-28T09:22:58+00:00",
-    "wheat_turn": 3
+    "wheat_full_at": "2026-11-28T17:17:49+00:00",
+    "wheat_try_at": "2026-11-28T17:17:01+00:00",
+    "wheat_turn": 2
   },
   "silver": {
     "move_alert_for": "2026-11-27",
