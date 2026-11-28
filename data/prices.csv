@@ -21491,10 +21491,10 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-16,Madhya Pradesh,Khandwa,Harsood APMC,Wheat,FAQ,2851.0,2866.0,2866.0
 2026-11-16,Madhya Pradesh,Sehore,Ichhawar APMC,Wheat,FAQ,2650.0,3290.0,2900.0
 2026-11-16,Madhya Pradesh,Sehore,Ichhawar APMC,Wheat Mix,FAQ,2859.0,2859.0,2859.0
-2026-11-16,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,1600.0,3737.0,2981.0
+2026-11-16,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,1705.0,3737.0,2981.0
 2026-11-16,Madhya Pradesh,Ashoknagar,Isagarh APMC,Wheat,FAQ,2525.0,2525.0,2525.0
 2026-11-16,Madhya Pradesh,Narmadapuram,Itarsi APMC,Wheat,FAQ,1680.0,2991.0,2851.0
-2026-11-16,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2121.0,3060.0,2651.0
+2026-11-16,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2121.0,3060.0,2600.0
 2026-11-16,Madhya Pradesh,Ratlam,Jaora APMC,Wheat,FAQ,2326.0,3661.0,3100.0
 2026-11-16,Madhya Pradesh,Tikamgarh,Jatara APMC,Mill Quality,Non-FAQ,2620.0,2660.0,2620.0
 2026-11-16,Madhya Pradesh,Tikamgarh,Jatara APMC,Wheat,Non-FAQ,2612.0,2647.0,2647.0
@@ -22454,7 +22454,7 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-20,Madhya Pradesh,Khandwa,Harsood APMC,Wheat,FAQ,2751.0,2898.0,2871.0
 2026-11-20,Madhya Pradesh,Khandwa,Harsood APMC,Wheat,Non-FAQ,2800.0,2800.0,2800.0
 2026-11-20,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,500.0,3750.0,2941.0
-2026-11-20,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2400.0,3081.0,2800.0
+2026-11-20,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2400.0,3081.0,2775.0
 2026-11-20,Madhya Pradesh,Ratlam,Jaora APMC,Wheat,FAQ,2323.0,3940.0,3200.0
 2026-11-20,Madhya Pradesh,Tikamgarh,Jatara APMC,Mill Quality,Non-FAQ,2710.0,2728.0,2724.0
 2026-11-20,Madhya Pradesh,Tikamgarh,Jatara APMC,Wheat,Non-FAQ,2620.0,2734.0,2643.0
@@ -24185,7 +24185,8 @@ date,state,district,market,variety,grade,min,max,modal
 2026-11-27,Madhya Pradesh,Indore,Gautampura APMC,Wheat,FAQ,2891.0,2891.0,2891.0
 2026-11-27,Madhya Pradesh,Guna,Guna APMC,Wheat,FAQ,2805.0,3335.0,3335.0
 2026-11-27,Madhya Pradesh,Harda,Harda APMC,Mill Quality,FAQ,2376.0,2830.0,2600.0
-2026-11-27,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2891.0,3670.0,3670.0
+2026-11-27,Madhya Pradesh,Indore,Indore APMC,Wheat,FAQ,2200.0,3670.0,2900.0
+2026-11-27,Madhya Pradesh,Jabalpur,Jabalpur APMC,Wheat,FAQ,2251.0,2861.0,2700.0
 2026-11-27,Madhya Pradesh,Ratlam,Jaora APMC,Wheat,FAQ,3204.0,3434.0,3434.0
 2026-11-27,Madhya Pradesh,Shajapur,Kalapipal APMC,Wheat,FAQ,2631.0,3168.0,3168.0
 2026-11-27,Madhya Pradesh,Shivpuri,Karera APMC,Mill Quality,FAQ,2200.0,2420.0,2390.0
